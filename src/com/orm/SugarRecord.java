@@ -2,12 +2,17 @@ package com.orm;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.orm.dsl.Collection.list;
 
@@ -60,18 +65,100 @@ public class SugarRecord<T> {
         database.closeDB();
     }
 
-    public static <T extends SugarRecord> T findById(Context context, Class<T> type, Long id){
-        T entity = null;
-        try {
-            entity = type.newInstance();
-        } catch (InstantiationException e) {
-            Log.e("Sugar", e.getMessage());
-        } catch (IllegalAccessException e) {
-            Log.e("Sugar", e.getMessage());
-        }
-
-        return null;
+    public static <T extends SugarRecord> List<T> listAll(Context context, Class<T> type){
+        return find(context,type, null,null,null,null,null);
     }
+
+    public static <T extends SugarRecord> T findById(Context context, Class<T> type, Long id){
+        List<T> list = find(context, type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        if(list.isEmpty()) return null;
+        return list.get(0);
+    }
+
+    public static <T extends SugarRecord> List<T> find(Context context, Class<T> type,
+                        String whereClause, String[] whereArgs,
+                        String groupBy, String orderBy, String limit){
+        Database db = ((SugarApp) context.getApplicationContext()).database;
+        SQLiteDatabase sqLiteDatabase = db.openDB();
+        T entity;
+                List<T> toRet = list();
+                Cursor c = sqLiteDatabase.query(getTableName(type), null,
+                                whereClause, whereArgs, groupBy, null, orderBy, limit);
+                try {
+                        while (c.moveToNext()) {
+                                entity = type.newInstance();
+                                entity.inflate(c);
+                                toRet.add(entity);
+                        }
+                } catch (IllegalAccessException e) {
+                } catch (InstantiationException e) {
+                } finally {
+                        c.close();
+                }
+                return toRet;
+    }
+
+    void inflate(Cursor cursor) {
+         Map<Field, Long> entities = new HashMap<Field, Long>();
+         List<Field> columns = getTableFields();
+         for (Field field : columns) {
+                        try {
+                                String typeString = field.getType().getName();
+                                String colName = StringUtil.toSQLName(field.getName());
+                                if (typeString.equals("long")) {
+                                        field.setLong(this,
+                                                        cursor.getLong(cursor.getColumnIndex(colName)));
+                                } else if (typeString.equals("java.lang.String")) {
+                                        String val = cursor.getString(cursor
+                                                        .getColumnIndex(colName));
+                                        field.set(this, val.equals("null") ? null : val);
+                                } else if (typeString.equals("double")) {
+                                        field.setDouble(this,
+                                                        cursor.getDouble(cursor.getColumnIndex(colName)));
+                                } else if (typeString.equals("boolean")) {
+                                        field.setBoolean(this,
+                                                        cursor.getString(cursor.getColumnIndex(colName))
+                                                                        .equals("true"));
+                                } else if (typeString.equals("[B")) {
+                                        field.set(this,
+                                                        cursor.getBlob(cursor.getColumnIndex(colName)));
+                                } else if (typeString.equals("int")) {
+                                        field.setInt(this,
+                                                        cursor.getInt(cursor.getColumnIndex(colName)));
+                                } else if (typeString.equals("float")) {
+                                        field.setFloat(this,
+                                                        cursor.getFloat(cursor.getColumnIndex(colName)));
+                                } else if (typeString.equals("short")) {
+                                        field.setShort(this,
+                                                        cursor.getShort(cursor.getColumnIndex(colName)));
+                                } else if (typeString.equals("java.sql.Timestamp")) {
+                                        long l = cursor.getLong(cursor.getColumnIndex(colName));
+                                        field.set(this, new Timestamp(l));
+                                } else if (field.getType().getSuperclass() == SugarRecord.class) {
+                                        long id = cursor.getLong(cursor.getColumnIndex(colName));
+                                        if (id > 0)
+                                                entities.put(field, id);
+                                        else
+                                                field.set(this, null);
+                                } else
+                                        Log.e("Sugar", "Class cannot be read from Sqlite3 database.");
+                        } catch (IllegalArgumentException e) {
+                        } catch (IllegalAccessException e) {
+                        }
+
+                }
+
+                for (Field f : entities.keySet()) {
+                        try {
+                                f.set(this, findById(context,
+                                        (Class<? extends SugarRecord>) f.getType(),
+                                        entities.get(f)));
+                        } catch (SQLiteException e) {
+                        } catch (IllegalArgumentException e) {
+                        } catch (IllegalAccessException e) {
+                        }
+                }
+        }
 
     public List<Field> getTableFields() {
         List<Field> typeFields = list();
@@ -97,8 +184,13 @@ public class SugarRecord<T> {
       }
 
     public String getSqlName(){
-        return StringUtil.toSQLName(getClass().getSimpleName());
+        return getTableName(getClass());
     }
+
+
+  public static String getTableName(Class<?> type) {
+    return StringUtil.toSQLName(type.getSimpleName());
+  }
 
     public Long getId() {
         return id;
