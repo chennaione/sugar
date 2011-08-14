@@ -42,6 +42,12 @@ public class SugarRecord<T> {
 
   }
 
+   public static <T extends SugarRecord> void deleteAll(Context context, Class<T> type){
+    Database db = ((SugarApp) context.getApplicationContext()).database;
+        SQLiteDatabase sqLiteDatabase = db.openDB();
+       sqLiteDatabase.delete(getTableName(type), null, null);
+   }
+
     public void save(){
         SQLiteDatabase sqLiteDatabase = database.openDB();
         List<Field> columns = getTableFields();
@@ -83,6 +89,11 @@ public class SugarRecord<T> {
         List<T> list = find(context, type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if(list.isEmpty()) return null;
         return list.get(0);
+    }
+
+    public static <T extends SugarRecord> List<T> find(Context context, Class<T> type,
+                        String whereClause, String[] whereArgs){
+        return find(context,type,whereClause,whereArgs,null,null,null);
     }
 
     public static <T extends SugarRecord> List<T> find(Context context, Class<T> type,
