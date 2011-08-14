@@ -9,6 +9,8 @@ import dalvik.system.DexFile;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -18,12 +20,13 @@ public class SugarDb extends SQLiteOpenHelper {
     private Context context;
 
     public SugarDb(Context context) {
-        super(context, "", null, 1);
+        super(context, "sugar.db", null, 102);
         this.context = context;
+
     }
 
     private static <T extends SugarRecord> List<T> getDomainClasses(Context context) {
-        List<T> domainClasses = list();
+        List<T> domainClasses = new ArrayList<T>();
         try {
             Enumeration allClasses = getAllClasses(context);
 
@@ -43,6 +46,7 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private static <T extends SugarRecord> T getDomainClass(String className, Context context) {
+        Log.i("Sugar", "domain class" );
         Class discoveredClass = null;
         Class superClass = null;
         try {
@@ -57,10 +61,14 @@ public class SugarDb extends SQLiteOpenHelper {
             return null;
         } else {
             try {
-                return (T) discoveredClass.newInstance();
+                return (T) discoveredClass.getDeclaredConstructor(Context.class).newInstance(context);
             } catch (InstantiationException e) {
                 Log.e("Sugar", e.getMessage());
             } catch (IllegalAccessException e) {
+                Log.e("Sugar", e.getMessage());
+            } catch (NoSuchMethodException e) {
+                Log.e("Sugar", e.getMessage());
+            } catch (InvocationTargetException e) {
                 Log.e("Sugar", e.getMessage());
             }
         }
@@ -81,6 +89,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        Log.i("Sugar", "on create" );
         createDatabase(sqLiteDatabase);
     }
 
@@ -92,30 +101,26 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private <T extends SugarRecord> void createTable(T table, SQLiteDatabase sqLiteDatabase) {
+        Log.i("Sugar", "create table" );
         List<Field> fields = table.getTableFields();
-        List definitions = list();
         StringBuilder sb = new StringBuilder("CREATE TABLE ").append(table.getSqlName()).append(
-                " (_id integer primary key");
+                " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
             String columnName = StringUtil.toSQLName(column.getName());
             String columnType = QueryBuilder.getColumnType(column.getType());
-            String definition = null;
 
-            if (columnType != null) definition = columnName + columnType;
+            if (columnType != null) {
 
-            if (definition != null) {
-
-                if (columnName.equals("Id")) {
-                    definition = definition + " PRIMARY KEY AUTOINCREMENT";
+                if (columnName.equalsIgnoreCase("Id")) {
+                    continue;
                 }
                 sb.append(", ").append(columnName).append(" ").append(columnType);
-
-                definitions.add(definition);
             }
         }
+        sb.append(" ) ");
 
-        Log.i("Sugar", "creating table" + table.getSqlName());
+        Log.i("Sugar", "creating table " + table.getSqlName());
 
         if (!"".equals(sb.toString()))
             sqLiteDatabase.execSQL(sb.toString());

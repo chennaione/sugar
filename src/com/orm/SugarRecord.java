@@ -9,7 +9,9 @@ import android.util.Log;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,27 +43,35 @@ public class SugarRecord<T> {
   }
 
     public void save(){
+        SQLiteDatabase sqLiteDatabase = database.openDB();
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
+            column.setAccessible(true);
                 try {
-                        if (column.getType().getSuperclass() == SugarRecord.class)
+                        if (column.getType().getSuperclass() == SugarRecord.class){
                                 values.put(StringUtil.toSQLName(column.getName()),
                                                 (column.get(this) != null)
                                                         ? String.valueOf(((SugarRecord) column.get(this)).id)
                                                         : "0");
-                        else
+                        }
+                        else {
+                            if(!"id".equalsIgnoreCase(column.getName())){
                                 values.put(StringUtil.toSQLName(column.getName()),
                                                 String.valueOf(column.get(this)));
+                            }
+                        }
+
                 } catch (IllegalAccessException e) {
                         Log.e("Sugar", e.getMessage());
                 }
         }
-        SQLiteDatabase sqLiteDatabase = database.openDB();
+
         id = (id == null)
                 ? sqLiteDatabase.insert(getSqlName(), null, values)
                 : sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
+        Log.i("Sugar", getClass().getSimpleName() +" saved : " + id);
         database.closeDB();
     }
 
@@ -81,17 +91,19 @@ public class SugarRecord<T> {
         Database db = ((SugarApp) context.getApplicationContext()).database;
         SQLiteDatabase sqLiteDatabase = db.openDB();
         T entity;
-                List<T> toRet = list();
+                List<T> toRet = new ArrayList<T>();
                 Cursor c = sqLiteDatabase.query(getTableName(type), null,
                                 whereClause, whereArgs, groupBy, null, orderBy, limit);
                 try {
                         while (c.moveToNext()) {
-                                entity = type.newInstance();
+                                entity = type.getDeclaredConstructor(Context.class).newInstance(context);
                                 entity.inflate(c);
                                 toRet.add(entity);
                         }
                 } catch (IllegalAccessException e) {
                 } catch (InstantiationException e) {
+                } catch (NoSuchMethodException e) {
+                } catch (InvocationTargetException e) {
                 } finally {
                         c.close();
                 }
@@ -102,6 +114,7 @@ public class SugarRecord<T> {
          Map<Field, Long> entities = new HashMap<Field, Long>();
          List<Field> columns = getTableFields();
          for (Field field : columns) {
+             field.setAccessible(true);
                         try {
                                 String typeString = field.getType().getName();
                                 String colName = StringUtil.toSQLName(field.getName());
@@ -161,10 +174,10 @@ public class SugarRecord<T> {
         }
 
     public List<Field> getTableFields() {
-        List<Field> typeFields = list();
+        List<Field> typeFields = new ArrayList<Field>();
         try
         {
-          typeFields.add(getClass().getSuperclass().getDeclaredField("mId"));
+          typeFields.add(getClass().getSuperclass().getDeclaredField("id"));
         }
         catch (SecurityException e) {
           Log.e("Sugar", e.getMessage());
@@ -195,4 +208,5 @@ public class SugarRecord<T> {
     public Long getId() {
         return id;
     }
+
 }

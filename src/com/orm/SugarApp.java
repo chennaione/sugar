@@ -1,5 +1,7 @@
 package com.orm;
 
+import android.util.Log;
+
 import java.util.*;
 
 import static com.orm.dsl.Collection.set;
@@ -7,12 +9,10 @@ import static com.orm.dsl.Collection.set;
 public class SugarApp extends android.app.Application{
 
     Database database;
-    Set<SugarDb> entities;
 
     public void onCreate(){
         super.onCreate();
-        database = new Database(this);
-        entities = set();
+        this.database = new Database(this);
     }
 
     public void onTerminate(){

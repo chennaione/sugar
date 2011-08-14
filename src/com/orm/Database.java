@@ -9,7 +9,7 @@ public class Database {
     private SQLiteDatabase sqLiteDatabase;
 
     public Database(Context context){
-        sugarDb  = new SugarDb(context);
+        this.sugarDb  = new SugarDb(context);
     }
 
 
