@@ -1,7 +1,5 @@
 This library is a wrapper on android's db interface for SQLLite.. It is built for #in50hrs competition.
 
-Please visit the wiki section for more details.
-
 ## Current State
 
 #table creation
@@ -55,3 +53,5 @@ Country.deleteAll(context, Country.class);
 Example project:
 Note Manager
 https://github.com/satyan/SugarExample
+
+Please visit the wiki section for more details.
