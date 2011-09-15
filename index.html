@@ -1,1 +1,183 @@
-My Github page
+<html lang="en"><head>
+    <meta charset="utf-8">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Sugar - Android database made easy.</title>
+	<link rel="stylesheet" href="./css/bootstrap-1.2.0.min.css">
+
+</head>
+
+    <body><div class="topbar">
+      <div class="fill">
+        <div class="container fixed">
+          <h3><a href="index.html">Sugar</a></h3>
+          <ul>
+            <li><a href="#create-table">Table creation</a></li>
+            <li><a href="#save-update">Save and update</a></li>
+            <li><a href="#retrieve">Retrieve values</a></li>
+            <li><a href="#extra">Extra Sugar</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+		<br><br><br>
+		
+			<div class="page-header">
+				<h1>Introducing Sugar <small>Android database made easy.</small></h1>
+			</div>
+			
+			<div class="row">
+			    <div class="span6 columns">
+			      <h2>What does it do?</h2>
+			      <p>It is intended to simplify the interaction with SQLite database in android.</p>
+					<ul>
+						<li>It eliminates writing SQL queries to interact with SQLite db.</li>
+						<li>It takes care of creating your database.</li>
+						<li>It manages object relationships too.</li>
+						<li>It provides you with clear and simple APIs for db operations</li>
+					</ul>
+					<p><a class="btn primary large" href="https://github.com/satyan/sugar">Download</a></p>
+			    </div>
+				<div class="span5 columns">
+			      <h3>Why it was made?</h3>
+					<p>
+						We felt the need for it while building android apps that had following characteristics..
+					</p>
+					<ul>
+				        <li>Fairly large and complex data model.</li>
+				        <li>Primary work was to save/retrieve and iterate over the business objects.</li>
+				        <li>Lot of boiler plate code for the db operations.</li>
+				        <li>We wanted to write our business logic in less technical and more business fashion.</li>
+			      </ul>
+				</div>
+			    <div class="span5 columns">
+			      <h3>What does it provide?</h3>
+			      <p>There are two parts to it:</p>
+			      <ul>
+			        <li>database creation</li>
+			        <li>simple APIs to manipulate your business objects</li>
+			      </ul>
+			    </div>
+			  </div>
+			
+			
+			<section id="create-table"><br><br><br>
+			<div class="row">
+
+					<div class="page-header">
+						<h2>Creating tables</h2>
+					</div>
+					
+					<h3>Without Sugar:</h3>
+					<pre>
+sampleDB.execSQL("CREATE TABLE IF NOT EXISTS BOOK" + " (title VARCHAR, edition VARCHAR);");
+					</pre>
+				
+					<h3>
+						With Sugar:
+					</h3>
+					<pre>
+public class Book extends SugarRecord<Book>{
+	String title;
+	String edition;
+
+	public Book(Context ctx, String title, String edition){
+		super(ctx);
+		this.title = title;
+		this.edition = edition;
+	}
+}
+					</pre>
+				
+					<p>Just create the classes extending <code>SugarRecord</code> and it creates a table with class name with its properties as columns.</code></p>
+			</div></section>
+			<section id="save-update"><br><br><br>
+			<div class="row">
+					<div class="page-header">
+						<h2>Save and update data</h2>
+					</div>
+					<h3>
+						Without Sugar:
+					</h3>
+					<pre>
+sampleDB.execSQL("INSERT INTO BOOK" +" Values ('Title here','2nd edition');");
+					</pre>
+					<p> or </p>
+					<pre>
+ContentValues values = new ContentValues();
+values.put("title", "Title here");
+values.put("edition", "2nd edition");
+sampleDB.insert("BOOK", null, values);
+					</pre>
+					<h3>
+						With Sugar:
+					</h3>
+					<pre>
+new Book(ctx, "Title here", "2nd edition").save();
+					</pre>
+</div></section>
+<section id="retrieve"><br><br><br>
+			<div class="row">
+					<div class="page-header">
+						<h2>Retrieving values</h2>
+					</div>
+					<h3>
+						Without Sugar:
+					</h3>
+					<pre>
+Cursor c = sampleDB.rawQuery("SELECT title, Age FROM BOOK", null);
+        
+  if (c != null ) {
+        if  (c.moveToFirst()) {
+              do {
+		String title = c.getString(c.getColumnIndex("title"));
+              	String edition = c.getString(c.getColumnIndex("edition"));
+              	results.add("" + title + ",edition: " + edition);
+              }while (c.moveToNext());
+        } 
+   }
+					</pre>
+					<h3>
+						With Sugar:
+					</h3>
+					<pre>
+List<Book> books = Book.listAll(ctx, Book.class);
+					</pre>
+</div></section>
+<section id="extra"><br><br><br>
+			<div class="row">
+					<div class="page-header">
+						<h2>Extra sugar</h2>
+					</div>
+					
+					<pre>
+// finders
+
+Book.findById(context, Book.class, 1);
+Book.find(context, Book.class, "title=?", new String[]{"Title here"});
+
+// delete
+Book.findById(context, Book.class, 1).delete();
+
+// few more..
+Book.listAll(context, Book.class);
+Book.deleteAll(context, Book.class);
+
+					</pre>
+				
+			</div>
+			</section>
+
+      <footer>
+        <p>Sugar is developed and maintained by <a href="http://twitter.com/snarayan">@snarayan</a></p>
+      </footer>
+
+    </div>
+
+</body></html>
