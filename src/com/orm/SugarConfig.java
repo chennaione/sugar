@@ -17,7 +17,7 @@ public class SugarConfig {
   }
 
   public static int getDatabaseVersion(Context context) {
-    Integer databaseVersion = Integer.valueOf(getMetaDataString(context, "VERSION"));
+    Integer databaseVersion = getMetaDataInteger(context, "VERSION");
 
     if ((databaseVersion == null) || (databaseVersion == 0)) {
       databaseVersion = 1;
@@ -27,13 +27,7 @@ public class SugarConfig {
   }
 
   public static boolean getDebugEnabled(Context context) {
-    String queryDebugEnabled = getMetaDataString(context, "QUERY_DEBUG_ENABLED");
-
-    if ("true".equalsIgnoreCase(queryDebugEnabled)) {
-      return true;
-    }
-
-    return false;
+    return getMetaDataBoolean(context, "QUERY_LOG");
   }
 
   public static String getMetaDataString(Context context, String name) {
@@ -44,6 +38,40 @@ public class SugarConfig {
     {
       ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 128);
       value = ai.metaData.getString(name);
+    }
+    catch (Exception e)
+    {
+      Log.d("sugar", "Couldn't find config value: " + name);
+    }
+
+    return value;
+  }
+
+  public static Integer getMetaDataInteger(Context context, String name) {
+    Integer value = null;
+
+    PackageManager pm = context.getPackageManager();
+    try
+    {
+      ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 128);
+      value = ai.metaData.getInt(name);
+    }
+    catch (Exception e)
+    {
+      Log.d("sugar", "Couldn't find config value: " + name);
+    }
+
+    return value;
+  }
+
+    public static Boolean getMetaDataBoolean(Context context, String name) {
+    Boolean value = false;
+
+    PackageManager pm = context.getPackageManager();
+    try
+    {
+      ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 128);
+      value = ai.metaData.getBoolean(name);
     }
     catch (Exception e)
     {
