@@ -68,20 +68,26 @@
 			
 			
 			<section id="create-table"><br><br><br>
+			<div class="page-header">
+						<h2>Creating tables</h2>
+			</div>
+					
 			<div class="row">
 
-					<div class="page-header">
-						<h2>Creating tables</h2>
-					</div>
-					
-					<h3>Without Sugar:</h3>
+				<div class="span4 columns">
+					<h3>Currently:</h3>
+				</div>
+				<div class="span12 columns">
 					<pre>
 sampleDB.execSQL("CREATE TABLE IF NOT EXISTS BOOK" + " (title VARCHAR, edition VARCHAR);");
 					</pre>
-				
+				</div>
+				<div class="span4 columns">
 					<h3>
 						With Sugar:
 					</h3>
+				</div>
+				<div class="span12 columns">
 					<pre>
 public class Book extends SugarRecord<Book>{
 	String title;
@@ -98,13 +104,17 @@ public class Book extends SugarRecord<Book>{
 					<p>Just create the classes extending <code>SugarRecord</code> and it creates a table with class name with its properties as columns.</code></p>
 			</div></section>
 			<section id="save-update"><br><br><br>
-			<div class="row">
+
 					<div class="page-header">
 						<h2>Save and update data</h2>
 					</div>
+			<div class="row">
+				<div class="span4 columns">
 					<h3>
-						Without Sugar:
+						Currently:
 					</h3>
+					</div>
+						<div class="span12 columns">
 					<pre>
 sampleDB.execSQL("INSERT INTO BOOK" +" Values ('Title here','2nd edition');");
 					</pre>
@@ -115,21 +125,29 @@ values.put("title", "Title here");
 values.put("edition", "2nd edition");
 sampleDB.insert("BOOK", null, values);
 					</pre>
+					</div>
+						<div class="span4 columns">
 					<h3>
 						With Sugar:
 					</h3>
+					</div>
+						<div class="span12 columns">
 					<pre>
 new Book(ctx, "Title here", "2nd edition").save();
 					</pre>
 </div></section>
 <section id="retrieve"><br><br><br>
-			<div class="row">
-					<div class="page-header">
+				<div class="page-header">
 						<h2>Retrieving values</h2>
 					</div>
+	
+			<div class="row">
+								<div class="span4 columns">
 					<h3>
-						Without Sugar:
+						Currently:
 					</h3>
+					</div>
+										<div class="span12 columns">
 					<pre>
 Cursor c = sampleDB.rawQuery("SELECT title, Age FROM BOOK", null);
         
@@ -143,9 +161,13 @@ Cursor c = sampleDB.rawQuery("SELECT title, Age FROM BOOK", null);
         } 
    }
 					</pre>
+										</div>
+															<div class="span4 columns">
 					<h3>
 						With Sugar:
 					</h3>
+					</div>
+										<div class="span12 columns">
 					<pre>
 List<Book> books = Book.listAll(ctx, Book.class);
 					</pre>
