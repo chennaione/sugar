@@ -68,9 +68,10 @@ public class SugarRecord<T> {
             }
         }
 
-        id = (id == null)
-                ? sqLiteDatabase.insert(getSqlName(), null, values)
-                : sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        if (id == null)
+                id = sqLiteDatabase.insert(getSqlName(), null, values);
+        else
+                sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
         database.closeDB();

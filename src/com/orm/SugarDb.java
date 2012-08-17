@@ -14,16 +14,14 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import static com.orm.SugarConfig.getDatabaseName;
 import static com.orm.SugarConfig.getDatabaseVersion;
 import static com.orm.SugarConfig.getDebugEnabled;
-import static com.orm.dsl.Collection.list;
 
 public class SugarDb extends SQLiteOpenHelper {
     private Context context;
 
     public SugarDb(Context context) {
-        super(context, getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
+        super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
         this.context = context;
 
     }
