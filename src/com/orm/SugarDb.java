@@ -26,7 +26,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
     }
 
-    private static <T extends SugarRecord> List<T> getDomainClasses(Context context) {
+    private <T extends SugarRecord> List<T> getDomainClasses(Context context) {
         List<T> domainClasses = new ArrayList<T>();
         try {
             Enumeration allClasses = getAllClasses(context);
@@ -46,7 +46,7 @@ public class SugarDb extends SQLiteOpenHelper {
         return domainClasses;
     }
 
-    private static <T extends SugarRecord> T getDomainClass(String className, Context context) {
+    private <T extends SugarRecord> T getDomainClass(String className, Context context) {
         Log.i("Sugar", "domain class" );
         Class discoveredClass = null;
         Class superClass = null;
@@ -78,13 +78,13 @@ public class SugarDb extends SQLiteOpenHelper {
 
     }
 
-    private static Enumeration getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+    private Enumeration getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
         String path = getSourcePath(context);
         DexFile dexfile = new DexFile(path);
         return dexfile.entries();
     }
 
-    private static String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
+    private String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
         return context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).sourceDir;
     }
 

@@ -12,12 +12,8 @@ public class StringUtil {
                     char prevChar = (i > 0) ? buf[i - 1] : 0;
                     char c = buf[i];
                     char nextChar = (i < buf.length - 1) ? buf[i + 1] : 0;
-                    boolean isFirstChar = (i == 0) ? true : false;
+                    boolean isFirstChar = (i == 0);
 
-                    // "AbCd"->"AB_CD"
-                    // "ABCd"->"AB_CD"
-                    // "AbCD"->"AB_CD"
-                    // "ShowplaceDetailsVO"->"SHOWPLACE_DETAILS_VO"
                     if (isFirstChar || Character.isLowerCase(c)) {
                             sb.append(Character.toUpperCase(c));
                     } else if (Character.isUpperCase(c)) {
