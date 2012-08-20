@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.orm.SugarApp.getSugarContext;
+
 public class SugarRecord<T> {
 
     private Context context;
@@ -38,8 +40,8 @@ public class SugarRecord<T> {
 
     }
 
-    public static <T extends SugarRecord> void deleteAll(Context context, Class<T> type) {
-        Database db = ((SugarApp) context.getApplicationContext()).database;
+    public static <T extends SugarRecord> void deleteAll(Class<T> type) {
+        Database db = getSugarContext().database;
         SQLiteDatabase sqLiteDatabase = db.openDB();
         sqLiteDatabase.delete(getTableName(type), null, null);
     }
@@ -77,25 +79,25 @@ public class SugarRecord<T> {
         database.closeDB();
     }
 
-    public static <T extends SugarRecord> List<T> listAll(Context context, Class<T> type) {
-        return find(context, type, null, null, null, null, null);
+    public static <T extends SugarRecord> List<T> listAll(Class<T> type) {
+        return find(type, null, null, null, null, null);
     }
 
-    public static <T extends SugarRecord> T findById(Context context, Class<T> type, Long id) {
-        List<T> list = find(context, type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+    public static <T extends SugarRecord> T findById(Class<T> type, Long id) {
+        List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if (list.isEmpty()) return null;
         return list.get(0);
     }
 
-    public static <T extends SugarRecord> List<T> find(Context context, Class<T> type,
+    public static <T extends SugarRecord> List<T> find(Class<T> type,
                                                        String whereClause, String[] whereArgs) {
-        return find(context, type, whereClause, whereArgs, null, null, null);
+        return find(type, whereClause, whereArgs, null, null, null);
     }
 
-    public static <T extends SugarRecord> List<T> find(Context context, Class<T> type,
+    public static <T extends SugarRecord> List<T> find(Class<T> type,
                                                        String whereClause, String[] whereArgs,
                                                        String groupBy, String orderBy, String limit) {
-        Database db = ((SugarApp) context.getApplicationContext()).database;
+        Database db = getSugarContext().database;
         SQLiteDatabase sqLiteDatabase = db.openDB();
         T entity;
         List<T> toRet = new ArrayList<T>();
@@ -103,7 +105,7 @@ public class SugarRecord<T> {
                 whereClause, whereArgs, groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor(Context.class).newInstance(context);
+                entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
                 entity.inflate(c);
                 toRet.add(entity);
             }
@@ -129,9 +131,7 @@ public class SugarRecord<T> {
                 if(colName.equalsIgnoreCase("id")){
                     long cid = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, Long.valueOf(cid));
-                }
-
-                if (typeString.equals("long")) {
+                }else if (typeString.equals("long")) {
                     field.setLong(this,
                             cursor.getLong(cursor.getColumnIndex(colName)));
                 } else if (typeString.equals("java.lang.String")) {
@@ -178,8 +178,7 @@ public class SugarRecord<T> {
 
         for (Field f : entities.keySet()) {
             try {
-                f.set(this, findById(context,
-                        (Class<? extends SugarRecord>) f.getType(),
+                f.set(this, findById((Class<? extends SugarRecord>) f.getType(),
                         entities.get(f)));
             } catch (SQLiteException e) {
             } catch (IllegalArgumentException e) {
