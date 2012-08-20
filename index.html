@@ -181,15 +181,15 @@ List<Book> books = Book.listAll(ctx, Book.class);
 					<pre>
 // finders
 
-Book.findById(context, Book.class, 1);
-Book.find(context, Book.class, "title=?", new String[]{"Title here"});
+Book.findById(Book.class, 1);
+Book.find(Book.class, "title=?", new String[]{"Title here"});
 
 // delete
-Book.findById(context, Book.class, 1).delete();
+Book.findById(Book.class, 1).delete();
 
 // few more..
-Book.listAll(context, Book.class);
-Book.deleteAll(context, Book.class);
+Book.listAll(Book.class);
+Book.deleteAll(Book.class);
 
 					</pre>
 				
