@@ -1,6 +1,9 @@
 Please follow the documentation at
 http://satyan.github.com/sugar
 
+The example application is here
+https://github.com/satyan/sugarexample
+
 # What's new in 1.1:
 
 1. Static api doesn't take context anymore. Hence
