@@ -24,3 +24,11 @@ http://developer.android.com/tools/projects/index.html#LibraryProjects
 
 
 2. Some cleanup in the code.
+
+# Plan for 1.2
+
+1. package restriction for domain classes.
+2. metadata caching
+3. QueryBuilder v1
+4. Provision for Raw queries
+5. Better and more organized api guide and usage instructions.
