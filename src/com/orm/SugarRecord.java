@@ -188,6 +188,11 @@ public class SugarRecord<T> {
     }
 
     public List<Field> getTableFields() {
+
+        List<Field> fieldList = SugarConfig.getFields(getClass());
+        if(fieldList != null) return fieldList;
+
+        Log.d("Sugar", "Fetching properties");
         List<Field> typeFields = new ArrayList<Field>();
         try {
             typeFields.add(getClass().getSuperclass().getDeclaredField("id"));
@@ -204,6 +209,7 @@ public class SugarRecord<T> {
             }
         }
 
+        SugarConfig.setFields(getClass(), typeFields);
         return typeFields;
     }
 
