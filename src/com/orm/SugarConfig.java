@@ -26,6 +26,16 @@ public class SugarConfig {
         return databaseVersion;
     }
 
+    public static String getDomainPackageName(Context context){
+        String domainPackageName = getMetaDataString(context, "DOMAIN_PACKAGE_NAME");
+
+        if (domainPackageName == null) {
+            domainPackageName = "";
+        }
+
+        return domainPackageName;
+    }
+
     public static boolean getDebugEnabled(Context context) {
         return getMetaDataBoolean(context, "QUERY_LOG");
     }

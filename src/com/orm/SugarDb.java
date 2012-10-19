@@ -33,8 +33,11 @@ public class SugarDb extends SQLiteOpenHelper {
 
             while (allClasses.hasMoreElements()) {
                 String className = (String) allClasses.nextElement();
-                T domainClass = getDomainClass(className, context);
-                if (domainClass != null) domainClasses.add(domainClass);
+
+                if(className.startsWith(SugarConfig.getDomainPackageName(context))){
+                    T domainClass = getDomainClass(className, context);
+                    if (domainClass != null) domainClasses.add(domainClass);
+                }
             }
 
         } catch (IOException e) {
