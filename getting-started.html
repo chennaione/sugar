@@ -40,10 +40,10 @@
           <a class="brand" href="./index.html">Sugar ORM</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active">
+              <li class="">
                 <a href="./index.html">Overview</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./getting-started.html">Get started</a>
               </li>
               <li class="">
@@ -63,8 +63,8 @@
 ================================================== -->
 <header class="jumbotron subhead" id="overview">
   <div class="container">
-    <h1>Sugar ORM</h1>
-    <p class="lead">Insanely easy way to work with Android Databases.</p>
+    
+    <p class="lead">Getting started with Sugar ORM.</p>
   </div>
 </header>
 
@@ -77,10 +77,9 @@
       <div class="span3 bs-docs-sidebar">
         <ul class="nav nav-list bs-docs-sidenav affix-top">
           <li class="active"><a href="#download-sugar"><i class="icon-chevron-right"></i> Download</a></li>
-          <li class=""><a href="#how-help"><i class="icon-chevron-right"></i> How does it help</a></li>
-          <li class=""><a href="#why"><i class="icon-chevron-right"></i> Why it was made</a></li>
-          <li class=""><a href="#what"><i class="icon-chevron-right"></i> What it provides</a></li>
-          <li class=""><a href="#what-next"><i class="icon-chevron-right"></i> What next?</a></li>
+          <li class=""><a href="#how-help"><i class="icon-chevron-right"></i> Configuration</a></li>
+          <li class=""><a href="#why"><i class="icon-chevron-right"></i> Entities</a></li>
+          <li class=""><a href="#what"><i class="icon-chevron-right"></i> Usage</a></li>
         </ul>
       </div>
       <div class="span9">
@@ -115,16 +114,67 @@
         ================================================== -->
         <section id="how-help">
           <div class="page-header">
-            <h1>2. How does it help.</h1>
+            <h1>2. Configuration.</h1>
           </div>
-          <p class="lead">It is intended to simplify the interaction with SQLite database in android.</p>
+          <p class="lead"> It requires minimal configuration.</p><p> All you need to do is, specify SugarApp as your application class in AndroidManifest.xml. You do that by changing the <code>android:name</code> attribute of the <code>application</code> tag.</p> 
+
+          <div class="bs-docs-example">
+
+            AndroidManifest.xml
           
-      <ul>
-        <li>It eliminates writing SQL queries to interact with SQLite db.</li>
-        <li>It takes care of creating your database.</li>
-        <li>It manages object relationships too.</li>
-        <li>It provides you with clear and simple APIs for db operations</li>
-      </ul>
+      <pre class="prettyprint linenums">
+&lt;application android:label="@string/app_name" android:icon="@drawable/icon" 
+android:name="com.orm.SugarApp"&gt;
+.
+.
+&lt;meta-data android:name="DATABASE" android:value="sugar_example.db" /&gt;
+&lt;meta-data android:name="VERSION" android:value="2" /&gt;
+&lt;meta-data android:name="QUERY_LOG" android:value="true" /&gt;
+&lt;meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.example" /&gt;
+.
+.
+&lt;/application&gt;</pre>
+</div>
+
+          <p > The meta-data tags are all optional and serve the following purpose:</p>
+          <table class="table table-bordered table-striped">
+            <colgroup>
+              <col class="span1">
+              <col class="span7">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Metadata</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code>DATABASE</code>
+                </td>
+                <td>Name of the generated sqlite database file. eg: app_name.db</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>VERSION</code>
+                </td>
+                <td>Version of your database schema.</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>QUERY_LOG</code>
+                </td>
+                <td>Logs the generated Select queries.</td>
+              </tr>
+              <tr>
+                <td>
+                  <code>DOMAIN_PACKAGE_NAME</code>
+                </td>
+                <td>Specify a package name where your domain/entity classes are present. This helps in smoother table creation.</td>
+              </tr>
+            </tbody>
+          </table>
       
         </section>
 
@@ -134,16 +184,21 @@
         ================================================== -->
         <section id="why">
           <div class="page-header">
-            <h1>3. Why it was made</h1>
+            <h1>3. Entities</h1>
           </div>
-          <p class="lead">We felt the need for it while building android apps that had following characteristics..</p>
-          
-      <ul>
-                <li>Fairly large and complex data model.</li>
-                <li>Primary work was to save/retrieve and iterate over the business objects.</li>
-                <li>Lot of boiler plate code for the db operations.</li>
-                <li>We wanted to write our business logic in less technical and more business fashion.</li>
-            </ul>
+          <p class="lead">Extend <code>SugarRecord</code> for all the classes that you need persisted. <strong>That's it.</strong> Sugar takes care of table creation for you.</p>
+          <pre class="prettyprint linenums">
+public class Book extends SugarRecord<Book>{
+  String title;
+  String edition;
+
+  public Book(Context ctx, String title, String edition){
+    super(ctx);
+    this.title = title;
+    this.edition = edition;
+  }
+}
+</pre>
         </section>
 
 
@@ -152,29 +207,37 @@
         ================================================== -->
         <section id="what">
           <div class="page-header">
-            <h1>4. What it provides</h1>
+            <h1>4. Basic Usage</h1>
           </div>
-          <p class="lead">There are two parts to it:</p>
-            <ul>
-              <li>database creation</li>
-              <li>simple APIs to manipulate your business objects</li>
-            </ul>
+          <p class="lead">Performing CRUD operations are very simple. Functions like <code>save()</code>, <code>delete()</code> and <code>findById(..)</code> are provided to make the work easy.</p>
+          <div class="bs-docs-example">
+
+            Save Entity:
+          <pre class="prettyprint linenums">
+new Book(ctx, "Title here", "2nd edition").save();
+</pre>
+
+
+            Load Entity:
+          <pre class="prettyprint linenums">
+Book book = Book.findById(Book.class, 1);
+</pre>
+
+            Delete Entity:
+          <pre class="prettyprint linenums">
+Book book = Book.findById(Book.class, 1);
+book.delete();
+</pre>
+
+
+            Bulk Operations:
+          <pre class="prettyprint linenums">
+List&lt;Book&gt; books = Book.listAll(Book.class);
+
+Book.deleteAll(Book.class);
+</pre></div>
+
         </section>
-
-
-
-        <!-- Next
-        ================================================== -->
-        <section id="what-next">
-          <div class="page-header">
-            <h1>What next?</h1>
-          </div>
-          <p class="lead">Get started by including sugar orm as part of your project. Read the "Getting Started" section for help.</p>
-          
-        </section>
-
-
-
 
       </div>
     </div>
