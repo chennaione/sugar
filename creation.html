@@ -64,14 +64,133 @@
 <header class="jumbotron subhead" id="overview">
   <div class="container">
     
-    <p class="lead">Work in progress..</p>
+    <p class="lead">Entities and Relationships</p>
   </div>
 </header>
 
 
   <div class="container">
 
+    <!-- Docs nav
+    ================================================== -->
+    <div class="row">
+      <div class="span3 bs-docs-sidebar">
+        <ul class="nav nav-list bs-docs-sidenav affix-top">
+          <li class="active"><a href="#define"><i class="icon-chevron-right"></i> Defining Entities</a></li>
+          <li class=""><a href="#how-help"><i class="icon-chevron-right"></i> Adding Properties</a></li>
+          <li class=""><a href="#why"><i class="icon-chevron-right"></i> Managing Relationships</a></li>
+          <li class=""><a href="#what"><i class="icon-chevron-right"></i> Basic Usage</a></li>
+          </ul>
+      </div>
+      <div class="span9">
+
+
+
+        <!-- Download
+        ================================================== -->
+        <section id="define">
+          <div class="page-header">
+            <h1>1. Defining Entities</h1>
+          </div>
+          <p class="lead">To create a persistent entity, just extend it with <code>SugarRecord</code>. 
+          
+          <div class="bs-docs-example">
+
+      <pre class="prettyprint linenums">
+public class Book extends SugarRecord&lt;Book&gt;{
+  String name;
+}</pre>
+</div>
+<p>This class would automatically map to a table named <code>book</code>. 
+        </section>
+
+
+
+        <!-- File structure
+        ================================================== -->
+        <section id="how-help">
+          <div class="page-header">
+            <h1>2. Adding properties.</h1>
+          </div>
+          <p class="lead"> Now that you have the entity, start defining their properties.</p> 
+
+          <div class="bs-docs-example">
+
+      <pre class="prettyprint linenums">
+public class Book extends SugarRecord{
+  
+  String name;
+  String ISBN;
+  String title;
+  String shortSummary;
+}</pre>
+</div>
+
+          <p > This would create corresponding columns in the <code>book</code> table. Column names would be <code>name, ISBN, title and short_summary</code>.
+Notice the conversion from <code>shortSummary</code> to <code>short_summary</code>. This is the convention followed in Sugar. (Next step: making it configurable.)
+</p>
+          
+        </section>
+
+
+
+        <!-- Contents
+        ================================================== -->
+        <section id="why">
+          <div class="page-header">
+            <h1>3. Managing relationships</h1>
+          </div>
+          <p class="lead">Lets bring another entity into picture.</p>
+          <pre class="prettyprint linenums">
+public class Author extends SugarRecord&lt;Author&gt;{
+  String name
+}
+</pre>
+<p class="lead">Each book has an author and that would be represented by having a reference to Author in Book class, as follows:</p>
+
+<pre class="prettyprint linenums">
+public class Book extends SugarRecord{
+  
+  String name;
+  String ISBN;
+  String title;
+  String shortSummary;
+
+  // defining a relationship
+  Author author;
+}
+</pre>
+
+<p class="lead">This would store a column named <code>author</code> in the book table. This would help with one-to-one and one-to-many relationships.</p>
+        </section>
+
+
+
+        <!-- HTML template
+        ================================================== -->
+        <section id="what">
+          <div class="page-header">
+            <h1>4. Basic Usage</h1>
+          </div>
+
+          <div class="bs-docs-example">
+
+          <pre class="prettyprint linenums">
+List&lt;Book&gt; books = Book.find(Book.class, "author = ?", new String{author.getId()});
+</pre>
+
+          <pre class="prettyprint linenums">
+Book book = Book.findById(Books.class, 1);
+Author author = book.author;
+</pre>
+</div>
+
+        </section>
+
+      </div>
     </div>
+
+  </div>
 
         </section>
 
