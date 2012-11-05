@@ -207,28 +207,15 @@ public class DummyContext extends Context{
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public void startActivity(Intent intent, Bundle bundle) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     @Override
     public void startActivities(Intent[] intents) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public void startActivities(Intent[] intents, Bundle bundle) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     @Override
     public void startIntentSender(IntentSender intentSender, Intent intent, int i, int i1, int i2) throws IntentSender.SendIntentException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void startIntentSender(IntentSender intentSender, Intent intent, int i, int i1, int i2, Bundle bundle) throws IntentSender.SendIntentException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

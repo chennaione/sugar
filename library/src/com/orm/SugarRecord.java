@@ -109,10 +109,8 @@ public class SugarRecord<T> {
                 entity.inflate(c);
                 toRet.add(entity);
             }
-        } catch (IllegalAccessException e) {
-        } catch (InstantiationException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             c.close();
         }
