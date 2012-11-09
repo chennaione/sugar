@@ -11,6 +11,7 @@ public class Select<T extends SugarRecord> {
     private String[] arguments;
     private String whereClause = "";
     private String orderBy;
+    private String groupBy;
     private String limit;
     private String offset;
 
@@ -23,6 +24,23 @@ public class Select<T extends SugarRecord> {
     public static <T extends SugarRecord> Select from(Class<T> record) {
         return new Select<T>(record);
     }
+
+    public Select orderBy(String prop) {
+        this.orderBy = prop;
+        return this;
+    }
+
+    public Select groupBy(String prop) {
+        this.groupBy = prop;
+        return this;
+    }
+
+    public Select limit(String limit) {
+        this.limit = limit;
+        return this;
+    }
+
+
 
     public Select where(String whereClause) {
         this.whereClause = whereClause;
@@ -81,7 +99,7 @@ public class Select<T extends SugarRecord> {
 
         if(arguments == null) arguments = convertArgs(args);
 
-        return T.find(record, whereClause, arguments);
+        return T.find(record, whereClause, arguments,groupBy,orderBy,limit);
 
     }
 
