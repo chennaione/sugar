@@ -40,7 +40,7 @@ public class AddNoteActivity extends Activity {
             public void onClick(View view) {
                 Tag tag = new Tag(AddNoteActivity.this, tagBox.getText().toString());
                 tag.save();
-                new Note(AddNoteActivity.this, titleBox.getText().toString(), descBox.getText().toString(),tag).save();
+                new Note(AddNoteActivity.this, 10, titleBox.getText().toString(), descBox.getText().toString(),tag).save();
                 Intent intent = new Intent(AddNoteActivity.this, NoteListActivity.class);
                 startActivity(intent);
             }

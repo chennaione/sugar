@@ -1,16 +1,13 @@
 package com.example;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import com.orm.SugarRecord;
+import com.orm.query.Select;
 
 import java.util.List;
-
-import static com.orm.dsl.Collection.list;
 
 
 public class NoteListActivity extends ListActivity {
@@ -18,7 +15,8 @@ public class NoteListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notelist);
 
-        List<Note> notes = Note.listAll(Note.class);
+        List<Note> notes = Select.from(Note.class).orderBy("title").limit("2").list();//Note.listAll(Note.class);
+
         setListAdapter(new ArrayAdapter<Note>(this,android.R.layout.simple_list_item_1, notes));
 
         findViewById(R.id.Button01).setOnClickListener(new View.OnClickListener() {
