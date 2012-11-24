@@ -32,7 +32,6 @@ public class SugarRecord<T> {
         this.database = application.database;
     }
 
-
     public void delete() {
         SQLiteDatabase db = this.database.openDB();
         db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
@@ -90,8 +89,34 @@ public class SugarRecord<T> {
     }
 
     public static <T extends SugarRecord> List<T> find(Class<T> type,
-                                                       String whereClause, String[] whereArgs) {
+                                                       String whereClause, String... whereArgs) {
         return find(type, whereClause, whereArgs, null, null, null);
+    }
+
+    public static <T extends SugarRecord> List<T> findWithQuery(Class<T> type, String query, String... arguments){
+
+        Database db = getSugarContext().database;
+        SQLiteDatabase sqLiteDatabase = db.openDB();
+        T entity;
+        List<T> toRet = new ArrayList<T>();
+        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
+
+        try {
+            while (c.moveToNext()) {
+                entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+                entity.inflate(c);
+                toRet.add(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            c.close();
+        }
+        return toRet;
+    }
+
+    public static void executeQuery(String query, String... arguments){
+        getSugarContext().database.openDB().execSQL(query, arguments);
     }
 
     public static <T extends SugarRecord> List<T> find(Class<T> type,
