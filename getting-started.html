@@ -186,11 +186,15 @@ android:name="com.orm.SugarApp"&gt;
           <div class="page-header">
             <h1>3. Entities</h1>
           </div>
-          <p class="lead">Extend <code>SugarRecord</code> for all the classes that you need persisted. <strong>That's it.</strong> Sugar takes care of table creation for you.</p>
+          <p class="lead">Extend <code>SugarRecord</code> for all the classes that you need persisted. <strong>That's it.</strong> Sugar takes care of table creation for you.</p><p> Note: Please retain one constructor with Context argument. (This constraint will be removed in subsequent release.)</p>
           <pre class="prettyprint linenums">
 public class Book extends SugarRecord<Book>{
   String title;
   String edition;
+
+  public Book(Context ctx){
+    super(ctx);
+  }
 
   public Book(Context ctx, String title, String edition){
     super(ctx);
