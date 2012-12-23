@@ -1,0 +1,5 @@
+library/bin
+library/gen
+library/.project
+library/.classpath
+*.class

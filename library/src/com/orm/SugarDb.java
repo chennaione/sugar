@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static com.orm.SugarConfig.getDatabaseVersion;
@@ -53,16 +54,15 @@ public class SugarDb extends SQLiteOpenHelper {
     private <T extends SugarRecord> T getDomainClass(String className, Context context) {
         Log.i("Sugar", "domain class");
         Class discoveredClass = null;
-        Class superClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
-            superClass = discoveredClass.getSuperclass();
         } catch (ClassNotFoundException e) {
             Log.e("Sugar", e.getMessage());
         }
 
-        if ((discoveredClass == null) || (superClass == null) ||
-                (!discoveredClass.getSuperclass().equals(SugarRecord.class))) {
+        if ((discoveredClass == null) ||
+                (!SugarRecord.class.isAssignableFrom(discoveredClass)) ||
+                Modifier.isAbstract(discoveredClass.getModifiers())) {
             return null;
         } else {
             try {
@@ -148,7 +148,6 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private boolean executeSugarUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
         boolean isSuccess = false;
         try {
             List<String> files = Arrays.asList(this.context.getAssets().list("sugar_upgrades"));

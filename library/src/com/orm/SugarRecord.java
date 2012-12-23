@@ -9,7 +9,6 @@ import android.util.Log;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,12 +19,17 @@ import static com.orm.SugarApp.getSugarContext;
 
 public class SugarRecord<T> {
 
+    @Ignore
     private Context context;
-    protected Long id = null;
+    @Ignore
     private SugarApp application;
+    @Ignore
     private Database database;
+    @Ignore
     String tableName = getSqlName();
-
+    
+    protected Long id = null;
+    
     public SugarRecord(Context context) {
         this.context = context;
         this.application = (SugarApp) context.getApplicationContext();
@@ -217,35 +221,40 @@ public class SugarRecord<T> {
     }
 
     public List<Field> getTableFields() {
-
         List<Field> fieldList = SugarConfig.getFields(getClass());
         if(fieldList != null) return fieldList;
 
-        Log.d("Sugar", "Fetching properties");
+        Log.d("Sugar", "Fetching properties: " + getClass().getName());
         List<Field> typeFields = new ArrayList<Field>();
-        try {
-            typeFields.add(getClass().getSuperclass().getDeclaredField("id"));
-        } catch (SecurityException e) {
-            Log.e("Sugar", e.getMessage());
-        } catch (NoSuchFieldException e) {
-            Log.e("Sugar", e.getMessage());
-        }
-
-        Field[] fields = getClass().getDeclaredFields();
-        for (Field field : fields) {
+        
+        getAllFields(typeFields, getClass());
+        
+        List<Field> toStore = new ArrayList<Field>();
+        for (Field field : typeFields) {
             if (!field.isAnnotationPresent(Ignore.class)) {
-                typeFields.add(field);
+            	toStore.add(field);
             }
         }
 
-        SugarConfig.setFields(getClass(), typeFields);
-        return typeFields;
+        SugarConfig.setFields(getClass(), toStore);
+        return toStore;
+    }
+    
+    private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+        for (Field field : type.getDeclaredFields()) {
+            fields.add(field);
+        }
+
+        if (type.getSuperclass() != null) {
+            fields = getAllFields(fields, type.getSuperclass());
+        }
+
+        return fields;
     }
 
     public String getSqlName() {
         return getTableName(getClass());
     }
-
 
     public static String getTableName(Class<?> type) {
         return StringUtil.toSQLName(type.getSimpleName());
