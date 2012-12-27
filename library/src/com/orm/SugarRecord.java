@@ -79,11 +79,10 @@ public class SugarRecord<T> {
             }
         }
 
-        if (id == null) {
-            id = sqLiteDatabase.insert(getSqlName(), null, values);
-        } else {
-        	sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
-        }
+        if (id == null)
+                id = sqLiteDatabase.insert(getSqlName(), null, values);
+        else
+                sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
         database.closeDB();
@@ -225,7 +224,7 @@ public class SugarRecord<T> {
         List<Field> fieldList = SugarConfig.getFields(getClass());
         if(fieldList != null) return fieldList;
 
-        Log.d("Sugar", "Fetching properties: " + getClass().getName());
+        Log.d("Sugar", "Fetching properties");
         List<Field> typeFields = new ArrayList<Field>();
         
         getAllFields(typeFields, getClass());
@@ -233,7 +232,7 @@ public class SugarRecord<T> {
         List<Field> toStore = new ArrayList<Field>();
         for (Field field : typeFields) {
             if (!field.isAnnotationPresent(Ignore.class)) {
-            	toStore.add(field);
+                toStore.add(field);
             }
         }
 
@@ -256,6 +255,7 @@ public class SugarRecord<T> {
     public String getSqlName() {
         return getTableName(getClass());
     }
+
 
     public static String getTableName(Class<?> type) {
         return StringUtil.toSQLName(type.getSimpleName());

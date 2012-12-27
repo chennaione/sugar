@@ -148,6 +148,7 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private boolean executeSugarUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
         boolean isSuccess = false;
         try {
             List<String> files = Arrays.asList(this.context.getAssets().list("sugar_upgrades"));
