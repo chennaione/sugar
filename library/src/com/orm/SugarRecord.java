@@ -62,7 +62,7 @@ public class SugarRecord<T> {
         for (Field column : columns) {
             column.setAccessible(true);
             try {
-                if (column.getType().getSuperclass() == SugarRecord.class) {
+                if (SugarRecord.class.isAssignableFrom(column.getType())) {
                     values.put(StringUtil.toSQLName(column.getName()),
                             (column.get(this) != null)
                                     ? String.valueOf(((SugarRecord) column.get(this)).id)
@@ -79,10 +79,11 @@ public class SugarRecord<T> {
             }
         }
 
-        if (id == null)
-                id = sqLiteDatabase.insert(getSqlName(), null, values);
-        else
-                sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        if (id == null) {
+            id = sqLiteDatabase.insert(getSqlName(), null, values);
+        } else {
+        	sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        }
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
         database.closeDB();
@@ -193,7 +194,7 @@ public class SugarRecord<T> {
                 } else if (typeString.equals("java.sql.Timestamp")) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, new Timestamp(l));
-                } else if (field.getType().getSuperclass() == SugarRecord.class) {
+                } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
                     long id = cursor.getLong(cursor.getColumnIndex(colName));
                     if (id > 0)
                         entities.put(field, id);
