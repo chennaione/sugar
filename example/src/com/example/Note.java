@@ -7,6 +7,7 @@ public class Note extends SugarRecord<Note>{
     private int noteId;
     private String title;
     private String description;
+   private String name;
     private Tag tag;
 
     public Note(Context context){

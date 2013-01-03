@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+import com.google.gson.annotations.SerializedName;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
@@ -21,15 +22,20 @@ import static com.orm.SugarApp.getSugarContext;
 public class SugarRecord<T> {
 
     private Context context;
-    protected Long id = null;
-    private SugarApp application;
+    @SerializedName("dbid")  protected Long id = null;
+   // private SugarApp application;
     private Database database;
     String tableName = getSqlName();
 
     public SugarRecord(Context context) {
         this.context = context;
-        this.application = (SugarApp) context.getApplicationContext();
-        this.database = application.database;
+       // this.application = (SugarApp) context.getApplicationContext();
+        this.database = ((SugarApp) context.getApplicationContext()).database;
+    }
+
+    public SugarRecord(){
+        this.context = SugarApp.getSugarContext();
+        this.database = SugarApp.getSugarContext().database;
     }
 
     public void delete() {

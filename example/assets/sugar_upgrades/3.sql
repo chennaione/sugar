@@ -1,0 +1,1 @@
+alter table NOTE add NAME TEXT;
