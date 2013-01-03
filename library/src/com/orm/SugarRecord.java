@@ -21,11 +21,11 @@ import static com.orm.SugarApp.getSugarContext;
 
 public class SugarRecord<T> {
 
-    private Context context;
-    @SerializedName("dbid")  protected Long id = null;
+    transient private Context context;
+    @SerializedName("dbid")  protected transient Long id = null;
    // private SugarApp application;
-    private Database database;
-    String tableName = getSqlName();
+    private transient Database database;
+    transient String tableName = getSqlName();
 
     public SugarRecord(Context context) {
         this.context = context;
