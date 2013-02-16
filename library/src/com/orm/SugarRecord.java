@@ -51,6 +51,12 @@ public class SugarRecord<T> {
         sqLiteDatabase.delete(getTableName(type), null, null);
     }
 
+    public static <T extends SugarRecord> void deleteAll(Class<T> type, String whereClause, String... whereArgs ) {
+        Database db = getSugarContext().database;
+        SQLiteDatabase sqLiteDatabase = db.openDB();
+        sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
+    }
+
     public void save() {
         SQLiteDatabase sqLiteDatabase = database.openDB();
         List<Field> columns = getTableFields();
@@ -258,4 +264,7 @@ public class SugarRecord<T> {
         this.id = id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
