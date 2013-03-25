@@ -7,13 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import com.orm.dsl.Ignore;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.orm.SugarApp.getSugarContext;
 
@@ -69,8 +68,26 @@ public class SugarRecord<T> {
                                     : "0");
                 } else {
                     if (!"id".equalsIgnoreCase(column.getName())) {
-                        values.put(StringUtil.toSQLName(column.getName()),
-                                String.valueOf(column.get(this)));
+                        if (DateTime.class.equals(column.getType())) {
+                            values.put(StringUtil.toSQLName(column.getName()),
+                                       ((DateTime) column.get(this)).getMillis());
+                        }
+                        if (DateMidnight.class.equals(column.getType())) {
+                            values.put(StringUtil.toSQLName(column.getName()),
+                                       ((DateMidnight) column.get(this)).getMillis());
+                        }
+                        else if (Date.class.equals(column.getType())) {
+                            values.put(StringUtil.toSQLName(column.getName()),
+                                       ((Date) column.get(this)).getTime());
+                        }
+                        else if (Calendar.class.equals(column.getType())) {
+                            values.put(StringUtil.toSQLName(column.getName()),
+                                       ((Calendar) column.get(this)).getTimeInMillis());
+                        }
+                        else {
+                            values.put(StringUtil.toSQLName(column.getName()),
+                                    String.valueOf(column.get(this)));
+                        }
                     }
                 }
 
@@ -193,6 +210,20 @@ public class SugarRecord<T> {
                 } else if (typeString.equals("java.sql.Timestamp")) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, new Timestamp(l));
+                } else if (typeString.equals("java.util.Date")) {
+                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    field.set(this, new Date(l));
+                } else if (typeString.equals("java.util.Calendar")) {
+                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(l);
+                    field.set(this, c);
+                } else if (typeString.equals("org.joda.time.DateTime")) {
+                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    field.set(this, new DateTime(l));
+                } else if (typeString.equals("org.joda.time.DateMidnight")) {
+                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    field.set(this, new DateMidnight(l));
                 } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
                     long id = cursor.getLong(cursor.getColumnIndex(colName));
                     if (id > 0)

@@ -1,28 +1,30 @@
 package com.orm;
 
+import org.joda.time.DateTime;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class QueryBuilder {
 
+    private static List longTypes = Arrays.asList(Boolean.class, Integer.class, Long.class, java.util.Date.class,
+                                                  java.util.Calendar.class, java.sql.Date.class, DateTime.class);
+    private static List longTypeStrings = Arrays.asList(Boolean.TYPE, Integer.TYPE, Long.TYPE);
+    private static List floatTypes = Arrays.asList(Double.class, Float.class);
+    private static List floatTypeStrings = Arrays.asList(Double.TYPE, Float.TYPE);
+    private static List textTypes = Arrays.asList(String.class, Character.class);
+    private static List textTypeStrings = Arrays.asList(Character.TYPE);
+
     public static String getColumnType(Class type) {
-        if ((type.equals(Boolean.class)) ||
-                (type.equals(Boolean.TYPE)) ||
-                (type.equals(java.util.Date.class)) ||
-                (type.equals(java.sql.Date.class)) ||
-                (type.equals(Integer.class)) ||
-                (type.equals(Integer.TYPE)) ||
-                (type.equals(Long.class)) ||
-                (type.equals(Long.TYPE)) || (
-                (!type.isPrimitive()) &&
-                        (type.getSuperclass() != null) &&
-                        (type.getSuperclass().equals(SugarRecord.class)))) {
+        if (longTypes.contains(type) || longTypeStrings.contains(type)) {
             return "INTEGER";
         }
 
-        if ((type.equals(Double.class)) || (type.equals(Double.TYPE)) || (type.equals(Float.class)) ||
-                (type.equals(Float.TYPE))) {
+        if (floatTypes.contains(type) || floatTypeStrings.contains(type)) {
             return "FLOAT";
         }
 
-        if ((type.equals(String.class)) || (type.equals(Character.TYPE))) {
+        if (textTypes.contains(type) || textTypeStrings.contains(type)) {
             return "TEXT";
         }
 
