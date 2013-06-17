@@ -10,10 +10,7 @@ import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.orm.SugarApp.getSugarContext;
 
@@ -241,9 +238,7 @@ public class SugarRecord<T> {
     }
     
     private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
-        for (Field field : type.getDeclaredFields()) {
-            fields.add(field);
-        }
+        Collections.addAll(fields, type.getDeclaredFields());
 
         if (type.getSuperclass() != null) {
             fields = getAllFields(fields, type.getSuperclass());

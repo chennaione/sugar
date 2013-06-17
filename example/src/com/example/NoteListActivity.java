@@ -15,7 +15,7 @@ public class NoteListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notelist);
 
-        List<Note> notes = Select.from(Note.class).orderBy("title").limit("2").list();//Note.listAll(Note.class);
+        List<Note> notes = Select.from(Note.class).orderBy("title").list();//Note.listAll(Note.class);
 
         setListAdapter(new ArrayAdapter<Note>(this,android.R.layout.simple_list_item_1, notes));
 
