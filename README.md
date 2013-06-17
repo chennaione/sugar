@@ -10,6 +10,15 @@ Sugar is now available as a library project also. Add it to your project and uti
 The project is available in the folder "library"
 http://developer.android.com/tools/projects/index.html#LibraryProjects
 
+# New in version 1.2
+
+1. package restriction for domain classes.
+2. metadata caching
+3. QueryBuilder v1
+4. Database Migrations
+5. Provision for Raw queries
+6. Better and more organized api guide and usage instructions.
+
 # What's new in 1.1:
 
 1. Static api doesn't take context anymore. Hence
@@ -23,10 +32,3 @@ http://developer.android.com/tools/projects/index.html#LibraryProjects
 
 2. Some cleanup in the code.
 
-# Plan for 1.2
-
-1. package restriction for domain classes.
-2. metadata caching
-3. QueryBuilder v1
-4. Provision for Raw queries
-5. Better and more organized api guide and usage instructions.
