@@ -52,6 +52,9 @@
               <li class="">
                 <a href="./query.html">Query Builder</a>
               </li>
+              <li class="">
+                <a href="./migration.html">Database Migration</a>
+              </li>
               
             </ul>
           </div>
@@ -77,9 +80,9 @@
       <div class="span3 bs-docs-sidebar">
         <ul class="nav nav-list bs-docs-sidenav affix-top">
           <li class="active"><a href="#download-sugar"><i class="icon-chevron-right"></i> Download</a></li>
-          <li class=""><a href="#how-help"><i class="icon-chevron-right"></i> Configuration</a></li>
-          <li class=""><a href="#why"><i class="icon-chevron-right"></i> Entities</a></li>
-          <li class=""><a href="#what"><i class="icon-chevron-right"></i> Usage</a></li>
+          <li class=""><a href="#configuration"><i class="icon-chevron-right"></i> Configuration</a></li>
+          <li class=""><a href="#entities"><i class="icon-chevron-right"></i> Entities</a></li>
+          <li class=""><a href="#usage"><i class="icon-chevron-right"></i> Usage</a></li>
         </ul>
       </div>
       <div class="span9">
@@ -112,7 +115,7 @@
 
         <!-- File structure
         ================================================== -->
-        <section id="how-help">
+        <section id="configuration">
           <div class="page-header">
             <h1>2. Configuration.</h1>
           </div>
@@ -182,7 +185,7 @@ android:name="com.orm.SugarApp"&gt;
 
         <!-- Contents
         ================================================== -->
-        <section id="why">
+        <section id="entities">
           <div class="page-header">
             <h1>3. Entities</h1>
           </div>
@@ -209,7 +212,7 @@ public class Book extends SugarRecord<Book>{
 
         <!-- HTML template
         ================================================== -->
-        <section id="what">
+        <section id="usage">
           <div class="page-header">
             <h1>4. Basic Usage</h1>
           </div>
@@ -218,13 +221,22 @@ public class Book extends SugarRecord<Book>{
 
             Save Entity:
           <pre class="prettyprint linenums">
-new Book(ctx, "Title here", "2nd edition").save();
+Book book = new Book(ctx, "Title here", "2nd edition")
+book.save();
 </pre>
 
 
             Load Entity:
           <pre class="prettyprint linenums">
 Book book = Book.findById(Book.class, 1);
+</pre>
+
+            Update Entity:
+          <pre class="prettyprint linenums">
+Book book = Book.findById(Book.class, 1);
+book.name = "updated title here"; // modify the values
+book.edition = "3rd edition";
+book.save(); // updates the previous entry with new values.
 </pre>
 
             Delete Entity:
