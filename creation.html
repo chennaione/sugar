@@ -135,6 +135,19 @@ public class Book extends SugarRecord{
           <p > This would create corresponding columns in the <code>book</code> table. Column names would be <code>name, ISBN, title and short_summary</code>.
 Notice the conversion from <code>shortSummary</code> to <code>short_summary</code>. This is the convention followed in Sugar. (Next step: making it configurable.)
 </p>
+
+<p class="lead"> To skip a property from persisting, annotate it as <code>Ignore</code>.</p><p> In below example, <code>name</code> would not be persisted, neither would a corresponding column be created for this property.
+</p>
+<pre class="prettyprint linenums">
+public class Book extends SugarRecord{
+  
+  @Ignore
+  String name;
+
+  String ISBN;
+  
+}</pre>
+
           
         </section>
 
