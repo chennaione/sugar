@@ -99,10 +99,18 @@ public class Select<T extends SugarRecord> {
 
         if(arguments == null) arguments = convertArgs(args);
 
-        return T.find(record, whereClause, arguments,groupBy,orderBy,limit);
+        return T.find(record, whereClause, arguments, groupBy, orderBy, limit);
 
     }
 
+    public T first() {
+
+        if(arguments == null) arguments = convertArgs(args);
+
+        List<T> list = T.find(record, whereClause, arguments, groupBy, orderBy, "1");
+        return list.size() > 0 ? list.get(0) : null;
+    }
+    
     String toSql() {
         StringBuilder sql = new StringBuilder();
 
