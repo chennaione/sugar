@@ -26,17 +26,22 @@ public class SugarRecord<T> {
     String tableName = getSqlName();
     
     protected Long id = null;
-    
+
     public SugarRecord(Context context) {
         this.context = context;
-        this.application = (SugarApp) context.getApplicationContext();
-        this.database = application.database;
+        // this.application = (SugarApp) context.getApplicationContext();
+        this.database = ((SugarApp) context.getApplicationContext()).database;
+    }
+
+    public SugarRecord(){
+        this.context = SugarApp.getSugarContext();
+        this.database = SugarApp.getSugarContext().database;
     }
 
     public void delete() {
-        SQLiteDatabase db = this.database.openDB();
+        SQLiteDatabase db = getSugarContext().database.openDB();
         db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
-        this.database.closeDB();
+        getSugarContext().database.closeDB();
 
     }
 
@@ -53,7 +58,7 @@ public class SugarRecord<T> {
     }
 
     public void save() {
-        SQLiteDatabase sqLiteDatabase = database.openDB();
+        SQLiteDatabase sqLiteDatabase = getSugarContext().database.openDB();
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
@@ -82,7 +87,7 @@ public class SugarRecord<T> {
                 sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
-        database.closeDB();
+        getSugarContext().database.closeDB();
     }
 
     public static <T extends SugarRecord> List<T> listAll(Class<T> type) {
