@@ -90,6 +90,62 @@ public class SugarRecord<T> {
         getSugarContext().database.closeDB();
     }
 
+    public static <T extends SugarRecord> void saveInTx(Class<T> type, T... objects ) {
+        long start = System.currentTimeMillis();
+
+        SQLiteDatabase sqLiteDatabase = getSugarContext().database.openDB();
+
+        try{
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for(T object: objects){
+                object.save(sqLiteDatabase);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        }catch (Exception e){
+
+        }finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
+
+        long end = System.currentTimeMillis();
+        Log.i("Sugar", "Time taken : " + (end - start));
+
+    }
+
+    void save(SQLiteDatabase db) {
+
+        List<Field> columns = getTableFields();
+        ContentValues values = new ContentValues(columns.size());
+        for (Field column : columns) {
+            column.setAccessible(true);
+            try {
+                if (SugarRecord.class.isAssignableFrom(column.getType())) {
+                    values.put(StringUtil.toSQLName(column.getName()),
+                            (column.get(this) != null)
+                                    ? String.valueOf(((SugarRecord) column.get(this)).id)
+                                    : "0");
+                } else {
+                    if (!"id".equalsIgnoreCase(column.getName())) {
+                        values.put(StringUtil.toSQLName(column.getName()),
+                                String.valueOf(column.get(this)));
+                    }
+                }
+
+            } catch (IllegalAccessException e) {
+                Log.e("Sugar", e.getMessage());
+            }
+        }
+
+        if (id == null)
+            id = db.insert(getSqlName(), null, values);
+        else
+            db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+
+        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+    }
+
     public static <T extends SugarRecord> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
