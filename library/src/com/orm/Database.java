@@ -13,16 +13,18 @@ public class Database {
     }
 
 
-  public SQLiteDatabase openDB() {
-    this.sqLiteDatabase = this.sugarDb.getWritableDatabase();
+    public SQLiteDatabase openDB() {
+        if (this.sqLiteDatabase == null) {
+            this.sqLiteDatabase = this.sugarDb.getWritableDatabase();
+        }
 
-    return this.sqLiteDatabase;
-  }
-
-  public void closeDB() {
-    if (this.sqLiteDatabase != null) {
-      this.sqLiteDatabase.close();
-      this.sqLiteDatabase = null;
+        return this.sqLiteDatabase;
     }
-  }
+
+    public void closeDB() {
+        if (this.sqLiteDatabase != null) {
+            this.sqLiteDatabase.close();
+            this.sqLiteDatabase = null;
+        }
+    }
 }
