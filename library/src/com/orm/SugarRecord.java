@@ -24,7 +24,7 @@ public class SugarRecord<T> {
     private Database database;
     @Ignore
     String tableName = getSqlName();
-    
+
     protected Long id = null;
 
     public SugarRecord(Context context) {
@@ -39,26 +39,24 @@ public class SugarRecord<T> {
     }
 
     public void delete() {
-        SQLiteDatabase db = getSugarContext().database.openDB();
+        SQLiteDatabase db = getSugarContext().database.getDB();
         db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
-        getSugarContext().database.closeDB();
-
     }
 
     public static <T extends SugarRecord> void deleteAll(Class<T> type) {
         Database db = getSugarContext().database;
-        SQLiteDatabase sqLiteDatabase = db.openDB();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(getTableName(type), null, null);
     }
 
     public static <T extends SugarRecord> void deleteAll(Class<T> type, String whereClause, String... whereArgs ) {
         Database db = getSugarContext().database;
-        SQLiteDatabase sqLiteDatabase = db.openDB();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
     }
 
     public void save() {
-        SQLiteDatabase sqLiteDatabase = getSugarContext().database.openDB();
+        SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
@@ -87,13 +85,12 @@ public class SugarRecord<T> {
                 sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
-        getSugarContext().database.closeDB();
     }
 
     public static <T extends SugarRecord> void saveInTx(Class<T> type, T... objects ) {
         long start = System.currentTimeMillis();
 
-        SQLiteDatabase sqLiteDatabase = getSugarContext().database.openDB();
+        SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
 
         try{
             sqLiteDatabase.beginTransaction();
@@ -164,7 +161,7 @@ public class SugarRecord<T> {
     public static <T extends SugarRecord> List<T> findWithQuery(Class<T> type, String query, String... arguments){
 
         Database db = getSugarContext().database;
-        SQLiteDatabase sqLiteDatabase = db.openDB();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
         List<T> toRet = new ArrayList<T>();
         Cursor c = sqLiteDatabase.rawQuery(query, arguments);
@@ -184,14 +181,14 @@ public class SugarRecord<T> {
     }
 
     public static void executeQuery(String query, String... arguments){
-        getSugarContext().database.openDB().execSQL(query, arguments);
+        getSugarContext().database.getDB().execSQL(query, arguments);
     }
 
     public static <T extends SugarRecord> List<T> find(Class<T> type,
                                                        String whereClause, String[] whereArgs,
                                                        String groupBy, String orderBy, String limit) {
         Database db = getSugarContext().database;
-        SQLiteDatabase sqLiteDatabase = db.openDB();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
         List<T> toRet = new ArrayList<T>();
         Cursor c = sqLiteDatabase.query(getTableName(type), null,
@@ -284,9 +281,9 @@ public class SugarRecord<T> {
 
         Log.d("Sugar", "Fetching properties");
         List<Field> typeFields = new ArrayList<Field>();
-        
+
         getAllFields(typeFields, getClass());
-        
+
         List<Field> toStore = new ArrayList<Field>();
         for (Field field : typeFields) {
             if (!field.isAnnotationPresent(Ignore.class)) {
@@ -297,7 +294,7 @@ public class SugarRecord<T> {
         SugarConfig.setFields(getClass(), toStore);
         return toStore;
     }
-    
+
     private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
         Collections.addAll(fields, type.getDeclaredFields());
 
