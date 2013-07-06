@@ -13,7 +13,7 @@ public class Database {
     }
 
 
-    public SQLiteDatabase openDB() {
+    public synchronized SQLiteDatabase getDB() {
         if (this.sqLiteDatabase == null) {
             this.sqLiteDatabase = this.sugarDb.getWritableDatabase();
         }
@@ -21,10 +21,4 @@ public class Database {
         return this.sqLiteDatabase;
     }
 
-    public void closeDB() {
-        if (this.sqLiteDatabase != null) {
-            this.sqLiteDatabase.close();
-            this.sqLiteDatabase = null;
-        }
-    }
 }
