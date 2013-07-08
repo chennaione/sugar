@@ -34,29 +34,29 @@ public class SugarActivity extends Activity
 
 
 
-//        Note n1 = new Note(this, 10, "note1", "description1", t1);
-//        Note n2 = new Note(this, 10, "note2", "description2", t1);
-//        Note n3 = new Note(this, 10, "note3", "description3", t2);
-//        Note n4 = new Note(this, 10, "note4", "description4", t2);
-//
-//         TextNote textNote = new TextNote(this);
-//         textNote.desc = "Test";
-//
-//         textNote.save();
-//        n1.save();
-//        n2.save();
-//        n3.save();
-//        n4.save();
-//
-//         n1.setDescription("matrix");
-//         n1.setTitle("atrix");
-//         n1.save();
-//         n2.setDescription("matrix");
-//         n2.setTitle("satrix");
-//         n2.save();
-//         n3.setDescription("matrix");
-//         n3.setTitle("batrix");
-//         n3.save();
+        Note n1 = new Note(this, 10, "note1", "description1", t1);
+        Note n2 = new Note(this, 10, "note2", "description2", t1);
+        Note n3 = new Note(this, 10, "note3", "description3", t2);
+        Note n4 = new Note(this, 10, "note4", "description4", t2);
+
+         TextNote textNote = new TextNote(this);
+         textNote.desc = "Test";
+
+         textNote.save();
+        n1.save();
+        n2.save();
+        n3.save();
+        n4.save();
+
+         n1.setDescription("matrix");
+         n1.setTitle("atrix");
+         n1.save();
+         n2.setDescription("matrix");
+         n2.setTitle("satrix");
+         n2.save();
+         n3.setDescription("matrix");
+         n3.setTitle("batrix");
+         n3.save();
 
     }
 }
