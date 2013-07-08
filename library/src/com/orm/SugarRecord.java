@@ -87,8 +87,7 @@ public class SugarRecord<T> {
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
     }
 
-    public static <T extends SugarRecord> void saveInTx(Class<T> type, T... objects ) {
-        long start = System.currentTimeMillis();
+    public static <T extends SugarRecord> void saveInTx(T... objects ) {
 
         SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
 
@@ -100,14 +99,32 @@ public class SugarRecord<T> {
             }
             sqLiteDatabase.setTransactionSuccessful();
         }catch (Exception e){
-
+            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
         }finally {
             sqLiteDatabase.endTransaction();
             sqLiteDatabase.setLockingEnabled(true);
         }
 
-        long end = System.currentTimeMillis();
-        Log.i("Sugar", "Time taken : " + (end - start));
+    }
+
+
+    public static <T extends SugarRecord> void saveInTx(Collection<T> objects ) {
+
+        SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
+
+        try{
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for(T object: objects){
+                object.save(sqLiteDatabase);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
+        }finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
 
     }
 
