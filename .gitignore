@@ -3,3 +3,4 @@ library/gen
 library/.project
 library/.classpath
 *.class
+.DS_Store
