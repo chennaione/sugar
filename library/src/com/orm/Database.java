@@ -8,10 +8,9 @@ public class Database {
     private SugarDb sugarDb;
     private SQLiteDatabase sqLiteDatabase;
 
-    public Database(Context context){
+    public Database(Context context) {
         this.sugarDb  = new SugarDb(context);
     }
-
 
     public synchronized SQLiteDatabase getDB() {
         if (this.sqLiteDatabase == null) {
@@ -21,4 +20,8 @@ public class Database {
         return this.sqLiteDatabase;
     }
 
+    public void deleteDatabase() {
+        this.sugarDb.deleteTables(this.getDB());
+        this.sugarDb.onCreate(this.getDB());
+    }
 }

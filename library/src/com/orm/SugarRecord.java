@@ -9,6 +9,8 @@ import android.util.Log;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -84,7 +86,7 @@ public class SugarRecord<T> {
         else
                 sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
-        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+        Log.i("Sugar", getClass().getSimpleName() + " saved: " + id);
     }
 
     public static <T extends SugarRecord> void saveInTx(T... objects ) {
@@ -157,7 +159,7 @@ public class SugarRecord<T> {
         else
             db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
-        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+        Log.i("Sugar", getClass().getSimpleName() + " saved: " + id);
     }
 
     public static <T extends SugarRecord> List<T> listAll(Class<T> type) {
@@ -265,6 +267,15 @@ public class SugarRecord<T> {
                 } else if (typeString.equals("java.sql.Timestamp")) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, new Timestamp(l));
+                } else if (Enum.class.isAssignableFrom(field.getType())) {
+                    try {
+                        Method valueOf = field.getType().getMethod("valueOf", String.class);
+                        String strVal = cursor.getString(cursor.getColumnIndex(colName));
+                        Object enumVal = valueOf.invoke(field.getType(), strVal);
+                        field.set(this, enumVal);
+                    } catch (Exception e) {
+                        Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    }
                 } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
                     long id = cursor.getLong(cursor.getColumnIndex(colName));
                     if (id > 0)
@@ -272,13 +283,12 @@ public class SugarRecord<T> {
                     else
                         field.set(this, null);
                 } else
-                    Log.e("Sugar", "Class cannot be read from Sqlite3 database.");
+                    Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + typeString + ")");
             } catch (IllegalArgumentException e) {
                 Log.e("field set error", e.getMessage());
             } catch (IllegalAccessException e) {
                 Log.e("field set error", e.getMessage());
             }
-
         }
 
         for (Field f : entities.keySet()) {
@@ -296,14 +306,14 @@ public class SugarRecord<T> {
         List<Field> fieldList = SugarConfig.getFields(getClass());
         if(fieldList != null) return fieldList;
 
-        Log.d("Sugar", "Fetching properties");
+        Log.d("Sugar", "fetching properties for " + getClass().getSimpleName());
         List<Field> typeFields = new ArrayList<Field>();
 
         getAllFields(typeFields, getClass());
 
         List<Field> toStore = new ArrayList<Field>();
         for (Field field : typeFields) {
-            if (!field.isAnnotationPresent(Ignore.class)) {
+            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers())) {
                 toStore.add(field);
             }
         }
