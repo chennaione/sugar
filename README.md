@@ -1,5 +1,5 @@
 Please follow the documentation at
-http://satyan.github.com/sugar
+http://satyan.github.io/sugar
 
 The example application is provided in the "example" folder in the source.
 
