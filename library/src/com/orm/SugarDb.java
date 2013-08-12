@@ -25,7 +25,6 @@ public class SugarDb extends SQLiteOpenHelper {
     public SugarDb(Context context) {
         super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
         this.context = context;
-
     }
 
     private <T extends SugarRecord> List<T> getDomainClasses(Context context) {
@@ -52,7 +51,7 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private <T extends SugarRecord> T getDomainClass(String className, Context context) {
-        Log.i("Sugar", "domain class");
+        Log.i("Sugar", "domain class: " + className);
         Class discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
@@ -79,7 +78,6 @@ public class SugarDb extends SQLiteOpenHelper {
         }
 
         return null;
-
     }
 
     private Enumeration getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
@@ -98,7 +96,7 @@ public class SugarDb extends SQLiteOpenHelper {
         createDatabase(sqLiteDatabase);
     }
 
-    private <T extends SugarRecord> void createDatabase(SQLiteDatabase sqLiteDatabase) {
+    public <T extends SugarRecord> void createDatabase(SQLiteDatabase sqLiteDatabase) {
         List<T> domainClasses = getDomainClasses(context);
         for (T domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
@@ -106,7 +104,6 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private <T extends SugarRecord> void createTable(T table, SQLiteDatabase sqLiteDatabase) {
-        Log.i("Sugar", "create table");
         List<Field> fields = table.getTableFields();
         StringBuilder sb = new StringBuilder("CREATE TABLE ").append(table.getSqlName()).append(
                 " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
@@ -125,7 +122,7 @@ public class SugarDb extends SQLiteOpenHelper {
         }
         sb.append(" ) ");
 
-        Log.i("Sugar", "creating table " + table.getSqlName());
+        Log.i("Sugar", "creating table: " + table.getSqlName());
 
         if (!"".equals(sb.toString()))
             sqLiteDatabase.execSQL(sb.toString());
@@ -140,9 +137,10 @@ public class SugarDb extends SQLiteOpenHelper {
         }
     }
 
-    private <T extends SugarRecord> void deleteTables(SQLiteDatabase sqLiteDatabase) {
+    public <T extends SugarRecord> void deleteTables(SQLiteDatabase sqLiteDatabase) {
         List<T> tables = getDomainClasses(this.context);
         for (T table : tables) {
+            Log.i("Sugar", "dropping table: " + table.getSqlName());
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + table.getSqlName());
         }
     }
@@ -155,7 +153,7 @@ public class SugarDb extends SQLiteOpenHelper {
             Collections.sort(files, new NumberComparator());
 
             for (String file : files){
-                Log.i("Sugar", "filename : " + file);
+                Log.i("Sugar", "filename: " + file);
                 try {
                     int version = Integer.valueOf(file.replace(".sql", ""));
 
@@ -188,7 +186,7 @@ public class SugarDb extends SQLiteOpenHelper {
             Log.e("Sugar", e.getMessage());
         }
 
-        Log.i("Sugar", "script : " + text.toString());
+        Log.i("Sugar", "script: " + text.toString());
         db.execSQL(text.toString());
     }
 }
