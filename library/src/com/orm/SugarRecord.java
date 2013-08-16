@@ -142,8 +142,15 @@ public class SugarRecord<T> {
                                     : "0");
                 } else {
                     if (!"id".equalsIgnoreCase(column.getName())) {
-                        values.put(StringUtil.toSQLName(column.getName()),
-                                String.valueOf(column.get(this)));
+                        if (Date.class.equals(column.getType())) {
+                            values.put(StringUtil.toSQLName(column.getName()), ((Date) column.get(this)).getTime());
+                        }
+                        else if (Calendar.class.equals(column.getType())) {
+                            values.put(StringUtil.toSQLName(column.getName()), ((Calendar) column.get(this)).getTimeInMillis());
+                        }
+                        else {
+                            values.put(StringUtil.toSQLName(column.getName()), String.valueOf(column.get(this)));
+                        }
                     }
                 }
 
@@ -265,6 +272,14 @@ public class SugarRecord<T> {
                 } else if (typeString.equals("java.sql.Timestamp")) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, new Timestamp(l));
+                } else if (typeString.equals("java.util.Date")) {
+                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    field.set(this, new Date(l));
+                } else if (typeString.equals("java.util.Calendar")) {
+                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(l);
+                    field.set(this, c);
                 } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
                     long id = cursor.getLong(cursor.getColumnIndex(colName));
                     if (id > 0)
