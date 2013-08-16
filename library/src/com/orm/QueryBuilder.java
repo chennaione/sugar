@@ -6,6 +6,7 @@ public class QueryBuilder {
         if ((type.equals(Boolean.class)) ||
                 (type.equals(Boolean.TYPE)) ||
                 (type.equals(java.util.Date.class)) ||
+                (type.equals(java.util.Calendar.class)) ||
                 (type.equals(java.sql.Date.class)) ||
                 (type.equals(Integer.class)) ||
                 (type.equals(Integer.TYPE)) ||
