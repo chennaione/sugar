@@ -58,7 +58,7 @@
               <li class="">
                 <a href="./about.html">About</a>
               </li>
-              
+
             </ul>
           </div>
         </div>
@@ -69,7 +69,7 @@
 ================================================== -->
 <header class="jumbotron subhead" id="overview">
   <div class="container">
-    
+
     <p class="lead">Query Builder (Beta)</p>
   </div>
 </header>
@@ -83,7 +83,7 @@
       <div class="span3 bs-docs-sidebar">
         <ul class="nav nav-list bs-docs-sidenav affix-top">
           <li class="active"><a href="#define"><i class="icon-chevron-right"></i> Overview</a></li>
-          
+
           </ul>
       </div>
       <div class="span9">
@@ -96,8 +96,8 @@
           <div class="page-header">
             <h1>1. Overview</h1>
           </div>
-          <p class="lead">The default way to query currently is by using the find method, where you pass the where clause and the arguments. It follows the same conventions as <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html#query(java.lang.String, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String, java.lang.String, java.lang.String, java.lang.String)">SQLiteDatabase query method </a> </p>. 
-          
+          <p class="lead">The default way to query currently is by using the find method, where you pass the where clause and the arguments. It follows the same conventions as <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html#query(java.lang.String, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String, java.lang.String, java.lang.String, java.lang.String)">SQLiteDatabase query method</a>.</p>
+
           <div class="bs-docs-example">
 
       <pre class="prettyprint linenums">
@@ -105,8 +105,8 @@ Note.find(Note.class, "name = ? and title = ?", "satya", "title1");
 </pre>
 </div>
 
-<p class="lead">If you have other conditions like group by, order by or limit, you could use the following method on the domain entity.</code>. 
-          
+<p class="lead">If you have other conditions like group by, order by or limit, you could use the following method on the domain entity:</code>
+
           <div class="bs-docs-example">
 
       <pre class="prettyprint linenums">
@@ -115,8 +115,8 @@ find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, Stri
 </pre>
 </div>
 
-<p class="lead">In case you're looking to execute a custom query, you could use the following methods:</code>. 
-          
+<p class="lead">In case you're looking to execute a custom query, you could use the following methods:</code>
+
           <div class="bs-docs-example">
 
       <pre class="prettyprint linenums">
@@ -124,14 +124,14 @@ find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, Stri
 // Could execute other raw queries too here..
 Note.executeQuery("VACUUM");
 
-// for finders using raw query. 
+// for finders using raw query.
 List&lt;Note&gt; notes = Note.findWithQuery(Note.class, "Select * from Note where name = ?", "satya");
 
 </pre>
 </div>
 
-<p class="lead">With a Query Builder approach, you could do the following:</p> 
-          
+<p class="lead">With a Query Builder approach, you could do the following:</p>
+
           <div class="bs-docs-example">
 
       <pre class="prettyprint linenums">
