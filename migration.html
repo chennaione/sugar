@@ -1,212 +1,72 @@
-<html lang="en"><head>
-    <meta charset="utf-8">
-    <title>Sugar ORM - Insanely easy way to work with Android database.</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+---
+layout: base
+title: Migration
+---
 
-    <!-- Le styles -->
-    <link href="./assets/css/bootstrap.css" rel="stylesheet">
-    <link href="./assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="./assets/css/docs.css" rel="stylesheet">
-    <link href="./assets/js/google-code-prettify/prettify.css" rel="stylesheet">
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="./assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="./assets/ico/apple-touch-icon-57-precomposed.png">
-
-  </head>
-
-  <body data-spy="scroll" data-target=".bs-docs-sidebar" data-twttr-rendered="true">
-
-    <!-- Navbar
-    ================================================== -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="./index.html">Sugar ORM</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="">
-                <a href="./index.html">Overview</a>
-              </li>
-              <li class="">
-                <a href="./getting-started.html">Get started</a>
-              </li>
-              <li class="">
-                <a href="./creation.html">Design your Entities</a>
-              </li>
-              <li class="">
-                <a href="./query.html">Query Builder</a>
-              </li>
-              <li class="active">
-                <a href="./migration.html">Database Migration</a>
-              </li>
-              <li class="">
-                <a href="./about.html">About</a>
-              </li>
-              
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-<!-- Subhead
-================================================== -->
 <header class="jumbotron subhead" id="overview">
   <div class="container">
-    
     <p class="lead">Migrating database from previous version.</p>
   </div>
 </header>
 
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 bs-docs-sidebar">
+      <ul class="nav nav-list bs-docs-sidenav affix-top">
+        <li class="active"><a href="#overview"><i class="glyphicon glyphicon-chevron-right"></i> Overview</a></li>
+        <li><a href="#script"><i class="glyphicon glyphicon-chevron-right"></i> Sample Script</a></li>
+      </ul>
+    </div>
+    <div class="col-md-9">
 
-  <div class="container">
-
-    <!-- Docs nav
-    ================================================== -->
-    <div class="row">
-      <div class="span3 bs-docs-sidebar">
-        <ul class="nav nav-list bs-docs-sidenav affix-top">
-          <li class="active"><a href="#overview"><i class="icon-chevron-right"></i> Overview</a></li>
-          <li class=""><a href="#script"><i class="icon-chevron-right"></i> Sample Script</a></li>
-        </ul>
-      </div>
-      <div class="span9">
-
-
-
-        <!-- Overview
-        ================================================== -->
         <section id="overview">
           <div class="page-header">
             <h1>1. Overview</h1>
           </div>
           <p class="lead">Most apps go through database schema changes as they grow and release multiple revisions. Sugar provides an easy way to upgrade the database. The inspiration is again from the way Rails migrations work. Here's how you'd do it:</p>
-          
-      <ul>
-        <li><p class="lead">Create a folder named <code>sugar_upgrades</code> in your <code>assets</code> folder.</p></li>
-        <li><p class="lead">Create a file named <code>&lt;version&gt;.sql</code> in that folder, which corresponds to the database version. eg. <code>1.sql</code>, <code>2.sql</code>
-          This file would contain all the update/alter queries for that particular version.
-        </p></li>
-        <li><p class="lead">Change the <CODE>VERSION</CODE> metadata field in AndroidManifest.xml to the appropriate version.</p>
 
-      <pre class="prettyprint linenums">
-&lt;application android:label="@string/app_name" android:icon="@drawable/icon" 
-android:name="com.orm.SugarApp"&gt;
-.
-.
-&lt;meta-data android:name="DATABASE" android:value="sugar_example.db" /&gt;
-&lt;meta-data android:name="VERSION" android:value="2" /&gt;
-.
-.
-&lt;/application&gt;</pre>
+          <ul>
+            <li><p class="lead">Create a folder named <code>sugar_upgrades</code> in your <code>assets</code> folder.</p></li>
+            <li>
+              <p class="lead">Create a file named <code>&lt;version&gt;.sql</code> in that folder, which corresponds to the database version. eg. <code>1.sql</code>, <code>2.sql</code> This file would contain all the update/alter queries for that particular version.</p>
+            </li>
+            <li>
+              <p class="lead">Change the <CODE>VERSION</CODE> metadata field in AndroidManifest.xml to the appropriate version.</p>
+              <div class="bs-docs-example">
+{% highlight xml %}
+<application android:label="@string/app_name" android:icon="@drawable/icon"
+android:name="com.orm.SugarApp">
+  .
+  .
+  <meta-data android:name="DATABASE" android:value="sugar_example.db" />
+  <meta-data android:name="VERSION" android:value="2" />
+  .
+  .
+</application>
+{% endhighlight %}
+              </div>
 
-          </li>
-        <li><p class="lead">Sugar takes care of upgrading the database from its present version to the upgraded version. For eg: if the database is currently at version <code>1</code> and the upgraded version is <code>4</code>, it'd look for <code>2.sql</code>, <code>3.sql</code> and <code>4.sql</code> and execute all of the present files in that order. 
-      </ul>
+            </li>
+            <li>
+              <p class="lead">Sugar takes care of upgrading the database from its present version to the upgraded version. For eg: if the database is currently at version <code>1</code> and the upgraded version is <code>4</code>, it'd look for <code>2.sql</code>, <code>3.sql</code> and <code>4.sql</code> and execute all of the present files in that order.</p>
+            </li>
+          </ul>
         </section>
 
-
-
-        <!-- File structure
-        ================================================== -->
         <section id="script">
           <div class="page-header">
             <h1>2. Upgrade Script sample.</h1>
           </div>
-          <p class="lead"> This is a normal sql script file. You can add all your alter and insert/update queries, one line at a time. Each line is terminated by a <code>;</code> (semicolon).</p> 
+          <p class="lead">This is a normal sql script file. You can add all your alter and insert/update queries, one line at a time. Each line is terminated by a <code>;</code> (semicolon).</p>
 
           <div class="bs-docs-example">
-
             2.sql
-          
-      <pre class="prettyprint linenums">
+
+{% highlight sql %}
 alter table NOTE add NAME TEXT;
-</pre>
-</div>
-
-          
-      
+{% endhighlight %}
+          </div>
         </section>
-
-        <!-- HTML template
-        ================================================== -->
-        
-
-      </div>
     </div>
-
   </div>
-
-<a href="https://github.com/satyan/sugar"><img style="position: absolute; top: 45; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-
-
-    <!-- Footer
-    ================================================== -->
-    <footer class="footer">
-      <div class="container">
-        <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>Sugar is designed and maintained by <a href="http://twitter.com/snarayan" target="_blank">@snarayan</a>.</p>
-        <ul class="footer-links">
-          <li><a href="mailto:satya@satyanarayan.in">Send me a note</a></li>
-        </ul>
-      </div>
-    </footer>
-
-
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-    <script src="./assets/js/jquery.js"></script>
-    <script src="./assets/js/google-code-prettify/prettify.js"></script>
-    <script src="./assets/js/bootstrap-transition.js"></script>
-    <script src="./assets/js/bootstrap-alert.js"></script>
-    <script src="./assets/js/bootstrap-modal.js"></script>
-    <script src="./assets/js/bootstrap-dropdown.js"></script>
-    <script src="./assets/js/bootstrap-scrollspy.js"></script>
-    <script src="./assets/js/bootstrap-tab.js"></script>
-    <script src="./assets/js/bootstrap-tooltip.js"></script>
-    <script src="./assets/js/bootstrap-popover.js"></script>
-    <script src="./assets/js/bootstrap-button.js"></script>
-    <script src="./assets/js/bootstrap-collapse.js"></script>
-    <script src="./assets/js/bootstrap-carousel.js"></script>
-    <script src="./assets/js/bootstrap-typeahead.js"></script>
-    <script src="./assets/js/bootstrap-affix.js"></script>
-    <script src="./assets/js/application.js"></script>
-
-
-    <!-- Analytics
-    ================================================== -->
-   <script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-25734741-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
-
-  
-
+</div>

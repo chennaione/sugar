@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sugar ORM - Insanely easy way to work with Android database.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Le styles -->
+  <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./assets/css/docs.css" rel="stylesheet">
+  <link href="./assets/css/syntax.css" rel="stylesheet">
+
+  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <!-- Le fav and touch icons -->
+  <link rel="shortcut icon" href="assets/ico/favicon.ico">
+</head>
+
+<body data-spy="scroll" data-target=".bs-docs-sidebar" data-twttr-rendered="true">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="./index.html">Sugar ORM</a>
+      </div>
+
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li {% if page.title == 'Overview' %}class="active"{% endif %}>
+            <a href="./index.html">Overview</a>
+          </li>
+          <li {% if page.title == 'Getting Started' %}class="active"{% endif %}>
+            <a href="./getting-started.html">Getting started</a>
+          </li>
+          <li {% if page.title == 'Creation' %}class="active"{% endif %}>
+            <a href="./creation.html">Design your Entities</a>
+          </li>
+          <li {% if page.title == 'Query' %}class="active"{% endif %}>
+            <a href="./query.html">Query Builder</a>
+          </li>
+          <li {% if page.title == 'Migration' %}class="active"{% endif %}>
+            <a href="./migration.html">Database Migration</a>
+          </li>
+          <li {% if page.title == 'About' %}class="active"{% endif %}>
+            <a href="./about.html">About</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <a href="https://github.com/satyan/sugar"><img style="position: absolute; top: 45; right: 0; border: 0; z-index:1000" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+  {{ content }}
+
+  <footer class="footer">
+    <div class="container">
+      <p class="pull-right"><a href="#">Back to top</a></p>
+      <p>Sugar is designed and maintained by <a href="http://twitter.com/snarayan" target="_blank">@snarayan</a>.</p>
+      <p class="footer-links">
+        <a href="mailto:satya@satyanarayan.in">Send me a note</a>
+      </p>
+    </div>
+  </footer>
+
+  <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+  <script src="./assets/js/jquery.js"></script>
+  <script src="./assets/js/bootstrap.min.js"></script>
+
+  <!-- Analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-25734741-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</body>
+</html>

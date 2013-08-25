@@ -1,122 +1,44 @@
-<html lang="en"><head>
-    <meta charset="utf-8">
-    <title>Sugar ORM - Insanely easy way to work with Android database.</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+---
+layout: base
+title: About
+---
 
-    <!-- Le styles -->
-    <link href="./assets/css/bootstrap.css" rel="stylesheet">
-    <link href="./assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="./assets/css/docs.css" rel="stylesheet">
-    <link href="./assets/js/google-code-prettify/prettify.css" rel="stylesheet">
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="assets/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="./assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="./assets/ico/apple-touch-icon-57-precomposed.png">
-
-  </head>
-
-  <body data-spy="scroll" data-target=".bs-docs-sidebar" data-twttr-rendered="true">
-
-    <!-- Navbar
-    ================================================== -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="./index.html">Sugar ORM</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="">
-                <a href="./index.html">Overview</a>
-              </li>
-              <li class="active">
-                <a href="./getting-started.html">Get started</a>
-              </li>
-              <li class="">
-                <a href="./creation.html">Design your Entities</a>
-              </li>
-              <li class="">
-                <a href="./query.html">Query Builder</a>
-              </li>
-              <li class="">
-                <a href="./migration.html">Database Migration</a>
-              </li>
-              <li class="">
-                <a href="./about.html">About</a>
-              </li>
-
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-<!-- Subhead
-================================================== -->
 <header class="jumbotron subhead" id="overview">
   <div class="container">
-
-    <p class="lead">Getting started with Sugar ORM.</p>
+    <p class="lead">Getting started with Sugar ORM</p>
   </div>
 </header>
 
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 bs-docs-sidebar">
+      <ul class="nav nav-list bs-docs-sidenav affix-top">
+        <li class="active"><a href="#download-sugar"><i class="glyphicon glyphicon-chevron-right"></i> Download</a></li>
+        <li><a href="#configuration"><i class="glyphicon glyphicon-chevron-right"></i> Configuration</a></li>
+        <li><a href="#entities"><i class="glyphicon glyphicon-chevron-right"></i> Entities</a></li>
+        <li><a href="#usage"><i class="glyphicon glyphicon-chevron-right"></i> Usage</a></li>
+      </ul>
+    </div>
+    <div class="col-md-9">
+      <section id="download-sugar">
+        <div class="page-header">
+          <h1>1. Download</h1>
+        </div>
+        <p class="lead">You could include Sugar as a .jar file or as a library project to your android project.</p>
 
-  <div class="container">
-
-    <!-- Docs nav
-    ================================================== -->
-    <div class="row">
-      <div class="span3 bs-docs-sidebar">
-        <ul class="nav nav-list bs-docs-sidenav affix-top">
-          <li class="active"><a href="#download-sugar"><i class="icon-chevron-right"></i> Download</a></li>
-          <li class=""><a href="#configuration"><i class="icon-chevron-right"></i> Configuration</a></li>
-          <li class=""><a href="#entities"><i class="icon-chevron-right"></i> Entities</a></li>
-          <li class=""><a href="#usage"><i class="icon-chevron-right"></i> Usage</a></li>
-        </ul>
-      </div>
-      <div class="span9">
-
-
-
-        <!-- Download
-        ================================================== -->
-        <section id="download-sugar">
-          <div class="page-header">
-            <h1>1. Download</h1>
+        <div class="row">
+          <div class="col-md-6">
+            <h2>Download jar file</h2>
+            <p><a class="btn btn-large btn-primary" href="https://raw.github.com/satyan/sugar/master/dist/sugar-1.2.jar">Download Sugar v1.2</a></p>
           </div>
-          <p class="lead">You could include Sugar as a .jar file or as a library project to your android project.</p>
-
-          <div class="row-fluid">
-            <div class="span6">
-              <h2>Download jar file</h2>
-              <p><a class="btn btn-large btn-primary" href="https://raw.github.com/satyan/sugar/master/dist/sugar-1.2.jar">Download Sugar v1.2</a></p>
-            </div>
-            <div class="span6">
-              <h2>Download source</h2>
-              <p></p>
-              <p><a class="btn btn-large" href="https://github.com/satyan/sugar/">Download Sugar source</a></p>
-            </div>
+          <div class="col-md-6">
+            <h2>Download source</h2>
+            <p></p>
+            <p><a class="btn btn-large btn-default" href="https://github.com/satyan/sugar/">Download Sugar source</a></p>
           </div>
-        </section>
+        </div>
+      </section>
 
-
-
-        <!-- File structure
-        ================================================== -->
         <section id="configuration">
           <div class="page-header">
             <h1>2. Configuration.</h1>
@@ -124,29 +46,25 @@
           <p class="lead"> It requires minimal configuration.</p><p> All you need to do is, specify SugarApp as your application class in AndroidManifest.xml. You do that by changing the <code>android:name</code> attribute of the <code>application</code> tag.</p>
 
           <div class="bs-docs-example">
-
             AndroidManifest.xml
 
-      <pre class="prettyprint linenums">
-&lt;application android:label="@string/app_name" android:icon="@drawable/icon"
-android:name="com.orm.SugarApp"&gt;
+{% highlight xml %}
+<application android:label="@string/app_name" android:icon="@drawable/icon"
+android:name="com.orm.SugarApp">
 .
 .
-&lt;meta-data android:name="DATABASE" android:value="sugar_example.db" /&gt;
-&lt;meta-data android:name="VERSION" android:value="2" /&gt;
-&lt;meta-data android:name="QUERY_LOG" android:value="true" /&gt;
-&lt;meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.example" /&gt;
+<meta-data android:name="DATABASE" android:value="sugar_example.db" />
+<meta-data android:name="VERSION" android:value="2" />
+<meta-data android:name="QUERY_LOG" android:value="true" />
+<meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.example" />
 .
 .
-&lt;/application&gt;</pre>
-</div>
+</application>
+{% endhighlight %}
+          </div>
 
-          <p > The meta-data tags are all optional and serve the following purpose:</p>
+          <p>The meta-data tags are all optional and serve the following purpose:</p>
           <table class="table table-bordered table-striped">
-            <colgroup>
-              <col class="span1">
-              <col class="span7">
-            </colgroup>
             <thead>
               <tr>
                 <th>Metadata</th>
@@ -180,20 +98,17 @@ android:name="com.orm.SugarApp"&gt;
               </tr>
             </tbody>
           </table>
-
         </section>
 
-
-
-        <!-- Contents
-        ================================================== -->
         <section id="entities">
           <div class="page-header">
             <h1>3. Entities</h1>
           </div>
           <p class="lead">Extend <code>SugarRecord</code> for all the classes that you need persisted. <strong>That's it.</strong> Sugar takes care of table creation for you.</p><p> Note: Please retain one constructor with Context argument. (This constraint will be removed in subsequent release.)</p>
-          <pre class="prettyprint linenums">
-public class Book extends SugarRecord<Book>{
+
+          <div class="bs-docs-example">
+{% highlight java %}
+public class Book extends SugarRecord<Book> {
   String title;
   String edition;
 
@@ -207,115 +122,56 @@ public class Book extends SugarRecord<Book>{
     this.edition = edition;
   }
 }
-</pre>
+{% endhighlight %}
+          </div>
         </section>
 
-
-
-        <!-- HTML template
-        ================================================== -->
         <section id="usage">
           <div class="page-header">
             <h1>4. Basic Usage</h1>
           </div>
           <p class="lead">Performing CRUD operations are very simple. Functions like <code>save()</code>, <code>delete()</code> and <code>findById(..)</code> are provided to make the work easy.</p>
           <div class="bs-docs-example">
-
             Save Entity:
-          <pre class="prettyprint linenums">
+
+{% highlight java %}
 Book book = new Book(ctx, "Title here", "2nd edition")
 book.save();
-</pre>
-
+{% endhighlight %}
 
             Load Entity:
-          <pre class="prettyprint linenums">
+
+{% highlight java %}
 Book book = Book.findById(Book.class, 1);
-</pre>
+{% endhighlight %}
 
             Update Entity:
-          <pre class="prettyprint linenums">
+
+{% highlight java %}
 Book book = Book.findById(Book.class, 1);
 book.title = "updated title here"; // modify the values
 book.edition = "3rd edition";
 book.save(); // updates the previous entry with new values.
-</pre>
+{% endhighlight %}
 
             Delete Entity:
-          <pre class="prettyprint linenums">
+
+{% highlight java %}
 Book book = Book.findById(Book.class, 1);
 book.delete();
-</pre>
+{% endhighlight %}
 
 
             Bulk Operations:
-          <pre class="prettyprint linenums">
-List&lt;Book&gt; books = Book.listAll(Book.class);
+
+{% highlight java %}
+List<Book> books = Book.listAll(Book.class);
 
 Book.deleteAll(Book.class);
-</pre></div>
-
+{% endhighlight %}
+          </div>
         </section>
 
-      </div>
     </div>
-
   </div>
-
-
-<a href="https://github.com/satyan/sugar"><img style="position: absolute; top: 45; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-
-    <!-- Footer
-    ================================================== -->
-    <footer class="footer">
-      <div class="container">
-        <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>Sugar is designed and maintained by <a href="http://twitter.com/snarayan" target="_blank">@snarayan</a>.</p>
-        <ul class="footer-links">
-          <li><a href="mailto:satya@satyanarayan.in">Send me a note</a></li>
-        </ul>
-      </div>
-    </footer>
-
-
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-    <script src="./assets/js/jquery.js"></script>
-    <script src="./assets/js/google-code-prettify/prettify.js"></script>
-    <script src="./assets/js/bootstrap-transition.js"></script>
-    <script src="./assets/js/bootstrap-alert.js"></script>
-    <script src="./assets/js/bootstrap-modal.js"></script>
-    <script src="./assets/js/bootstrap-dropdown.js"></script>
-    <script src="./assets/js/bootstrap-scrollspy.js"></script>
-    <script src="./assets/js/bootstrap-tab.js"></script>
-    <script src="./assets/js/bootstrap-tooltip.js"></script>
-    <script src="./assets/js/bootstrap-popover.js"></script>
-    <script src="./assets/js/bootstrap-button.js"></script>
-    <script src="./assets/js/bootstrap-collapse.js"></script>
-    <script src="./assets/js/bootstrap-carousel.js"></script>
-    <script src="./assets/js/bootstrap-typeahead.js"></script>
-    <script src="./assets/js/bootstrap-affix.js"></script>
-    <script src="./assets/js/application.js"></script>
-
-
-    <!-- Analytics
-    ================================================== -->
-   <script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-25734741-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
-
-
-
+</div>
