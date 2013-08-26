@@ -5,16 +5,18 @@ title: Query
 
 <header class="jumbotron subhead" id="overview">
   <div class="container">
-    <p class="lead">Query Builder (Beta)</p>
+    <h3>Query Builder (Beta)</h3>
   </div>
 </header>
 
 <div class="container">
   <div class="row">
-    <div class="col-md-3 bs-docs-sidebar">
-      <ul class="nav nav-list bs-docs-sidenav affix-top">
-        <li class="active"><a href="#define"><i class="glyphicon glyphicon-chevron-right"></i> Overview</a></li>
-      </ul>
+    <div class="col-md-3">
+      <div id="sidebar" role="complementary" data-spy="affix" data-offset-top="80">
+        <ul class="nav sidebar">
+          <li class="active"><a href="#define">Overview</a></li>
+        </ul>
+      </div>
     </div>
     <div class="col-md-9">
 
@@ -63,9 +65,6 @@ Condition.prop("prop").eq(2))
         <p class="lead">Property names are not converted currently. So, it'd be the table column names (conversion eg: testUnderscore => test_underscore). You could fine few more examples in the <a href="https://github.com/satyan/sugar/blob/master/library/test/com/orm/query/SelectTest.java">SelectTest.java</a> class.
         </p>
       </section>
-
-
-
 
     </div>
   </div>
