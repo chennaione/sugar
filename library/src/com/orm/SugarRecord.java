@@ -61,16 +61,39 @@ public class SugarRecord<T> {
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
             column.setAccessible(true);
+            Class<?> columnType = column.getType();
             try {
-                if (SugarRecord.class.isAssignableFrom(column.getType())) {
-                    values.put(StringUtil.toSQLName(column.getName()),
-                            (column.get(this) != null)
-                                    ? String.valueOf(((SugarRecord) column.get(this)).id)
+                String columnName = StringUtil.toSQLName(column.getName());
+                Object columnValue = column.get(this);
+                if (SugarRecord.class.isAssignableFrom(columnType)) {
+                    values.put(columnName,
+                            (columnValue != null)
+                                    ? String.valueOf(((SugarRecord) columnValue).id)
                                     : "0");
                 } else {
                     if (!"id".equalsIgnoreCase(column.getName())) {
-                        values.put(StringUtil.toSQLName(column.getName()),
-                                String.valueOf(column.get(this)));
+                        if (columnType.equals(Short.class) || columnType.equals(short.class)) {
+                            values.put(columnName, (Short) columnValue);
+                        }
+                        else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
+                            values.put(columnName, (Integer) columnValue);
+                        }
+                        else if (columnType.equals(Long.class) || columnType.equals(long.class)) {
+                            values.put(columnName, (Long) columnValue);
+                        }
+                        else if (columnType.equals(Float.class) || columnType.equals(float.class)) {
+                            values.put(columnName, (Float) columnValue);
+                        }
+                        else if (columnType.equals(Double.class) || columnType.equals(double.class)) {
+                            values.put(columnName, (Double) columnValue);
+                        }
+                        else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
+                            values.put(columnName, (Boolean) columnValue);
+                        }
+                        else{
+                            values.put(columnName, String.valueOf(columnValue));
+                        }
+
                     }
                 }
 
@@ -237,45 +260,45 @@ public class SugarRecord<T> {
         for (Field field : columns) {
             field.setAccessible(true);
             try {
-                String typeString = field.getType().getName();
+                Class fieldType = field.getType();
                 String colName = StringUtil.toSQLName(field.getName());
 
                 if(colName.equalsIgnoreCase("id")){
                     long cid = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, Long.valueOf(cid));
-                }else if (typeString.equals("long")) {
+                }else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                     field.setLong(this,
                             cursor.getLong(cursor.getColumnIndex(colName)));
-                } else if (typeString.equals("java.lang.String")) {
+                } else if (fieldType.equals(String.class)) {
                     String val = cursor.getString(cursor
                             .getColumnIndex(colName));
                     field.set(this, val.equals("null") ? null : val);
-                } else if (typeString.equals("double")) {
+                } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
                     field.setDouble(this,
                             cursor.getDouble(cursor.getColumnIndex(colName)));
-                } else if (typeString.equals("boolean")) {
+                } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.setBoolean(this,
                             cursor.getString(cursor.getColumnIndex(colName))
                                     .equals("true"));
-                } else if (typeString.equals("[B")) {
+                } else if (field.getType().getName().equals("[B")) {
                     field.set(this,
                             cursor.getBlob(cursor.getColumnIndex(colName)));
-                } else if (typeString.equals("int")) {
+                } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
                     field.setInt(this,
                             cursor.getInt(cursor.getColumnIndex(colName)));
-                } else if (typeString.equals("float")) {
+                } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
                     field.setFloat(this,
                             cursor.getFloat(cursor.getColumnIndex(colName)));
-                } else if (typeString.equals("short")) {
+                } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
                     field.setShort(this,
                             cursor.getShort(cursor.getColumnIndex(colName)));
-                } else if (typeString.equals("java.sql.Timestamp")) {
+                } else if (fieldType.equals(Timestamp.class)) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, new Timestamp(l));
-                } else if (typeString.equals("java.util.Date")) {
+                } else if (fieldType.equals(Date.class)) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, new Date(l));
-                } else if (typeString.equals("java.util.Calendar")) {
+                } else if (fieldType.equals(Calendar.class)) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
