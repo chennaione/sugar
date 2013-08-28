@@ -9,6 +9,8 @@ import android.util.Log;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.*;
 
