@@ -2,7 +2,7 @@ package com.orm;
 
 public class QueryBuilder {
 
-    public static String getColumnType(Class type) {
+    public static String getColumnType(Class<?> type) {
         if ((type.equals(Boolean.class)) ||
                 (type.equals(Boolean.TYPE)) ||
                 (type.equals(java.util.Date.class)) ||

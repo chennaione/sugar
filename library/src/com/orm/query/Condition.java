@@ -1,7 +1,5 @@
 package com.orm.query;
 
-import java.util.ResourceBundle;
-
 public class Condition {
     private String property;
     private Object value;

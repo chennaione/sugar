@@ -43,13 +43,13 @@ public class SugarRecord<T> {
         db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
     }
 
-    public static <T extends SugarRecord> void deleteAll(Class<T> type) {
+    public static <T extends SugarRecord<?>> void deleteAll(Class<T> type) {
         Database db = getSugarContext().database;
         SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(getTableName(type), null, null);
     }
 
-    public static <T extends SugarRecord> void deleteAll(Class<T> type, String whereClause, String... whereArgs ) {
+    public static <T extends SugarRecord<?>> void deleteAll(Class<T> type, String whereClause, String... whereArgs ) {
         Database db = getSugarContext().database;
         SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
@@ -110,7 +110,8 @@ public class SugarRecord<T> {
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
     }
 
-    public static <T extends SugarRecord> void saveInTx(T... objects ) {
+    @SuppressWarnings("deprecation")
+    public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
 
         SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
 
@@ -130,8 +131,8 @@ public class SugarRecord<T> {
 
     }
 
-
-    public static <T extends SugarRecord> void saveInTx(Collection<T> objects ) {
+    @SuppressWarnings("deprecation")
+    public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
 
         SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
 
@@ -190,22 +191,22 @@ public class SugarRecord<T> {
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
     }
 
-    public static <T extends SugarRecord> List<T> listAll(Class<T> type) {
+    public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
 
-    public static <T extends SugarRecord> T findById(Class<T> type, Long id) {
+    public static <T extends SugarRecord<?>> T findById(Class<T> type, Long id) {
         List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if (list.isEmpty()) return null;
         return list.get(0);
     }
 
-    public static <T extends SugarRecord> List<T> find(Class<T> type,
+    public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String... whereArgs) {
         return find(type, whereClause, whereArgs, null, null, null);
     }
 
-    public static <T extends SugarRecord> List<T> findWithQuery(Class<T> type, String query, String... arguments){
+    public static <T extends SugarRecord<?>> List<T> findWithQuery(Class<T> type, String query, String... arguments){
 
         Database db = getSugarContext().database;
         SQLiteDatabase sqLiteDatabase = db.getDB();
@@ -231,7 +232,7 @@ public class SugarRecord<T> {
         getSugarContext().database.getDB().execSQL(query, arguments);
     }
 
-    public static <T extends SugarRecord> List<T> find(Class<T> type,
+    public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String[] whereArgs,
                                                        String groupBy, String orderBy, String limit) {
         Database db = getSugarContext().database;
@@ -254,6 +255,7 @@ public class SugarRecord<T> {
         return toRet;
     }
 
+    @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
         Map<Field, Long> entities = new HashMap<Field, Long>();
         List<Field> columns = getTableFields();
@@ -321,7 +323,7 @@ public class SugarRecord<T> {
 
         for (Field f : entities.keySet()) {
             try {
-                f.set(this, findById((Class<? extends SugarRecord>) f.getType(),
+                f.set(this, findById((Class<? extends SugarRecord<?>>) f.getType(), 
                         entities.get(f)));
             } catch (SQLiteException e) {
             } catch (IllegalArgumentException e) {
