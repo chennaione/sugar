@@ -230,67 +230,68 @@ public class SugarRecord<T> {
         for (Field field : columns) {
             field.setAccessible(true);
             try {
-                Class fieldType = field.getType();
+                Class<?> fieldType = field.getType();
                 String colName = StringUtil.toSQLName(field.getName());
-
-                if (cursor.isNull(cursor.getColumnIndex(colName))) {
+                int index = cursor.getColumnIndex(colName);
+                
+                if (cursor.isNull(index)) {
                     field.set(this, null);
                 } 
                 else if(colName.equalsIgnoreCase("id")){
-                    long cid = cursor.getLong(cursor.getColumnIndex(colName));
+                    long cid = cursor.getLong(index);
                     field.set(this, Long.valueOf(cid));
                 }
                 else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
-                    field.setLong(this, cursor.getLong(cursor.getColumnIndex(colName)));
+                    field.setLong(this, cursor.getLong(index));
                 } 
                 else if (fieldType.equals(String.class)) {
-                    String val = cursor.getString(cursor.getColumnIndex(colName));
+                    String val = cursor.getString(index);
                     field.set(this, val.equals("null") ? null : val);
                 } 
                 else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                    field.setDouble(this, cursor.getDouble(cursor.getColumnIndex(colName)));
+                    field.setDouble(this, cursor.getDouble(index));
                 } 
                 else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                    field.setBoolean(this, cursor.getString(cursor.getColumnIndex(colName)).equals("true"));
+                    field.setBoolean(this, cursor.getString(index).equals("true"));
                 } 
                 else if (fieldType.getName().equals("[B")) {
-                    field.set(this, cursor.getBlob(cursor.getColumnIndex(colName)));
+                    field.set(this, cursor.getBlob(index));
                 } 
                 else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
-                    field.setInt(this, cursor.getInt(cursor.getColumnIndex(colName)));
+                    field.setInt(this, cursor.getInt(index));
                 } 
                 else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                    field.setFloat(this, cursor.getFloat(cursor.getColumnIndex(colName)));
+                    field.setFloat(this, cursor.getFloat(index));
                 } 
                 else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
-                    field.setShort(this, cursor.getShort(cursor.getColumnIndex(colName)));
+                    field.setShort(this, cursor.getShort(index));
                 } 
                 else if (fieldType.equals(Timestamp.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(index);
                     field.set(this, new Timestamp(l));
                 } 
                 else if (fieldType.equals(Date.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(index);
                     field.set(this, new Date(l));
                 } 
                 else if (fieldType.equals(Calendar.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(index);
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
                     field.set(this, c);
                 } 
-                else if (Enum.class.isAssignableFrom(field.getType())) {
+                else if (Enum.class.isAssignableFrom(fieldType)) {
                     try {
-                        Method valueOf = field.getType().getMethod("valueOf", String.class);
-                        String strVal = cursor.getString(cursor.getColumnIndex(colName));
-                        Object enumVal = valueOf.invoke(field.getType(), strVal);
+                        Method valueOf = fieldType.getMethod("valueOf", String.class);
+                        String strVal = cursor.getString(index);
+                        Object enumVal = valueOf.invoke(fieldType, strVal);
                         field.set(this, enumVal);
                     } catch (Exception e) {
                         Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
                     }
                 } 
-                else if (SugarRecord.class.isAssignableFrom(field.getType())) {
-                    long id = cursor.getLong(cursor.getColumnIndex(colName));
+                else if (SugarRecord.class.isAssignableFrom(fieldType)) {
+                    long id = cursor.getLong(index);
                     if (id > 0)
                         entities.put(field, id);
                     else
