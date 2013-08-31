@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Select<T extends SugarRecord> {
+public class Select<T extends SugarRecord<?>> {
 
     private Class<T> record;
     private String[] arguments;
@@ -21,33 +21,33 @@ public class Select<T extends SugarRecord> {
         this.record = record;
     }
 
-    public static <T extends SugarRecord> Select from(Class<T> record) {
+    public static <T extends SugarRecord<?>> Select<?> from(Class<T> record) {
         return new Select<T>(record);
     }
 
-    public Select orderBy(String prop) {
+    public Select<?> orderBy(String prop) {
         this.orderBy = prop;
         return this;
     }
 
-    public Select groupBy(String prop) {
+    public Select<?> groupBy(String prop) {
         this.groupBy = prop;
         return this;
     }
 
-    public Select limit(String limit) {
+    public Select<?> limit(String limit) {
         this.limit = limit;
         return this;
     }
 
 
 
-    public Select where(String whereClause) {
+    public Select<?> where(String whereClause) {
         this.whereClause = whereClause;
         return this;
     }
 
-    public Select where(Condition... condition) {
+    public Select<?> where(Condition... condition) {
 
         mergeConditions(condition, Condition.Type.AND);
 
@@ -74,22 +74,22 @@ public class Select<T extends SugarRecord> {
         }
     }
 
-    public Select whereOr(Condition... args) {
+    public Select<?> whereOr(Condition... args) {
         mergeConditions(args, Condition.Type.OR);
         return this;
     }
 
-    public Select and(Condition... args) {
+    public Select<?> and(Condition... args) {
         mergeConditions(args, Condition.Type.AND);
         return this;
     }
 
-    public Select or(Condition... args) {
+    public Select<?> or(Condition... args) {
         mergeConditions(args, Condition.Type.OR);
         return this;
     }
 
-    public Select where(String whereClause, String[] args) {
+    public Select<?> where(String whereClause, String[] args) {
         this.whereClause = whereClause;
         this.arguments = args;
         return this;
