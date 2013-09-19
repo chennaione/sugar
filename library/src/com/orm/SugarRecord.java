@@ -281,7 +281,7 @@ public class SugarRecord<T> {
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.setBoolean(this,
                             cursor.getString(cursor.getColumnIndex(colName))
-                                    .equals("true"));
+                                    .equals("1"));
                 } else if (field.getType().getName().equals("[B")) {
                     field.set(this,
                             cursor.getBlob(cursor.getColumnIndex(colName)));
