@@ -30,33 +30,33 @@ public class SugarRecord<T> {
     public SugarRecord(Context context) {
         this.context = context;
         // this.application = (SugarApp) context.getApplicationContext();
-        this.database = ((SugarApp) context.getApplicationContext()).database;
+        this.database = ((SugarApp) context.getApplicationContext()).getDatabase();
     }
 
     public SugarRecord(){
         this.context = SugarApp.getSugarContext();
-        this.database = SugarApp.getSugarContext().database;
+        this.database = SugarApp.getSugarContext().getDatabase();
     }
 
     public void delete() {
-        SQLiteDatabase db = getSugarContext().database.getDB();
+        SQLiteDatabase db = getSugarContext().getDatabase().getDB();
         db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
     }
 
     public static <T extends SugarRecord<?>> void deleteAll(Class<T> type) {
-        Database db = getSugarContext().database;
+        Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(getTableName(type), null, null);
     }
 
     public static <T extends SugarRecord<?>> void deleteAll(Class<T> type, String whereClause, String... whereArgs ) {
-        Database db = getSugarContext().database;
+        Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
     }
 
     public void save() {
-        SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
+        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
@@ -113,7 +113,7 @@ public class SugarRecord<T> {
     @SuppressWarnings("deprecation")
     public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
 
-        SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
+        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
 
         try{
             sqLiteDatabase.beginTransaction();
@@ -134,7 +134,7 @@ public class SugarRecord<T> {
     @SuppressWarnings("deprecation")
     public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
 
-        SQLiteDatabase sqLiteDatabase = getSugarContext().database.getDB();
+        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
 
         try{
             sqLiteDatabase.beginTransaction();
@@ -208,7 +208,7 @@ public class SugarRecord<T> {
 
     public static <T extends SugarRecord<?>> List<T> findWithQuery(Class<T> type, String query, String... arguments){
 
-        Database db = getSugarContext().database;
+        Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
         List<T> toRet = new ArrayList<T>();
@@ -229,13 +229,13 @@ public class SugarRecord<T> {
     }
 
     public static void executeQuery(String query, String... arguments){
-        getSugarContext().database.getDB().execSQL(query, arguments);
+        getSugarContext().getDatabase().getDB().execSQL(query, arguments);
     }
 
     public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String[] whereArgs,
                                                        String groupBy, String orderBy, String limit) {
-        Database db = getSugarContext().database;
+        Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
         List<T> toRet = new ArrayList<T>();
