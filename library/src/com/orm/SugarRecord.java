@@ -90,7 +90,12 @@ public class SugarRecord<T> {
                         else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
                             values.put(columnName, (Boolean) columnValue);
                         }
-                        else{
+                        else if (Date.class.equals(columnType)) {
+                            values.put(columnName, ((Date) column.get(this)).getTime());
+                        }
+                        else if (Calendar.class.equals(columnType)) {
+                            values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
+                        }else{
                             values.put(columnName, String.valueOf(columnValue));
                         }
 
@@ -269,7 +274,7 @@ public class SugarRecord<T> {
                     long cid = cursor.getLong(cursor.getColumnIndex(colName));
                     field.set(this, Long.valueOf(cid));
                 }else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
-                    field.setLong(this,
+                    field.set(this,
                             cursor.getLong(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(String.class)) {
                     String val = cursor.getString(cursor
@@ -279,20 +284,20 @@ public class SugarRecord<T> {
                     field.setDouble(this,
                             cursor.getDouble(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                    field.setBoolean(this,
+                    field.set(this,
                             cursor.getString(cursor.getColumnIndex(colName))
                                     .equals("1"));
                 } else if (field.getType().getName().equals("[B")) {
                     field.set(this,
                             cursor.getBlob(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
-                    field.setInt(this,
+                    field.set(this,
                             cursor.getInt(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                    field.setFloat(this,
+                    field.set(this,
                             cursor.getFloat(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
-                    field.setShort(this,
+                    field.set(this,
                             cursor.getShort(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(Timestamp.class)) {
                     long l = cursor.getLong(cursor.getColumnIndex(colName));
