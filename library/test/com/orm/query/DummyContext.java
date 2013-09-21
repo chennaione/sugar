@@ -4,6 +4,7 @@ import android.content.*;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,6 +14,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.UserHandle;
+import android.view.Display;
 
 import java.io.*;
 
@@ -207,15 +210,30 @@ public class DummyContext extends Context{
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void startActivity(Intent intent, Bundle options) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
     @Override
     public void startActivities(Intent[] intents) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void startActivities(Intent[] intents, Bundle options) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
     @Override
     public void startIntentSender(IntentSender intentSender, Intent intent, int i, int i1, int i2) throws IntentSender.SendIntentException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void startIntentSender(IntentSender intent, Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options) throws IntentSender.SendIntentException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -240,6 +258,21 @@ public class DummyContext extends Context{
     }
 
     @Override
+    public void sendBroadcastAsUser(Intent intent, UserHandle user) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void sendBroadcastAsUser(Intent intent, UserHandle user, String receiverPermission) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void sendOrderedBroadcastAsUser(Intent intent, UserHandle user, String receiverPermission, BroadcastReceiver resultReceiver, Handler scheduler, int initialCode, String initialData, Bundle initialExtras) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public void sendStickyBroadcast(Intent intent) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -251,6 +284,21 @@ public class DummyContext extends Context{
 
     @Override
     public void removeStickyBroadcast(Intent intent) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void sendStickyBroadcastAsUser(Intent intent, UserHandle user) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void sendStickyOrderedBroadcastAsUser(Intent intent, UserHandle user, BroadcastReceiver resultReceiver, Handler scheduler, int initialCode, String initialData, Bundle initialExtras) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void removeStickyBroadcastAsUser(Intent intent, UserHandle user) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -381,6 +429,16 @@ public class DummyContext extends Context{
 
     @Override
     public Context createPackageContext(String s, int i) throws PackageManager.NameNotFoundException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Context createConfigurationContext(Configuration overrideConfiguration) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Context createDisplayContext(Display display) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
