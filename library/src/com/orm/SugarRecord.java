@@ -1,18 +1,28 @@
 package com.orm;
 
+import static com.orm.SugarApp.getSugarContext;
+
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+
 import com.orm.dsl.Ignore;
-
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.util.*;
-
-import static com.orm.SugarApp.getSugarContext;
 
 public class SugarRecord<T> {
 
@@ -26,6 +36,54 @@ public class SugarRecord<T> {
     String tableName = getSqlName();
 
     protected Long id = null;
+    
+    static class CursorIterator<E extends SugarRecord<?>> implements Iterator<E> {
+    	Class<E> type;
+    	Cursor cursor;
+    	
+    	public CursorIterator(Class<E> type, Cursor cursor) {
+    		this.type = type;
+    		this.cursor = cursor;
+    	}
+    	
+		@Override
+		public boolean hasNext() {
+			return cursor != null && !cursor.isClosed() && !cursor.isAfterLast();
+		}
+
+		@Override
+		public E next() {
+			E entity = null;
+			if (cursor == null || cursor.isAfterLast()) {
+				throw new NoSuchElementException();
+			}
+			
+			if (cursor.isBeforeFirst()) {
+				cursor.moveToFirst();
+			}
+			
+			try {
+				entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+				entity.inflate(cursor);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			finally {
+				cursor.moveToNext();
+				if (cursor.isAfterLast()) {
+					cursor.close();
+				}
+			}
+			return entity;
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+	
+    }
 
     public SugarRecord(Context context) {
         this.context = context;
@@ -200,11 +258,20 @@ public class SugarRecord<T> {
         return find(type, null, null, null, null, null);
     }
 
+    public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
+        return findAsIterator(type, null, null, null, null, null);
+    }
+    
     public static <T extends SugarRecord<?>> T findById(Class<T> type, Long id) {
         List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if (list.isEmpty()) return null;
         return list.get(0);
     }
+    
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+	            String whereClause, String... whereArgs) {
+    	return findAsIterator(type, whereClause, whereArgs, null, null, null);
+	}
 
     public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String... whereArgs) {
@@ -232,6 +299,13 @@ public class SugarRecord<T> {
         }
         return toRet;
     }
+    
+    public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
+        return new CursorIterator<T>(type, c);
+    }
 
     public static void executeQuery(String query, String... arguments){
         getSugarContext().getDatabase().getDB().execSQL(query, arguments);
@@ -258,6 +332,17 @@ public class SugarRecord<T> {
             c.close();
         }
         return toRet;
+    }
+    
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+            String whereClause, String[] whereArgs,
+            String groupBy, String orderBy, String limit) {
+    	
+    	Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.query(getTableName(type), null,
+                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        return new CursorIterator<T>(type, c);
     }
 
     @SuppressWarnings("unchecked")
