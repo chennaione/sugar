@@ -278,7 +278,12 @@ public class SugarRecord<T> {
         
         String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
         SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + getTableName(type) + filter);
-        sqLiteStatament.bindAllArgsAsStrings(whereArgs);
+
+        if (whereArgs != null) {
+            for (int i = whereArgs.length; i != 0; i--) {
+                sqLiteStatament.bindString(i, whereArgs[i - 1]);
+            }
+        }
               
         try {
         	toRet = sqLiteStatament.simpleQueryForLong();
