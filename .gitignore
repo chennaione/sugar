@@ -1,6 +1,7 @@
-library/bin
-library/gen
-library/.project
-library/.classpath
+bin
+gen
+.project
+.classpath
 *.class
 .DS_Store
+

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+
+import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.util.List;
@@ -15,7 +17,7 @@ public class NoteListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notelist);
 
-        List<Note> notes = Select.from(Note.class).orderBy("title").list();//Note.listAll(Note.class);
+        List<Note> notes = (List<Note>) Select.from(Note.class).orderBy("title").list();//Note.listAll(Note.class);
 
         setListAdapter(new ArrayAdapter<Note>(this,android.R.layout.simple_list_item_1, notes));
 
@@ -25,6 +27,9 @@ public class NoteListActivity extends ListActivity {
                 startActivity(intent);
             }
         });
+        
+        // TEST COUNT
+        android.util.Log.d("COUNT", "Count: " + Select.from(Note.class).where("title like '%ba%'").count() +"/"+notes.size());
     }
 
 }

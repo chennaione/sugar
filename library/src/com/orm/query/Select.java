@@ -102,6 +102,13 @@ public class Select<T extends SugarRecord<?>> {
         return T.find(record, whereClause, arguments, groupBy, orderBy, limit);
 
     }
+    
+    public int count() {
+    	
+    	if(arguments == null) arguments = convertArgs(args);
+    	
+    	return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
+    }
 
     public T first() {
 

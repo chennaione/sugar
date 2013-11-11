@@ -259,6 +259,33 @@ public class SugarRecord<T> {
         }
         return toRet;
     }
+    
+    public static <T extends SugarRecord<?>> int count(Class<?> type,
+            String whereClause, String[] whereArgs) {
+    	return count(type, whereClause, whereArgs, null, null, null);
+    }
+    
+    public static <T extends SugarRecord<?>> int count(Class<?> type,
+            String whereClause, String[] whereArgs,
+            String groupBy, String orderBy, String limit) {
+    	
+    	Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        
+        int toRet = -1;
+        Cursor c = sqLiteDatabase.query(getTableName(type), null,
+                whereClause, whereArgs, groupBy, null, orderBy, limit);
+                
+        try {
+        	toRet = c.getCount();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            c.close();
+        }
+        
+    	return toRet;
+    }
 
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
