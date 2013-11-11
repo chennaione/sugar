@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
+import android.text.TextUtils;
 import android.util.Log;
 import com.orm.dsl.Ignore;
 
@@ -260,28 +262,30 @@ public class SugarRecord<T> {
         return toRet;
     }
     
-    public static <T extends SugarRecord<?>> int count(Class<?> type,
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
             String whereClause, String[] whereArgs) {
     	return count(type, whereClause, whereArgs, null, null, null);
     }
     
-    public static <T extends SugarRecord<?>> int count(Class<?> type,
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
             String whereClause, String[] whereArgs,
             String groupBy, String orderBy, String limit) {
     	
     	Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         
-        int toRet = -1;
-        Cursor c = sqLiteDatabase.query(getTableName(type), null,
-                whereClause, whereArgs, groupBy, null, orderBy, limit);
-                
+        long toRet = -1;
+        
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
+        SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + getTableName(type) + filter);
+        sqLiteStatament.bindAllArgsAsStrings(whereArgs);
+              
         try {
-        	toRet = c.getCount();
+        	toRet = sqLiteStatament.simpleQueryForLong();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            c.close();
+        	sqLiteStatament.close();
         }
         
     	return toRet;

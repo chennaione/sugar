@@ -103,7 +103,7 @@ public class Select<T extends SugarRecord<?>> {
 
     }
     
-    public int count() {
+    public long count() {
     	
     	if(arguments == null) arguments = convertArgs(args);
     	

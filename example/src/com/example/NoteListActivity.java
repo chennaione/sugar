@@ -29,7 +29,7 @@ public class NoteListActivity extends ListActivity {
         });
         
         // TEST COUNT
-        android.util.Log.d("COUNT", "Count: " + Select.from(Note.class).where("title like '%ba%'").count() +"/"+notes.size());
+        android.util.Log.d("COUNT", "Count: " + Select.from(Note.class).where("title like '%atr%'").count() +"/"+notes.size());
     }
 
 }
