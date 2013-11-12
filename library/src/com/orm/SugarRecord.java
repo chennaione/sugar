@@ -25,13 +25,9 @@ import android.util.Log;
 import com.orm.dsl.Ignore;
 
 public class SugarRecord<T> {
-
     @Ignore
     private Context context;
-    @Ignore
-    private SugarApp application;
-    @Ignore
-    private Database database;
+
     @Ignore
     String tableName = getSqlName();
 
@@ -87,13 +83,10 @@ public class SugarRecord<T> {
 
     public SugarRecord(Context context) {
         this.context = context;
-        // this.application = (SugarApp) context.getApplicationContext();
-        this.database = ((SugarApp) context.getApplicationContext()).getDatabase();
     }
 
     public SugarRecord(){
         this.context = SugarApp.getSugarContext();
-        this.database = SugarApp.getSugarContext().getDatabase();
     }
 
     public void delete() {
