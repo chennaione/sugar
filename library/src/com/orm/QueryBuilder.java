@@ -13,8 +13,7 @@ public class QueryBuilder {
                 (type.equals(Long.class)) ||
                 (type.equals(Long.TYPE)) || (
                 (!type.isPrimitive()) &&
-                        (type.getSuperclass() != null) &&
-                        (type.getSuperclass().equals(SugarRecord.class)))) {
+                        (SugarRecord.class.isAssignableFrom(type)))) {
             return "INTEGER";
         }
 
