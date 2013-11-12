@@ -63,7 +63,7 @@ public class SugarRecord<T> {
 			}
 			
 			try {
-				entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+				entity = type.getDeclaredConstructor().newInstance();
 				entity.inflate(cursor);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -288,7 +288,7 @@ public class SugarRecord<T> {
 
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+                entity = type.getDeclaredConstructor().newInstance();
                 entity.inflate(c);
                 toRet.add(entity);
             }
@@ -322,7 +322,7 @@ public class SugarRecord<T> {
                 whereClause, whereArgs, groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+                entity = type.getDeclaredConstructor().newInstance();
                 entity.inflate(c);
                 toRet.add(entity);
             }
