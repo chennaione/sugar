@@ -420,6 +420,9 @@ public class SugarRecord<T> {
             } catch (IllegalAccessException e) {
             }
         }
+        
+        // Notify the object that loading has been completed
+        onLoad(this.getId());
     }
 
     public List<Field> getTableFields() {
@@ -467,5 +470,8 @@ public class SugarRecord<T> {
 
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    public void onLoad(Long id) {
     }
 }
