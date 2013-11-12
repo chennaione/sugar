@@ -16,6 +16,10 @@ public class QueryBuilder {
                         (SugarRecord.class.isAssignableFrom(type)))) {
             return "INTEGER";
         }
+        
+        if (type.getName().equals("[B")) {
+        	return "BLOB";
+        }
 
         if ((type.equals(Double.class)) || (type.equals(Double.TYPE)) || (type.equals(Float.class)) ||
                 (type.equals(Float.TYPE))) {
