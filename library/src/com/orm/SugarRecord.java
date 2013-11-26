@@ -347,49 +347,54 @@ public class SugarRecord<T> {
             try {
                 Class fieldType = field.getType();
                 String colName = StringUtil.toSQLName(field.getName());
+                
+                int columnIndex = cursor.getColumnIndex(colName);
+                if (cursor.isNull(columnIndex)) {
+                	continue;
+                }
 
                 if(colName.equalsIgnoreCase("id")){
-                    long cid = cursor.getLong(cursor.getColumnIndex(colName));
+                    long cid = cursor.getLong(columnIndex);
                     field.set(this, Long.valueOf(cid));
                 }else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                     field.set(this,
-                            cursor.getLong(cursor.getColumnIndex(colName)));
+                            cursor.getLong(columnIndex));
                 } else if (fieldType.equals(String.class)) {
                     String val = cursor.getString(cursor
                             .getColumnIndex(colName));
                     field.set(this, val != null && val.equals("null") ? null : val);
                 } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
                     field.setDouble(this,
-                            cursor.getDouble(cursor.getColumnIndex(colName)));
+                            cursor.getDouble(columnIndex));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.set(this,
-                            cursor.getString(cursor.getColumnIndex(colName))
+                            cursor.getString(columnIndex)
                                     .equals("1"));
                 } else if (field.getType().getName().equals("[B")) {
                     field.set(this,
-                            cursor.getBlob(cursor.getColumnIndex(colName)));
+                            cursor.getBlob(columnIndex));
                 } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
                     field.set(this,
-                            cursor.getInt(cursor.getColumnIndex(colName)));
+                            cursor.getInt(columnIndex));
                 } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
                     field.set(this,
-                            cursor.getFloat(cursor.getColumnIndex(colName)));
+                            cursor.getFloat(columnIndex));
                 } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
                     field.set(this,
-                            cursor.getShort(cursor.getColumnIndex(colName)));
+                            cursor.getShort(columnIndex));
                 } else if (fieldType.equals(Timestamp.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(columnIndex);
                     field.set(this, new Timestamp(l));
                 } else if (fieldType.equals(Date.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(columnIndex);
                     field.set(this, new Date(l));
                 } else if (fieldType.equals(Calendar.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(columnIndex);
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
                     field.set(this, c);
                 } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
-                    long id = cursor.getLong(cursor.getColumnIndex(colName));
+                    long id = cursor.getLong(columnIndex);
                     if (id > 0)
                         entities.put(field, id);
                     else
