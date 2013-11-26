@@ -3,6 +3,7 @@ package com.orm;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import dalvik.system.DexFile;
@@ -135,9 +136,27 @@ public class SugarDb extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         Log.i("Sugar", "upgrading sugar");
+        // check if some tables are to be created
+        doUpgrade(sqLiteDatabase);
+
         if (!executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion)) {
             deleteTables(sqLiteDatabase);
             onCreate(sqLiteDatabase);
+        }
+    }
+
+    /**
+     * Create the tables that do not exist.
+     */
+    private <T extends SugarRecord<?>> void doUpgrade(SQLiteDatabase sqLiteDatabase) {
+        List<T> domainClasses = getDomainClasses(context);
+        for (T domain : domainClasses) {
+            try {// we try to do a select, if fails then (?) there isn't the table
+                sqLiteDatabase.query(domain.tableName, null, null, null, null, null, null);
+            } catch (SQLiteException e) {
+                Log.i("Sugar", String.format("creating table on update (error was '%s')", e.getMessage()));
+                createTable(domain, sqLiteDatabase);
+            }
         }
     }
 
