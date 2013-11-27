@@ -352,7 +352,7 @@ public class SugarRecord<T> {
                 if (cursor.isNull(columnIndex)) {
                 	continue;
                 }
-
+                
                 if(colName.equalsIgnoreCase("id")){
                     long cid = cursor.getLong(columnIndex);
                     field.set(this, Long.valueOf(cid));
@@ -364,7 +364,7 @@ public class SugarRecord<T> {
                             .getColumnIndex(colName));
                     field.set(this, val != null && val.equals("null") ? null : val);
                 } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                    field.setDouble(this,
+                    field.set(this,
                             cursor.getDouble(columnIndex));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.set(this,
