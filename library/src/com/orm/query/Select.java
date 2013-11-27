@@ -3,9 +3,10 @@ package com.orm.query;
 import com.orm.SugarRecord;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class Select<T extends SugarRecord<?>> {
+public class Select<T extends SugarRecord<?>> implements Iterable<T> {
 
     private Class<T> record;
     private String[] arguments;
@@ -156,4 +157,11 @@ public class Select<T extends SugarRecord<?>> {
 
         return argsArray;
     }
+
+	@Override
+	public Iterator<T> iterator() {
+		if(arguments == null) arguments = convertArgs(args);
+
+        return T.findAsIterator(record, whereClause, arguments, groupBy, orderBy, limit);
+	}
 }

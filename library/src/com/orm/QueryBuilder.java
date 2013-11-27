@@ -13,9 +13,12 @@ public class QueryBuilder {
                 (type.equals(Long.class)) ||
                 (type.equals(Long.TYPE)) || (
                 (!type.isPrimitive()) &&
-                        (type.getSuperclass() != null) &&
-                        (type.getSuperclass().equals(SugarRecord.class)))) {
+                        (SugarRecord.class.isAssignableFrom(type)))) {
             return "INTEGER";
+        }
+        
+        if (type.getName().equals("[B")) {
+        	return "BLOB";
         }
 
         if ((type.equals(Double.class)) || (type.equals(Double.TYPE)) || (type.equals(Float.class)) ||
