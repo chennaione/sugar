@@ -176,20 +176,18 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private void executeScript(SQLiteDatabase db, String file) {
-        StringBuilder text = new StringBuilder();
         try {
             InputStream is = this.context.getAssets().open("sugar_upgrades/" + file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = reader.readLine()) != null) {
-                text.append(line);
-                text.append("\n");
+                Log.i("Sugar script", line);
+                db.execSQL(line.toString());
             }
         } catch (IOException e) {
             Log.e("Sugar", e.getMessage());
         }
 
-        Log.i("Sugar", "script : " + text.toString());
-        db.execSQL(text.toString());
+        Log.i("Sugar", "script executed");
     }
 }
