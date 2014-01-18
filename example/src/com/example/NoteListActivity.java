@@ -3,8 +3,11 @@ package com.example;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+
+import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.util.List;
@@ -25,6 +28,10 @@ public class NoteListActivity extends ListActivity {
                 startActivity(intent);
             }
         });
+        
+        // TEST COUNT
+//        android.util.Log.d("COUNT", "Count: " + Select.from(Note.class).where("title like '%ba%'").count() +"/"+notes.size());
+        Log.d("COUNT", "Count: " + Select.from(Note.class).where(new Condition[]{new Condition("title").eq("note")}).count() + "/" + notes.size());
     }
 
 }
