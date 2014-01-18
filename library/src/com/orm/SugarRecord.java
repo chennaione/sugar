@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
+import android.text.TextUtils;
 import android.util.Log;
 import com.orm.dsl.Ignore;
 
@@ -258,6 +260,40 @@ public class SugarRecord<T> {
             c.close();
         }
         return toRet;
+    }
+    
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
+            String whereClause, String[] whereArgs) {
+    	return count(type, whereClause, whereArgs, null, null, null);
+    }
+    
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
+            String whereClause, String[] whereArgs,
+            String groupBy, String orderBy, String limit) {
+    	
+    	Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        
+        long toRet = -1;
+        
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
+        SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + getTableName(type) + filter);
+
+        if (whereArgs != null) {
+            for (int i = whereArgs.length; i != 0; i--) {
+                sqLiteStatament.bindString(i, whereArgs[i - 1]);
+            }
+        }
+              
+        try {
+        	toRet = sqLiteStatament.simpleQueryForLong();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        	sqLiteStatament.close();
+        }
+        
+    	return toRet;
     }
 
     @SuppressWarnings("unchecked")
