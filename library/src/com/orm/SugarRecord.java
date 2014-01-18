@@ -11,6 +11,8 @@ import android.util.Log;
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -345,6 +347,15 @@ public class SugarRecord<T> {
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
                     field.set(this, c);
+                } else if (Enum.class.isAssignableFrom(field.getType())) {
+                    try {
+                        Method valueOf = field.getType().getMethod("valueOf", String.class);
+                        String strVal = cursor.getString(cursor.getColumnIndex(colName));
+                        Object enumVal = valueOf.invoke(field.getType(), strVal);
+                        field.set(this, enumVal);
+                    } catch (Exception e) {
+                        Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    }
                 } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
                     long id = cursor.getLong(cursor.getColumnIndex(colName));
                     if (id > 0)
@@ -352,7 +363,7 @@ public class SugarRecord<T> {
                     else
                         field.set(this, null);
                 } else
-                    Log.e("Sugar", "Class cannot be read from Sqlite3 database.");
+                    Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
             } catch (IllegalArgumentException e) {
                 Log.e("field set error", e.getMessage());
             } catch (IllegalAccessException e) {
@@ -383,7 +394,7 @@ public class SugarRecord<T> {
 
         List<Field> toStore = new ArrayList<Field>();
         for (Field field : typeFields) {
-            if (!field.isAnnotationPresent(Ignore.class)) {
+            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers())) {
                 toStore.add(field);
             }
         }
