@@ -44,7 +44,36 @@ public class SugarRecord<T>{
     }
 
     public void save() {
+        save(getSugarContext().getDatabase().getDB());
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
+        saveInTx(Arrays.asList(objects));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
         SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
+
+        try{
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for(T object: objects){
+                object.save(sqLiteDatabase);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
+        }finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
+
+    }
+
+    void save(SQLiteDatabase db) {
+
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
@@ -87,87 +116,6 @@ public class SugarRecord<T>{
                             values.put(columnName, String.valueOf(columnValue));
                         }
 
-                    }
-                }
-
-            } catch (IllegalAccessException e) {
-                Log.e("Sugar", e.getMessage());
-            }
-        }
-
-        if (id == null)
-                id = sqLiteDatabase.insert(getSqlName(), null, values);
-        else
-                sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
-
-        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
-    }
-
-    @SuppressWarnings("deprecation")
-    public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
-
-        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
-
-        try{
-            sqLiteDatabase.beginTransaction();
-            sqLiteDatabase.setLockingEnabled(false);
-            for(T object: objects){
-                object.save(sqLiteDatabase);
-            }
-            sqLiteDatabase.setTransactionSuccessful();
-        }catch (Exception e){
-            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
-        }finally {
-            sqLiteDatabase.endTransaction();
-            sqLiteDatabase.setLockingEnabled(true);
-        }
-
-    }
-
-    @SuppressWarnings("deprecation")
-    public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
-
-        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
-
-        try{
-            sqLiteDatabase.beginTransaction();
-            sqLiteDatabase.setLockingEnabled(false);
-            for(T object: objects){
-                object.save(sqLiteDatabase);
-            }
-            sqLiteDatabase.setTransactionSuccessful();
-        }catch (Exception e){
-            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
-        }finally {
-            sqLiteDatabase.endTransaction();
-            sqLiteDatabase.setLockingEnabled(true);
-        }
-
-    }
-
-    void save(SQLiteDatabase db) {
-
-        List<Field> columns = getTableFields();
-        ContentValues values = new ContentValues(columns.size());
-        for (Field column : columns) {
-            column.setAccessible(true);
-            try {
-                if (SugarRecord.class.isAssignableFrom(column.getType())) {
-                    values.put(StringUtil.toSQLName(column.getName()),
-                            (column.get(this) != null)
-                                    ? String.valueOf(((SugarRecord) column.get(this)).id)
-                                    : "0");
-                } else {
-                    if (!"id".equalsIgnoreCase(column.getName())) {
-                        if (Date.class.equals(column.getType())) {
-                            values.put(StringUtil.toSQLName(column.getName()), ((Date) column.get(this)).getTime());
-                        }
-                        else if (Calendar.class.equals(column.getType())) {
-                            values.put(StringUtil.toSQLName(column.getName()), ((Calendar) column.get(this)).getTimeInMillis());
-                        }
-                        else {
-                            values.put(StringUtil.toSQLName(column.getName()), String.valueOf(column.get(this)));
-                        }
                     }
                 }
 
