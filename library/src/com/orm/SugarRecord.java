@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.orm.dsl.Ignore;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -21,26 +22,9 @@ import static com.orm.SugarApp.getSugarContext;
 public class SugarRecord<T> {
 
     @Ignore
-    private Context context;
-    @Ignore
-    private SugarApp application;
-    @Ignore
-    private Database database;
-    @Ignore
     String tableName = getSqlName();
 
     protected Long id = null;
-
-    public SugarRecord(Context context) {
-        this.context = context;
-        // this.application = (SugarApp) context.getApplicationContext();
-        this.database = ((SugarApp) context.getApplicationContext()).getDatabase();
-    }
-
-    public SugarRecord(){
-        this.context = SugarApp.getSugarContext();
-        this.database = SugarApp.getSugarContext().getDatabase();
-    }
 
     public void delete() {
         SQLiteDatabase db = getSugarContext().getDatabase().getDB();
@@ -225,7 +209,7 @@ public class SugarRecord<T> {
 
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+                entity = type.getDeclaredConstructor().newInstance();
                 entity.inflate(c);
                 toRet.add(entity);
             }
@@ -252,7 +236,7 @@ public class SugarRecord<T> {
                 whereClause, whereArgs, groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor(Context.class).newInstance(getSugarContext());
+                entity = type.getDeclaredConstructor().newInstance();
                 entity.inflate(c);
                 toRet.add(entity);
             }
@@ -318,7 +302,7 @@ public class SugarRecord<T> {
                             .getColumnIndex(colName));
                     field.set(this, val != null && val.equals("null") ? null : val);
                 } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                    field.setDouble(this,
+                    field.set(this,
                             cursor.getDouble(cursor.getColumnIndex(colName)));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.set(this,
@@ -347,7 +331,7 @@ public class SugarRecord<T> {
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
                     field.set(this, c);
-                } else if (Enum.class.isAssignableFrom(field.getType())) {
+                } else if (Enum.class.isAssignableFrom(fieldType)) {
                     try {
                         Method valueOf = field.getType().getMethod("valueOf", String.class);
                         String strVal = cursor.getString(cursor.getColumnIndex(colName));
@@ -356,7 +340,7 @@ public class SugarRecord<T> {
                     } catch (Exception e) {
                         Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
                     }
-                } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
+                } else if (SugarRecord.class.isAssignableFrom(fieldType)) {
                     long id = cursor.getLong(cursor.getColumnIndex(colName));
                     if (id > 0)
                         entities.put(field, id);

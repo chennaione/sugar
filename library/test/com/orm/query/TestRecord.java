@@ -9,11 +9,6 @@ public class TestRecord extends SugarRecord<TestRecord>{
     private String name;
 
     public TestRecord(Context context) {
-        super(new DummyContext(){
-            @Override
-            public Context getApplicationContext() {
-                return null;
-            }
-        });
+        super();
     }
 }

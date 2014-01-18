@@ -67,7 +67,7 @@ public class SugarDb extends SQLiteOpenHelper {
             return null;
         } else {
             try {
-                return (T) discoveredClass.getDeclaredConstructor(Context.class).newInstance(context);
+                return (T) discoveredClass.getDeclaredConstructor().newInstance();
             } catch (InstantiationException e) {
                 Log.e("Sugar", e.getMessage());
             } catch (IllegalAccessException e) {

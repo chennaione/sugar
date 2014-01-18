@@ -8,12 +8,10 @@ public class NoteRelation  extends SugarRecord<Note> {
     int noteId;
 
 
-    public NoteRelation(Context context) {
-        super(context);
+    public NoteRelation() {
     }
 
     public NoteRelation(Context context, String name, int noteId) {
-        super(context);
         this.name = name;
         this.noteId = noteId;
 

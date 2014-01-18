@@ -6,13 +6,11 @@ import com.orm.SugarRecord;
 public class Tag extends SugarRecord<Tag>{
     private String name;
 
-    public Tag(Context context, String name) {
-        super(context);
+    public Tag(String name) {
         this.name = name;
     }
 
-    public Tag(Context context) {
-        super(context);
+    public Tag() {
     }
 
     public String getName() {
