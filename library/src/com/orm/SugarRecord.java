@@ -19,7 +19,7 @@ import java.util.*;
 
 import static com.orm.SugarApp.getSugarContext;
 
-public class SugarRecord<T> {
+public class SugarRecord<T>{
 
     @Ignore
     String tableName = getSqlName();
@@ -194,6 +194,33 @@ public class SugarRecord<T> {
         return list.get(0);
     }
 
+    public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
+        return findAsIterator(type, null, null, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+                                                                        String whereClause, String... whereArgs) {
+        return findAsIterator(type, whereClause, whereArgs, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
+        return new CursorIterator<T>(type, c);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+                                                                    String whereClause, String[] whereArgs,
+                                                                    String groupBy, String orderBy, String limit) {
+
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.query(getTableName(type), null,
+                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        return new CursorIterator<T>(type, c);
+    }
+
     public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String... whereArgs) {
         return find(type, whereClause, whereArgs, null, null, null);
@@ -261,7 +288,7 @@ public class SugarRecord<T> {
         SQLiteDatabase sqLiteDatabase = db.getDB();
 
         long toRet = -1;
-        String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where "  + whereClause : "";
         SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + getTableName(type) + filter);
 
         if (whereArgs != null) {
@@ -291,57 +318,61 @@ public class SugarRecord<T> {
                 Class fieldType = field.getType();
                 String colName = StringUtil.toSQLName(field.getName());
 
+                int columnIndex = cursor.getColumnIndex(colName);
+
+                if (cursor.isNull(columnIndex)) {
+                    continue;
+                }
+
                 if(colName.equalsIgnoreCase("id")){
-                    long cid = cursor.getLong(cursor.getColumnIndex(colName));
+                    long cid = cursor.getLong(columnIndex);
                     field.set(this, Long.valueOf(cid));
                 }else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                     field.set(this,
-                            cursor.getLong(cursor.getColumnIndex(colName)));
+                            cursor.getLong(columnIndex));
                 } else if (fieldType.equals(String.class)) {
-                    String val = cursor.getString(cursor
-                            .getColumnIndex(colName));
+                    String val = cursor.getString(columnIndex);
                     field.set(this, val != null && val.equals("null") ? null : val);
                 } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
                     field.set(this,
-                            cursor.getDouble(cursor.getColumnIndex(colName)));
+                            cursor.getDouble(columnIndex));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.set(this,
-                            cursor.getString(cursor.getColumnIndex(colName))
-                                    .equals("1"));
+                            cursor.getString(columnIndex).equals("1"));
                 } else if (field.getType().getName().equals("[B")) {
                     field.set(this,
-                            cursor.getBlob(cursor.getColumnIndex(colName)));
+                            cursor.getBlob(columnIndex));
                 } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
                     field.set(this,
-                            cursor.getInt(cursor.getColumnIndex(colName)));
+                            cursor.getInt(columnIndex));
                 } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
                     field.set(this,
-                            cursor.getFloat(cursor.getColumnIndex(colName)));
+                            cursor.getFloat(columnIndex));
                 } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
                     field.set(this,
-                            cursor.getShort(cursor.getColumnIndex(colName)));
+                            cursor.getShort(columnIndex));
                 } else if (fieldType.equals(Timestamp.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(columnIndex);
                     field.set(this, new Timestamp(l));
                 } else if (fieldType.equals(Date.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(columnIndex);
                     field.set(this, new Date(l));
                 } else if (fieldType.equals(Calendar.class)) {
-                    long l = cursor.getLong(cursor.getColumnIndex(colName));
+                    long l = cursor.getLong(columnIndex);
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
                     field.set(this, c);
                 } else if (Enum.class.isAssignableFrom(fieldType)) {
                     try {
                         Method valueOf = field.getType().getMethod("valueOf", String.class);
-                        String strVal = cursor.getString(cursor.getColumnIndex(colName));
+                        String strVal = cursor.getString(columnIndex);
                         Object enumVal = valueOf.invoke(field.getType(), strVal);
                         field.set(this, enumVal);
                     } catch (Exception e) {
                         Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
                     }
                 } else if (SugarRecord.class.isAssignableFrom(fieldType)) {
-                    long id = cursor.getLong(cursor.getColumnIndex(colName));
+                    long id = cursor.getLong(columnIndex);
                     if (id > 0)
                         entities.put(field, id);
                     else
@@ -413,4 +444,52 @@ public class SugarRecord<T> {
     public void setId(Long id) {
         this.id = id;
     }
+
+    static class CursorIterator<E extends SugarRecord<?>> implements Iterator<E> {
+        Class<E> type;
+        Cursor cursor;
+
+        public CursorIterator(Class<E> type, Cursor cursor) {
+            this.type = type;
+            this.cursor = cursor;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor != null && !cursor.isClosed() && !cursor.isAfterLast();
+        }
+
+        @Override
+        public E next() {
+            E entity = null;
+            if (cursor == null || cursor.isAfterLast()) {
+                throw new NoSuchElementException();
+            }
+
+            if (cursor.isBeforeFirst()) {
+                cursor.moveToFirst();
+            }
+
+            try {
+                entity = type.getDeclaredConstructor().newInstance();
+                entity.inflate(cursor);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                cursor.moveToNext();
+                if (cursor.isAfterLast()) {
+                    cursor.close();
+                }
+            }
+            return entity;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+
+    }
+
 }
