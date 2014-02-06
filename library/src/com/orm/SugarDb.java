@@ -17,6 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import com.orm.dsl.Index;
+
 import static com.orm.SugarConfig.getDatabaseVersion;
 import static com.orm.SugarConfig.getDebugEnabled;
 
@@ -113,6 +115,7 @@ public class SugarDb extends SQLiteOpenHelper {
         StringBuilder sb = new StringBuilder("CREATE TABLE ").append(table.getSqlName()).append(
                 " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
+        List<String> indexStatements = new ArrayList<String>();
         for (Field column : fields) {
             String columnName = StringUtil.toSQLName(column.getName());
             String columnType = QueryBuilder.getColumnType(column.getType());
@@ -124,6 +127,12 @@ public class SugarDb extends SQLiteOpenHelper {
                 }
                 sb.append(", ").append(columnName).append(" ").append(columnType);
             }
+            
+            if(column.isAnnotationPresent(Index.class)) {
+            	String idxStr = column.getAnnotation(Index.class).unique() ? "CREATE UNIQUE INDEX" : "CREATE INDEX";
+            	StringBuilder indexBuilder = new StringBuilder(idxStr).append(" IF NOT EXISTS ").append(columnName).append("_idx");
+            	indexBuilder.append(" ON ").append(table.getSqlName()).append(" (").append(columnName).append(" asc)");
+            }
         }
         sb.append(" ) ");
 
@@ -131,6 +140,10 @@ public class SugarDb extends SQLiteOpenHelper {
 
         if (!"".equals(sb.toString()))
             sqLiteDatabase.execSQL(sb.toString());
+        
+        for (String indexStatement : indexStatements) {
+			sqLiteDatabase.execSQL(indexStatement);
+		}
     }
 
     @Override
