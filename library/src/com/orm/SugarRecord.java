@@ -126,8 +126,13 @@ public class SugarRecord<T>{
 
         if (id == null)
             id = db.insert(getSqlName(), null, values);
-        else
-            db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        else {
+        	int updateCount = db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        	if (updateCount == 0) {
+        		values.put("ID", id);
+        		id = db.insert(getSqlName(), null, values);
+        	}
+        }
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
     }
