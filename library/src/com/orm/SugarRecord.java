@@ -13,7 +13,7 @@ import com.orm.util.ReflectionUtil;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static com.orm.SugarApp.getSugarContext;
+import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
 

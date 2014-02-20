@@ -6,7 +6,7 @@ import android.util.Log;
 public class SugarTransactionHelper {
 
     public static void doInTansaction(SugarTransactionHelper.Callback callback) {
-        SQLiteDatabase database = SugarApp.getSugarContext().getSugarDb().getDB();
+        SQLiteDatabase database = SugarContext.getSugarContext().getSugarDb().getDB();
         database.beginTransaction();
 
         try {
