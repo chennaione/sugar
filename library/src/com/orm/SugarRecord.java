@@ -357,7 +357,7 @@ public class SugarRecord<T>{
 
         List<Field> toStore = new ArrayList<Field>();
         for (Field field : typeFields) {
-            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers())) {
+            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers())&& !Modifier.isTransient(field.getModifiers())) {
                 toStore.add(field);
             }
         }
