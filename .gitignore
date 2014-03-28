@@ -1,4 +1,5 @@
 library/bin
+library/build
 library/gen
 library/.project
 library/.classpath
