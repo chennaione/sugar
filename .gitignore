@@ -3,5 +3,6 @@ library/build
 library/gen
 library/.project
 library/.classpath
+library/library.iml
 *.class
 .DS_Store
