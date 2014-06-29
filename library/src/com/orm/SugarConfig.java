@@ -54,6 +54,16 @@ public class SugarConfig {
         return databaseVersion;
     }
 
+    public static String getDatabasePassword(Context context) {
+        String encryptionKey = getMetaDataString(context, "ENCRYPTION_KEY");
+
+        if ((encryptionKey == null) || (encryptionKey.trim().equals(""))) {
+            encryptionKey = "DEFAULT_ENCRYPTION_KEY";
+        }
+
+        return encryptionKey;
+    }
+
     public static String getDomainPackageName(Context context){
         String domainPackageName = getMetaDataString(context, "DOMAIN_PACKAGE_NAME");
 

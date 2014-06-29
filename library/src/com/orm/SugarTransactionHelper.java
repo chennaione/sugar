@@ -1,7 +1,7 @@
 package com.orm;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import net.sqlcipher.database.SQLiteDatabase;
 
 public class SugarTransactionHelper {
 
