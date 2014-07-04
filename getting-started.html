@@ -26,18 +26,16 @@ title: Getting Started
         <div class="page-header">
           <h1>1. Download</h1>
         </div>
-        <p class="lead">You could include Sugar as a .jar file or as a library project to your android project.</p>
+        <p class="lead">Gradle:</p>
 
         <div class="row">
-          <div class="col-md-6">
-            <h2>Download jar file</h2>
-            <p><a class="btn btn-lg btn-primary" href="https://raw.github.com/satyan/sugar/master/dist/sugar-1.2.jar">Download Sugar v1.2</a></p>
-          </div>
-          <div class="col-md-6">
-            <h2>Download source</h2>
-            <p></p>
-            <p><a class="btn btn-lg btn-default" href="https://github.com/satyan/sugar/">Download Sugar source</a></p>
-          </div>
+
+
+{% highlight xml %}
+compile 'com.github.satyan:sugar:1.3'
+{% endhighlight %}
+        
+          
         </div>
       </section>
 
@@ -106,7 +104,7 @@ android:name="com.orm.SugarApp">
           <div class="page-header">
             <h1>3. Entities</h1>
           </div>
-          <p class="lead">Extend <code>SugarRecord</code> for all the classes that you need persisted. <strong>That's it.</strong> Sugar takes care of table creation for you.</p><p> Note: Please retain one constructor with Context argument. (This constraint will be removed in subsequent release.)</p>
+          <p class="lead">Extend <code>SugarRecord</code> for all the classes that you need persisted. <strong>That's it.</strong> Sugar takes care of table creation for you.</p><p> <strong>Note: Please retain the default constructor.</strong></p>
 
           <div class="bs-docs-example">
 {% highlight java %}
@@ -114,12 +112,10 @@ public class Book extends SugarRecord<Book> {
   String title;
   String edition;
 
-  public Book(Context ctx){
-    super(ctx);
+  public Book(){
   }
 
-  public Book(Context ctx, String title, String edition){
-    super(ctx);
+  public Book(String title, String edition){
     this.title = title;
     this.edition = edition;
   }
