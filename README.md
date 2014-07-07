@@ -10,6 +10,15 @@ Sugar is now available as a library project also. Add it to your project and uti
 The project is available in the folder "library"
 http://developer.android.com/tools/projects/index.html#LibraryProjects
 
+# New in version 1.3
+
+Transaction Support
+Bulk Insert of records 
+Encrypted datastore (branch : sugar-cipher using sqlcipher)
+Removed Constructor with context parameter. Needs default constructor now.
+Enhancements to QueryBuilder
+Bug fixes and other improvements.
+
 # New in version 1.2
 
 1. package restriction for domain classes.
