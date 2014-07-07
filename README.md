@@ -12,12 +12,12 @@ http://developer.android.com/tools/projects/index.html#LibraryProjects
 
 # New in version 1.3
 
-Transaction Support
-Bulk Insert of records 
-Encrypted datastore (branch : sugar-cipher using sqlcipher)
-Removed Constructor with context parameter. Needs default constructor now.
-Enhancements to QueryBuilder
-Bug fixes and other improvements.
+1. Transaction Support
+2. Bulk Insert of records 
+3. Encrypted datastore (branch : sugar-cipher using sqlcipher)
+4. Removed Constructor with context parameter. Needs default constructor now.
+5. Enhancements to QueryBuilder
+6. Bug fixes and other improvements.
 
 # New in version 1.2
 
