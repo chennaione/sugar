@@ -43,8 +43,8 @@ public class SugarRecord<T>{
         sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
     }
 
-    public void save() {
-        save(getSugarContext().getDatabase().getDB());
+    public long save() {
+        return save(getSugarContext().getDatabase().getDB());
     }
 
     @SuppressWarnings("deprecation")
@@ -72,7 +72,7 @@ public class SugarRecord<T>{
 
     }
 
-    void save(SQLiteDatabase db) {
+    long save(SQLiteDatabase db) {
 
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
@@ -138,6 +138,7 @@ public class SugarRecord<T>{
             db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+        return id;
     }
 
     public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
