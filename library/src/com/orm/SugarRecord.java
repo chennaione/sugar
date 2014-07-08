@@ -231,6 +231,10 @@ public class SugarRecord<T>{
         }
         return toRet;
     }
+
+    public static <T extends SugarRecord<?>> long count(Class<?> type) {
+        return count(type, null, null, null, null, null);
+    }
     
     public static <T extends SugarRecord<?>> long count(Class<?> type,
             String whereClause, String[] whereArgs) {
