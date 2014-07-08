@@ -56,7 +56,7 @@ Please fork this repository and contribute back using [pull requests](https://gi
 
 ## Changelog
 
-#### 1.3 [[jar](https://github.com/satyan/sugar/releases/download/v1.3/sugar-1.3.jar)]
+#### v1.3 [[jar](https://github.com/satyan/sugar/releases/download/v1.3/sugar-1.3.jar)]
 
 1. Transaction Support
 2. Bulk Insert of records 
@@ -65,7 +65,7 @@ Please fork this repository and contribute back using [pull requests](https://gi
 5. Enhancements to QueryBuilder
 6. Bug fixes and other improvements.
 
-#### 1.2 [[jar](https://github.com/satyan/sugar/releases/download/v1.2/sugar-1.2.jar)]
+#### v1.2 [[jar](https://github.com/satyan/sugar/releases/download/v1.2/sugar-1.2.jar)]
 
 1. package restriction for domain classes.
 2. metadata caching
@@ -74,7 +74,7 @@ Please fork this repository and contribute back using [pull requests](https://gi
 5. Provision for Raw queries
 6. Better and more organized api guide and usage instructions.
 
-#### 1.1 [[jar](https://github.com/satyan/sugar/releases/download/v1.1/sugar-1.1.jar)]
+#### v1.1 [[jar](https://github.com/satyan/sugar/releases/download/v1.1/sugar-1.1.jar)]
 
 1. Static api doesn't take context anymore. Hence
 
