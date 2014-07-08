@@ -108,10 +108,18 @@ public class SugarRecord<T>{
                             values.put(columnName, (Boolean) columnValue);
                         }
                         else if (Date.class.equals(columnType)) {
-                            values.put(columnName, ((Date) column.get(this)).getTime());
+                            try {
+                                values.put(columnName, ((Date) column.get(this)).getTime());
+                            } catch (NullPointerException e) {
+                                values.put(columnName, (Long) null);
+                            }
                         }
                         else if (Calendar.class.equals(columnType)) {
-                            values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
+                            try {
+                                values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
+                            } catch (NullPointerException e) {
+                                values.put(columnName, (Long) null);
+                            }
                         }else{
                             values.put(columnName, String.valueOf(columnValue));
                         }
