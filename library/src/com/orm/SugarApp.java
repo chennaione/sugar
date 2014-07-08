@@ -1,28 +1,45 @@
 package com.orm;
 
-public class SugarApp extends android.app.Application{
+import android.content.Context;
 
-    private Database database;
-    private static SugarApp sugarContext;
+public class SugarApp {
+	
+	private static SugarApp instance = null;
+	private Context context;
+	private Database database;
+	
+	private SugarApp(Context context) {
+		this.context = context;
+		this.database = new Database(context);
+	}
 
-    public void onCreate(){
-        super.onCreate();
-        SugarApp.sugarContext = this;
-        this.database = new Database(this);
-    }
+	public static SugarApp getSugarContext(){
+		if (instance == null) 
+			throw new NullPointerException("SugarApp has not been initialized properly. Call Sugar.init(Context) in your Application.onCreate() method and Sugar.terminate(Context).");
+			
+	    return instance;
+	}
 
-    public void onTerminate(){
-        if (this.database != null) {
-            this.database.getDB().close();
-        }
-        super.onTerminate();
-    }
+	public static void init(Context context) {
+		instance = new SugarApp(context);
+	}
+	
+	public static void terminate() {
+		if (instance == null)
+			return;
+		
+		instance.doTerminate();
+	}
 
-    public static SugarApp getSugarContext(){
-        return sugarContext;
-    }
-
-    protected Database getDatabase() {
+	protected Database getDatabase() {
         return database;
     }
+	
+	private void doTerminate() {
+		if (database == null)
+			return;
+
+        this.database.getDB().close();
+	}
 }
+
