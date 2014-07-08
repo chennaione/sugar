@@ -151,6 +151,10 @@ public class SugarRecord<T>{
         return list.get(0);
     }
 
+    public static <T extends SugarRecord<?>> T findById(Class<T> type, Integer id) {
+        return findById(type, Long.valueOf(id));
+    }
+
     public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
         return findAsIterator(type, null, null, null, null, null);
     }
