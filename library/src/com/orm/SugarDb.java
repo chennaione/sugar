@@ -19,7 +19,12 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 import static com.orm.SugarConfig.getDatabaseVersion;
 import static com.orm.SugarConfig.getDebugEnabled;
@@ -36,11 +41,7 @@ public class SugarDb extends SQLiteOpenHelper {
     private <T extends SugarRecord<?>> List<T> getDomainClasses(Context context) {
         List<T> domainClasses = new ArrayList<T>();
         try {
-            Enumeration<?> allClasses = getAllClasses(context);
-
-            while (allClasses.hasMoreElements()) {
-                String className = (String) allClasses.nextElement();
-
+            for (String className : getAllClasses(context)) {
                 if (className.startsWith(SugarConfig.getDomainPackageName(context))) {
                     T domainClass = getDomainClass(className, context);
                     if (domainClass != null) domainClasses.add(domainClass);
@@ -88,10 +89,26 @@ public class SugarDb extends SQLiteOpenHelper {
 
     }
 
-    private Enumeration<?> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+    private List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
         String path = getSourcePath(context);
-        DexFile dexfile = new DexFile(path);
-        return dexfile.entries();
+        List<String> classNames = new ArrayList<String>();
+        try {
+            DexFile dexfile = new DexFile(path);
+            Enumeration<String> dexEntries = dexfile.entries();
+            while (dexEntries.hasMoreElements()) {
+                classNames.add(dexEntries.nextElement());
+            }
+        } catch (NullPointerException e) {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            Enumeration<URL> urls = classLoader.getResources("");
+            while (urls.hasMoreElements()) {
+                String urlPath = urls.nextElement().getFile();
+                if (urlPath.contains("bin") || urlPath.contains("classes")) {
+                    classNames.add(urlPath);
+                }
+            }
+        }
+        return classNames;
     }
 
     private String getSourcePath(Context context) throws PackageManager.NameNotFoundException {

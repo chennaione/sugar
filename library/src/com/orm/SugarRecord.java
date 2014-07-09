@@ -43,8 +43,8 @@ public class SugarRecord<T>{
         sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
     }
 
-    public void save() {
-        save(getSugarContext().getDatabase().getDB());
+    public long save() {
+        return save(getSugarContext().getDatabase().getDB());
     }
 
     @SuppressWarnings("deprecation")
@@ -72,7 +72,7 @@ public class SugarRecord<T>{
 
     }
 
-    void save(SQLiteDatabase db) {
+    long save(SQLiteDatabase db) {
 
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
@@ -108,10 +108,18 @@ public class SugarRecord<T>{
                             values.put(columnName, (Boolean) columnValue);
                         }
                         else if (Date.class.equals(columnType)) {
-                            values.put(columnName, ((Date) column.get(this)).getTime());
+                            try {
+                                values.put(columnName, ((Date) column.get(this)).getTime());
+                            } catch (NullPointerException e) {
+                                values.put(columnName, (Long) null);
+                            }
                         }
                         else if (Calendar.class.equals(columnType)) {
-                            values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
+                            try {
+                                values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
+                            } catch (NullPointerException e) {
+                                values.put(columnName, (Long) null);
+                            }
                         }else{
                             values.put(columnName, String.valueOf(columnValue));
                         }
@@ -130,6 +138,7 @@ public class SugarRecord<T>{
             db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+        return id;
     }
 
     public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
@@ -140,6 +149,10 @@ public class SugarRecord<T>{
         List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if (list.isEmpty()) return null;
         return list.get(0);
+    }
+
+    public static <T extends SugarRecord<?>> T findById(Class<T> type, Integer id) {
+        return findById(type, Long.valueOf(id));
     }
 
     public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
@@ -221,6 +234,10 @@ public class SugarRecord<T>{
             c.close();
         }
         return toRet;
+    }
+
+    public static <T extends SugarRecord<?>> long count(Class<?> type) {
+        return count(type, null, null, null, null, null);
     }
     
     public static <T extends SugarRecord<?>> long count(Class<?> type,
