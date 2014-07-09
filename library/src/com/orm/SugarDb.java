@@ -6,6 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.orm.dsl.NotNull;
+import com.orm.dsl.Unique;
+
 import dalvik.system.DexFile;
 
 import java.io.BufferedReader;
@@ -140,6 +144,12 @@ public class SugarDb extends SQLiteOpenHelper {
                     continue;
                 }
                 sb.append(", ").append(columnName).append(" ").append(columnType);
+                if(column.isAnnotationPresent(NotNull.class)) {
+                    sb.append(" not null");
+                }
+                if(column.isAnnotationPresent(Unique.class)) {
+                    sb.append(" unique");
+                }
             }
         }
         sb.append(" ) ");
