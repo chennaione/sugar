@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import com.orm.dsl.Index;
+
 import static com.orm.SugarConfig.getDatabaseVersion;
 import static com.orm.SugarConfig.getDebugEnabled;
 
@@ -55,7 +57,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @SuppressWarnings("unchecked")
     private <T extends SugarRecord<?>> T getDomainClass(String className, Context context) {
-        Log.i("Sugar", "domain class");
+        Log.d("Sugar", "domain class");
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
@@ -113,7 +115,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        Log.i("Sugar", "on create");
+        Log.d("Sugar", "on create");
         createDatabase(sqLiteDatabase);
     }
 
@@ -125,11 +127,12 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private <T extends SugarRecord<?>> void createTable(T table, SQLiteDatabase sqLiteDatabase) {
-        Log.i("Sugar", "create table");
+        Log.d("Sugar", "create table");
         List<Field> fields = table.getTableFields();
         StringBuilder sb = new StringBuilder("CREATE TABLE ").append(table.getSqlName()).append(
                 " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
+        List<String> indexStatements = new ArrayList<String>();
         for (Field column : fields) {
             String columnName = StringUtil.toSQLName(column.getName());
             String columnType = QueryBuilder.getColumnType(column.getType());
@@ -141,18 +144,30 @@ public class SugarDb extends SQLiteOpenHelper {
                 }
                 sb.append(", ").append(columnName).append(" ").append(columnType);
             }
+            
+            if(column.isAnnotationPresent(Index.class)) {
+            	String idxStr = column.getAnnotation(Index.class).unique() ? "CREATE UNIQUE INDEX" : "CREATE INDEX";
+            	StringBuilder indexBuilder = new StringBuilder(idxStr).append(" IF NOT EXISTS ").append(table.getSqlName()).append("_").append(columnName).append("_IDX");
+            	indexBuilder.append(" ON ").append(table.getSqlName()).append(" (").append(columnName).append(" asc)");
+            	indexStatements.add(indexBuilder.toString());
+            }
         }
         sb.append(" ) ");
 
-        Log.i("Sugar", "creating table " + table.getSqlName());
+        Log.d("Sugar", "creating table " + table.getSqlName());
 
         if (!"".equals(sb.toString()))
             sqLiteDatabase.execSQL(sb.toString());
+        
+        for (String indexStatement : indexStatements) {
+        	Log.d("Sugar", "creating index " + indexStatement);
+			sqLiteDatabase.execSQL(indexStatement);
+		}
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        Log.i("Sugar", "upgrading sugar");
+        Log.d("Sugar", "upgrading sugar");
         // check if some tables are to be created
         doUpgrade(sqLiteDatabase);
 
@@ -171,7 +186,7 @@ public class SugarDb extends SQLiteOpenHelper {
             try {// we try to do a select, if fails then (?) there isn't the table
                 sqLiteDatabase.query(domain.tableName, null, null, null, null, null, null);
             } catch (SQLiteException e) {
-                Log.i("Sugar", String.format("creating table on update (error was '%s')", e.getMessage()));
+                Log.d("Sugar", String.format("creating table on update (error was '%s')", e.getMessage()));
                 createTable(domain, sqLiteDatabase);
             }
         }
@@ -192,7 +207,7 @@ public class SugarDb extends SQLiteOpenHelper {
             Collections.sort(files, new NumberComparator());
 
             for (String file : files){
-                Log.i("Sugar", "filename : " + file);
+                Log.d("Sugar", "filename : " + file);
                 try {
                     int version = Integer.valueOf(file.replace(".sql", ""));
 
@@ -201,7 +216,7 @@ public class SugarDb extends SQLiteOpenHelper {
                         isSuccess = true;
                     }
                 } catch (NumberFormatException e) {
-                    Log.i("Sugar", "not a sugar script. ignored." + file);
+                    Log.d("Sugar", "not a sugar script. ignored." + file);
                 }
             }
         } catch (IOException e) {
@@ -217,13 +232,13 @@ public class SugarDb extends SQLiteOpenHelper {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = reader.readLine()) != null) {
-                Log.i("Sugar script", line);
+                Log.d("Sugar script", line);
                 db.execSQL(line.toString());
             }
         } catch (IOException e) {
             Log.e("Sugar", e.getMessage());
         }
 
-        Log.i("Sugar", "script executed");
+        Log.d("Sugar", "script executed");
     }
 }
