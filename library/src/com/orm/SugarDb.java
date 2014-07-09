@@ -1,14 +1,10 @@
 package com.orm;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import dalvik.system.DexFile;
+import static com.orm.SugarConfig.getDatabaseVersion;
+import static com.orm.SugarConfig.getDebugEnabled;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,8 +18,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import static com.orm.SugarConfig.getDatabaseVersion;
-import static com.orm.SugarConfig.getDebugEnabled;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import dalvik.system.DexFile;
 
 public class SugarDb extends SQLiteOpenHelper {
     private Context context;
@@ -97,14 +98,41 @@ public class SugarDb extends SQLiteOpenHelper {
         } catch (NullPointerException e) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Enumeration<URL> urls = classLoader.getResources("");
+            List<String> fileNames = new ArrayList<String>();
             while (urls.hasMoreElements()) {
-                String urlPath = urls.nextElement().getFile();
-                if (urlPath.contains("bin") || urlPath.contains("classes")) {
-                    classNames.add(urlPath);
+                String classDirectoryName = urls.nextElement().getFile();
+                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
+                    File classDirectory = new File(classDirectoryName);
+                    for (File filePath : classDirectory.listFiles()) {
+                        populateFiles(filePath, fileNames, "");
+                    }
+                    classNames.addAll(fileNames);
                 }
             }
         }
         return classNames;
+    }
+    
+    private void populateFiles(File path, List<String> fileNames, String parent) {
+        if (path.isDirectory()) {
+            for (File newPath : path.listFiles()) {
+                if ("".equals(parent)) {
+                    populateFiles(newPath, fileNames, path.getName());
+                } else {
+                    populateFiles(newPath, fileNames, parent + "." + path.getName());
+                }
+            }
+        } else {
+            String pathName = path.getName();
+            String classSuffix = ".class";
+            pathName = pathName.endsWith(classSuffix) ?
+                    pathName.substring(0, pathName.length() - classSuffix.length()) : pathName;
+            if ("".equals(parent)) {
+                fileNames.add(pathName);
+            } else {
+                fileNames.add(parent + "." + pathName);
+            }
+        }
     }
 
     private String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
