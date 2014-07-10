@@ -9,8 +9,8 @@ Official documentation can be found [here](http://satyan.github.io/sugar). The e
 Sugar ORM was built in contrast to other ORM's to have:
 
 1. A simple, concise, and clean integration process with minimal configuration.
-3. Automatic table and column naming through reflection.
-4. Support for migrations between different schema versions.
+2. Automatic table and column naming through reflection.
+3. Support for migrations between different schema versions.
 
 ## Installing
 
