@@ -88,34 +88,32 @@ public class SugarRecord<T>{
                                     ? String.valueOf(((SugarRecord) columnValue).id)
                                     : "0");
                 } else {
-                    if (!"id".equalsIgnoreCase(column.getName())) {
-                        if (columnType.equals(Short.class) || columnType.equals(short.class)) {
-                            values.put(columnName, (Short) columnValue);
-                        } else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
-                            values.put(columnName, (Integer) columnValue);
-                        } else if (columnType.equals(Long.class) || columnType.equals(long.class)) {
-                            values.put(columnName, (Long) columnValue);
-                        } else if (columnType.equals(Float.class) || columnType.equals(float.class)) {
-                            values.put(columnName, (Float) columnValue);
-                        } else if (columnType.equals(Double.class) || columnType.equals(double.class)) {
-                            values.put(columnName, (Double) columnValue);
-                        } else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
-                            values.put(columnName, (Boolean) columnValue);
-                        } else if (Date.class.equals(columnType)) {
-                            try {
-                                values.put(columnName, ((Date) column.get(this)).getTime());
-                            } catch (NullPointerException e) {
-                                values.put(columnName, (Long) null);
-                            }
-                        } else if (Calendar.class.equals(columnType)) {
-                            try {
-                                values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
-                            } catch (NullPointerException e) {
-                                values.put(columnName, (Long) null);
-                            }
-                        } else {
-                            values.put(columnName, String.valueOf(columnValue));
+                    if (columnType.equals(Short.class) || columnType.equals(short.class)) {
+                        values.put(columnName, (Short) columnValue);
+                    } else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
+                        values.put(columnName, (Integer) columnValue);
+                    } else if (columnType.equals(Long.class) || columnType.equals(long.class)) {
+                        values.put(columnName, (Long) columnValue);
+                    } else if (columnType.equals(Float.class) || columnType.equals(float.class)) {
+                        values.put(columnName, (Float) columnValue);
+                    } else if (columnType.equals(Double.class) || columnType.equals(double.class)) {
+                        values.put(columnName, (Double) columnValue);
+                    } else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
+                        values.put(columnName, (Boolean) columnValue);
+                    } else if (Date.class.equals(columnType)) {
+                        try {
+                            values.put(columnName, ((Date) column.get(this)).getTime());
+                        } catch (NullPointerException e) {
+                            values.put(columnName, (Long) null);
                         }
+                    } else if (Calendar.class.equals(columnType)) {
+                        try {
+                            values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
+                        } catch (NullPointerException e) {
+                            values.put(columnName, (Long) null);
+                        }
+                    } else {
+                        values.put(columnName, String.valueOf(columnValue));
                     }
                 }
 
@@ -124,10 +122,7 @@ public class SugarRecord<T>{
             }
         }
 
-        if (id == null)
-            id = db.insert(getSqlName(), null, values);
-        else
-            db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        id = db.insertWithOnConflict(getSqlName(), null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
         return id;
