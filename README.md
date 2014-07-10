@@ -8,9 +8,9 @@ Official documentation can be found [here](http://satyan.github.io/sugar). The e
 
 Sugar ORM was built in contrast to other ORM's to have:
 
-1. A simple, concise, and clean integration process with minimal configuration.
-2. Automatic table and column naming through reflection.
-3. Support for migrations between different schema versions.
+- A simple, concise, and clean integration process with minimal configuration.
+- Automatic table and column naming through reflection.
+- Support for migrations between different schema versions.
 
 ## Installing
 
@@ -58,25 +58,25 @@ Please fork this repository and contribute back using [pull requests](https://gi
 
 #### v1.3 [[jar](https://github.com/satyan/sugar/releases/download/v1.3/sugar-1.3.jar)]
 
-1. Transaction Support
-2. Bulk Insert of records 
-3. Encrypted datastore (branch : sugar-cipher using sqlcipher)
-4. Removed Constructor with context parameter. Needs default constructor now.
-5. Enhancements to QueryBuilder
-6. Bug fixes and other improvements.
+- Transaction Support
+- Bulk Insert of records 
+- Encrypted datastore (branch : sugar-cipher using sqlcipher)
+- Removed Constructor with context parameter. Needs default constructor now.
+- Enhancements to QueryBuilder
+- Bug fixes and other improvements.
 
 #### v1.2 [[jar](https://github.com/satyan/sugar/releases/download/v1.2/sugar-1.2.jar)]
 
-1. package restriction for domain classes.
-2. metadata caching
-3. QueryBuilder v1
-4. Database Migrations
-5. Provision for Raw queries
-6. Better and more organized api guide and usage instructions.
+- package restriction for domain classes.
+- metadata caching
+- QueryBuilder v1
+- Database Migrations
+- Provision for Raw queries
+- Better and more organized api guide and usage instructions.
 
 #### v1.1 [[jar](https://github.com/satyan/sugar/releases/download/v1.1/sugar-1.1.jar)]
 
-1. Static api doesn't take context anymore. Hence
+- Static api doesn't take context anymore. Hence
 
 ```java
 Book.findById(context, Book.class, 1);
@@ -88,4 +88,4 @@ becomes
 Book.findById(Book.class, 1);
 ```
 
-2. Some cleanup in the code.
+- Some cleanup in the code.
