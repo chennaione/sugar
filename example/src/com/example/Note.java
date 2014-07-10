@@ -17,12 +17,10 @@ public class Note extends SugarRecord<Note>{
     private double noteTagNumber = 24.4;
     private Tag tag;
 
-    public Note(Context context){
-        super(context);
+    public Note(){
     }
 
-    public Note(Context context, int noteId, String title, String description, Tag tag) {
-        super(context);
+    public Note(int noteId, String title, String description, Tag tag) {
         this.noteId = noteId;
         this.title = title;
         this.description = description;

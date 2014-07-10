@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Select<T extends SugarRecord<?>> implements Iterable<T> {
+public class Select<T extends SugarRecord<?>> implements Iterable {
 
     private Class<T> record;
     private String[] arguments;
@@ -22,33 +22,33 @@ public class Select<T extends SugarRecord<?>> implements Iterable<T> {
         this.record = record;
     }
 
-    public static <T extends SugarRecord<?>> Select<?> from(Class<T> record) {
+    public static <T extends SugarRecord<T>> Select<T> from(Class<T> record) {
         return new Select<T>(record);
     }
 
-    public Select<?> orderBy(String prop) {
+    public Select<T> orderBy(String prop) {
         this.orderBy = prop;
         return this;
     }
 
-    public Select<?> groupBy(String prop) {
+    public Select<T> groupBy(String prop) {
         this.groupBy = prop;
         return this;
     }
 
-    public Select<?> limit(String limit) {
+    public Select<T> limit(String limit) {
         this.limit = limit;
         return this;
     }
 
 
 
-    public Select<?> where(String whereClause) {
+    public Select<T> where(String whereClause) {
         this.whereClause = whereClause;
         return this;
     }
 
-    public Select<?> where(Condition... condition) {
+    public Select<T> where(Condition... condition) {
 
         mergeConditions(condition, Condition.Type.AND);
 
@@ -75,22 +75,22 @@ public class Select<T extends SugarRecord<?>> implements Iterable<T> {
         }
     }
 
-    public Select<?> whereOr(Condition... args) {
+    public Select<T> whereOr(Condition... args) {
         mergeConditions(args, Condition.Type.OR);
         return this;
     }
 
-    public Select<?> and(Condition... args) {
+    public Select<T> and(Condition... args) {
         mergeConditions(args, Condition.Type.AND);
         return this;
     }
 
-    public Select<?> or(Condition... args) {
+    public Select<T> or(Condition... args) {
         mergeConditions(args, Condition.Type.OR);
         return this;
     }
 
-    public Select<?> where(String whereClause, String[] args) {
+    public Select<T> where(String whereClause, String[] args) {
         this.whereClause = whereClause;
         this.arguments = args;
         return this;
@@ -102,6 +102,13 @@ public class Select<T extends SugarRecord<?>> implements Iterable<T> {
 
         return T.find(record, whereClause, arguments, groupBy, orderBy, limit);
 
+    }
+    
+    public long count() {
+    	
+    	if(arguments == null) arguments = convertArgs(args);
+    	
+    	return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
     }
 
     public T first() {
@@ -158,10 +165,10 @@ public class Select<T extends SugarRecord<?>> implements Iterable<T> {
         return argsArray;
     }
 
-	@Override
-	public Iterator<T> iterator() {
-		if(arguments == null) arguments = convertArgs(args);
+    @Override
+    public Iterator<T> iterator() {
+        if(arguments == null) arguments = convertArgs(args);
 
         return T.findAsIterator(record, whereClause, arguments, groupBy, orderBy, limit);
-	}
+    }
 }

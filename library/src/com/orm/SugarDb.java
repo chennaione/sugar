@@ -1,23 +1,30 @@
 package com.orm;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import dalvik.system.DexFile;
+import static com.orm.SugarConfig.getDatabaseVersion;
+import static com.orm.SugarConfig.getDebugEnabled;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
-import static com.orm.SugarConfig.getDatabaseVersion;
-import static com.orm.SugarConfig.getDebugEnabled;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import dalvik.system.DexFile;
 
 public class SugarDb extends SQLiteOpenHelper {
     private Context context;
@@ -31,11 +38,7 @@ public class SugarDb extends SQLiteOpenHelper {
     private <T extends SugarRecord<?>> List<T> getDomainClasses(Context context) {
         List<T> domainClasses = new ArrayList<T>();
         try {
-            Enumeration<?> allClasses = getAllClasses(context);
-
-            while (allClasses.hasMoreElements()) {
-                String className = (String) allClasses.nextElement();
-
+            for (String className : getAllClasses(context)) {
                 if (className.startsWith(SugarConfig.getDomainPackageName(context))) {
                     T domainClass = getDomainClass(className, context);
                     if (domainClass != null) domainClasses.add(domainClass);
@@ -83,10 +86,53 @@ public class SugarDb extends SQLiteOpenHelper {
 
     }
 
-    private Enumeration<?> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+    private List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
         String path = getSourcePath(context);
-        DexFile dexfile = new DexFile(path);
-        return dexfile.entries();
+        List<String> classNames = new ArrayList<String>();
+        try {
+            DexFile dexfile = new DexFile(path);
+            Enumeration<String> dexEntries = dexfile.entries();
+            while (dexEntries.hasMoreElements()) {
+                classNames.add(dexEntries.nextElement());
+            }
+        } catch (NullPointerException e) {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            Enumeration<URL> urls = classLoader.getResources("");
+            List<String> fileNames = new ArrayList<String>();
+            while (urls.hasMoreElements()) {
+                String classDirectoryName = urls.nextElement().getFile();
+                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
+                    File classDirectory = new File(classDirectoryName);
+                    for (File filePath : classDirectory.listFiles()) {
+                        populateFiles(filePath, fileNames, "");
+                    }
+                    classNames.addAll(fileNames);
+                }
+            }
+        }
+        return classNames;
+    }
+    
+    private void populateFiles(File path, List<String> fileNames, String parent) {
+        if (path.isDirectory()) {
+            for (File newPath : path.listFiles()) {
+                if ("".equals(parent)) {
+                    populateFiles(newPath, fileNames, path.getName());
+                } else {
+                    populateFiles(newPath, fileNames, parent + "." + path.getName());
+                }
+            }
+        } else {
+            String pathName = path.getName();
+            String classSuffix = ".class";
+            pathName = pathName.endsWith(classSuffix) ?
+                    pathName.substring(0, pathName.length() - classSuffix.length()) : pathName;
+            if ("".equals(parent)) {
+                fileNames.add(pathName);
+            } else {
+                fileNames.add(parent + "." + pathName);
+            }
+        }
     }
 
     private String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
@@ -135,9 +181,27 @@ public class SugarDb extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         Log.i("Sugar", "upgrading sugar");
+        // check if some tables are to be created
+        doUpgrade(sqLiteDatabase);
+
         if (!executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion)) {
             deleteTables(sqLiteDatabase);
             onCreate(sqLiteDatabase);
+        }
+    }
+
+    /**
+     * Create the tables that do not exist.
+     */
+    private <T extends SugarRecord<?>> void doUpgrade(SQLiteDatabase sqLiteDatabase) {
+        List<T> domainClasses = getDomainClasses(context);
+        for (T domain : domainClasses) {
+            try {// we try to do a select, if fails then (?) there isn't the table
+                sqLiteDatabase.query(domain.tableName, null, null, null, null, null, null);
+            } catch (SQLiteException e) {
+                Log.i("Sugar", String.format("creating table on update (error was '%s')", e.getMessage()));
+                createTable(domain, sqLiteDatabase);
+            }
         }
     }
 
@@ -176,20 +240,18 @@ public class SugarDb extends SQLiteOpenHelper {
     }
 
     private void executeScript(SQLiteDatabase db, String file) {
-        StringBuilder text = new StringBuilder();
         try {
             InputStream is = this.context.getAssets().open("sugar_upgrades/" + file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = reader.readLine()) != null) {
-                text.append(line);
-                text.append("\n");
+                Log.i("Sugar script", line);
+                db.execSQL(line.toString());
             }
         } catch (IOException e) {
             Log.e("Sugar", e.getMessage());
         }
 
-        Log.i("Sugar", "script : " + text.toString());
-        db.execSQL(text.toString());
+        Log.i("Sugar", "script executed");
     }
 }

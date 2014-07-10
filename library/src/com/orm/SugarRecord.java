@@ -1,93 +1,30 @@
 package com.orm;
 
-import static com.orm.SugarApp.getSugarContext;
-
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
+import android.text.TextUtils;
 import android.util.Log;
-
 import com.orm.dsl.Ignore;
 
-public class SugarRecord<T> {
-    @Ignore
-    private Context context;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.sql.Timestamp;
+import java.util.*;
+
+import static com.orm.SugarApp.getSugarContext;
+
+public class SugarRecord<T>{
 
     @Ignore
     String tableName = getSqlName();
 
     protected Long id = null;
-    
-    static class CursorIterator<E extends SugarRecord<?>> implements Iterator<E> {
-    	Class<E> type;
-    	Cursor cursor;
-    	
-    	public CursorIterator(Class<E> type, Cursor cursor) {
-    		this.type = type;
-    		this.cursor = cursor;
-    	}
-    	
-		@Override
-		public boolean hasNext() {
-			return cursor != null && !cursor.isClosed() && !cursor.isAfterLast();
-		}
-
-		@Override
-		public E next() {
-			E entity = null;
-			if (cursor == null || cursor.isAfterLast()) {
-				throw new NoSuchElementException();
-			}
-			
-			if (cursor.isBeforeFirst()) {
-				cursor.moveToFirst();
-			}
-			
-			try {
-				entity = type.getDeclaredConstructor().newInstance();
-				entity.inflate(cursor);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			finally {
-				cursor.moveToNext();
-				if (cursor.isAfterLast()) {
-					cursor.close();
-				}
-			}
-			return entity;
-		}
-
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
-		}
-
-	
-    }
-
-    public SugarRecord(Context context) {
-        this.context = context;
-    }
-
-    public SugarRecord(){
-        this.context = SugarApp.getSugarContext();
-    }
 
     public void delete() {
         SQLiteDatabase db = getSugarContext().getDatabase().getDB();
@@ -106,8 +43,37 @@ public class SugarRecord<T> {
         sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
     }
 
-    public void save() {
+    public long save() {
+        return save(getSugarContext().getDatabase().getDB());
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
+        saveInTx(Arrays.asList(objects));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
         SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
+
+        try{
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for(T object: objects){
+                object.save(sqLiteDatabase);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
+        }finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
+
+    }
+
+    long save(SQLiteDatabase db) {
+
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
@@ -122,34 +88,32 @@ public class SugarRecord<T> {
                                     ? String.valueOf(((SugarRecord) columnValue).id)
                                     : "0");
                 } else {
-                    if (!"id".equalsIgnoreCase(column.getName())) {
-                        if (columnType.equals(Short.class) || columnType.equals(short.class)) {
-                            values.put(columnName, (Short) columnValue);
-                        }
-                        else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
-                            values.put(columnName, (Integer) columnValue);
-                        }
-                        else if (columnType.equals(Long.class) || columnType.equals(long.class)) {
-                            values.put(columnName, (Long) columnValue);
-                        }
-                        else if (columnType.equals(Float.class) || columnType.equals(float.class)) {
-                            values.put(columnName, (Float) columnValue);
-                        }
-                        else if (columnType.equals(Double.class) || columnType.equals(double.class)) {
-                            values.put(columnName, (Double) columnValue);
-                        }
-                        else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
-                            values.put(columnName, (Boolean) columnValue);
-                        }
-                        else if (Date.class.equals(columnType)) {
+                    if (columnType.equals(Short.class) || columnType.equals(short.class)) {
+                        values.put(columnName, (Short) columnValue);
+                    } else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
+                        values.put(columnName, (Integer) columnValue);
+                    } else if (columnType.equals(Long.class) || columnType.equals(long.class)) {
+                        values.put(columnName, (Long) columnValue);
+                    } else if (columnType.equals(Float.class) || columnType.equals(float.class)) {
+                        values.put(columnName, (Float) columnValue);
+                    } else if (columnType.equals(Double.class) || columnType.equals(double.class)) {
+                        values.put(columnName, (Double) columnValue);
+                    } else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
+                        values.put(columnName, (Boolean) columnValue);
+                    } else if (Date.class.equals(columnType)) {
+                        try {
                             values.put(columnName, ((Date) column.get(this)).getTime());
+                        } catch (NullPointerException e) {
+                            values.put(columnName, (Long) null);
                         }
-                        else if (Calendar.class.equals(columnType)) {
+                    } else if (Calendar.class.equals(columnType)) {
+                        try {
                             values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
-                        }else{
-                            values.put(columnName, String.valueOf(columnValue));
+                        } catch (NullPointerException e) {
+                            values.put(columnName, (Long) null);
                         }
-
+                    } else {
+                        values.put(columnName, String.valueOf(columnValue));
                     }
                 }
 
@@ -158,113 +122,52 @@ public class SugarRecord<T> {
             }
         }
 
-        if (id == null)
-                id = sqLiteDatabase.insert(getSqlName(), null, values);
-        else
-                sqLiteDatabase.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
+        id = db.insertWithOnConflict(getSqlName(), null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
-    }
-
-    @SuppressWarnings("deprecation")
-    public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
-
-        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
-
-        try{
-            sqLiteDatabase.beginTransaction();
-            sqLiteDatabase.setLockingEnabled(false);
-            for(T object: objects){
-                object.save(sqLiteDatabase);
-            }
-            sqLiteDatabase.setTransactionSuccessful();
-        }catch (Exception e){
-            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
-        }finally {
-            sqLiteDatabase.endTransaction();
-            sqLiteDatabase.setLockingEnabled(true);
-        }
-
-    }
-
-    @SuppressWarnings("deprecation")
-    public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
-
-        SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
-
-        try{
-            sqLiteDatabase.beginTransaction();
-            sqLiteDatabase.setLockingEnabled(false);
-            for(T object: objects){
-                object.save(sqLiteDatabase);
-            }
-            sqLiteDatabase.setTransactionSuccessful();
-        }catch (Exception e){
-            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
-        }finally {
-            sqLiteDatabase.endTransaction();
-            sqLiteDatabase.setLockingEnabled(true);
-        }
-
-    }
-
-    void save(SQLiteDatabase db) {
-
-        List<Field> columns = getTableFields();
-        ContentValues values = new ContentValues(columns.size());
-        for (Field column : columns) {
-            column.setAccessible(true);
-            try {
-                if (SugarRecord.class.isAssignableFrom(column.getType())) {
-                    values.put(StringUtil.toSQLName(column.getName()),
-                            (column.get(this) != null)
-                                    ? String.valueOf(((SugarRecord) column.get(this)).id)
-                                    : "0");
-                } else {
-                    if (!"id".equalsIgnoreCase(column.getName())) {
-                        if (Date.class.equals(column.getType())) {
-                            values.put(StringUtil.toSQLName(column.getName()), ((Date) column.get(this)).getTime());
-                        }
-                        else if (Calendar.class.equals(column.getType())) {
-                            values.put(StringUtil.toSQLName(column.getName()), ((Calendar) column.get(this)).getTimeInMillis());
-                        }
-                        else {
-                            values.put(StringUtil.toSQLName(column.getName()), String.valueOf(column.get(this)));
-                        }
-                    }
-                }
-
-            } catch (IllegalAccessException e) {
-                Log.e("Sugar", e.getMessage());
-            }
-        }
-
-        if (id == null)
-            id = db.insert(getSqlName(), null, values);
-        else
-            db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
-
-        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+        return id;
     }
 
     public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
 
-    public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
-        return findAsIterator(type, null, null, null, null, null);
-    }
-    
     public static <T extends SugarRecord<?>> T findById(Class<T> type, Long id) {
         List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if (list.isEmpty()) return null;
         return list.get(0);
     }
-    
+
+    public static <T extends SugarRecord<?>> T findById(Class<T> type, Integer id) {
+        return findById(type, Long.valueOf(id));
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
+        return findAsIterator(type, null, null, null, null, null);
+    }
+
     public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
-	            String whereClause, String... whereArgs) {
-    	return findAsIterator(type, whereClause, whereArgs, null, null, null);
-	}
+                                                                        String whereClause, String... whereArgs) {
+        return findAsIterator(type, whereClause, whereArgs, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
+        return new CursorIterator<T>(type, c);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+                                                                    String whereClause, String[] whereArgs,
+                                                                    String groupBy, String orderBy, String limit) {
+
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.query(getTableName(type), null,
+                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        return new CursorIterator<T>(type, c);
+    }
 
     public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String... whereArgs) {
@@ -291,13 +194,6 @@ public class SugarRecord<T> {
             c.close();
         }
         return toRet;
-    }
-    
-    public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
-        Database db = getSugarContext().getDatabase();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
-        return new CursorIterator<T>(type, c);
     }
 
     public static void executeQuery(String query, String... arguments){
@@ -326,16 +222,42 @@ public class SugarRecord<T> {
         }
         return toRet;
     }
+
+    public static <T extends SugarRecord<?>> long count(Class<?> type) {
+        return count(type, null, null, null, null, null);
+    }
     
-    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
+            String whereClause, String[] whereArgs) {
+    	return count(type, whereClause, whereArgs, null, null, null);
+    }
+    
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
             String whereClause, String[] whereArgs,
             String groupBy, String orderBy, String limit) {
     	
     	Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
-        Cursor c = sqLiteDatabase.query(getTableName(type), null,
-                whereClause, whereArgs, groupBy, null, orderBy, limit);
-        return new CursorIterator<T>(type, c);
+
+        long toRet = -1;
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where "  + whereClause : "";
+        SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + getTableName(type) + filter);
+
+        if (whereArgs != null) {
+            for (int i = whereArgs.length; i != 0; i--) {
+                sqLiteStatament.bindString(i, whereArgs[i - 1]);
+            }
+        }
+
+        try {
+            toRet = sqLiteStatament.simpleQueryForLong();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteStatament.close();
+        }
+        
+    	return toRet;
     }
 
     @SuppressWarnings("unchecked")
@@ -347,12 +269,13 @@ public class SugarRecord<T> {
             try {
                 Class fieldType = field.getType();
                 String colName = StringUtil.toSQLName(field.getName());
-                
+
                 int columnIndex = cursor.getColumnIndex(colName);
+
                 if (cursor.isNull(columnIndex)) {
-                	continue;
+                    continue;
                 }
-                
+
                 if(colName.equalsIgnoreCase("id")){
                     long cid = cursor.getLong(columnIndex);
                     field.set(this, Long.valueOf(cid));
@@ -360,16 +283,14 @@ public class SugarRecord<T> {
                     field.set(this,
                             cursor.getLong(columnIndex));
                 } else if (fieldType.equals(String.class)) {
-                    String val = cursor.getString(cursor
-                            .getColumnIndex(colName));
+                    String val = cursor.getString(columnIndex);
                     field.set(this, val != null && val.equals("null") ? null : val);
                 } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
                     field.set(this,
                             cursor.getDouble(columnIndex));
                 } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                     field.set(this,
-                            cursor.getString(columnIndex)
-                                    .equals("1"));
+                            cursor.getString(columnIndex).equals("1"));
                 } else if (field.getType().getName().equals("[B")) {
                     field.set(this,
                             cursor.getBlob(columnIndex));
@@ -393,14 +314,23 @@ public class SugarRecord<T> {
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(l);
                     field.set(this, c);
-                } else if (SugarRecord.class.isAssignableFrom(field.getType())) {
+                } else if (Enum.class.isAssignableFrom(fieldType)) {
+                    try {
+                        Method valueOf = field.getType().getMethod("valueOf", String.class);
+                        String strVal = cursor.getString(columnIndex);
+                        Object enumVal = valueOf.invoke(field.getType(), strVal);
+                        field.set(this, enumVal);
+                    } catch (Exception e) {
+                        Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    }
+                } else if (SugarRecord.class.isAssignableFrom(fieldType)) {
                     long id = cursor.getLong(columnIndex);
                     if (id > 0)
                         entities.put(field, id);
                     else
                         field.set(this, null);
                 } else
-                    Log.e("Sugar", "Class cannot be read from Sqlite3 database.");
+                    Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
             } catch (IllegalArgumentException e) {
                 Log.e("field set error", e.getMessage());
             } catch (IllegalAccessException e) {
@@ -431,7 +361,7 @@ public class SugarRecord<T> {
 
         List<Field> toStore = new ArrayList<Field>();
         for (Field field : typeFields) {
-            if (!field.isAnnotationPresent(Ignore.class)) {
+            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers())&& !Modifier.isTransient(field.getModifiers())) {
                 toStore.add(field);
             }
         }
@@ -466,4 +396,52 @@ public class SugarRecord<T> {
     public void setId(Long id) {
         this.id = id;
     }
+
+    static class CursorIterator<E extends SugarRecord<?>> implements Iterator<E> {
+        Class<E> type;
+        Cursor cursor;
+
+        public CursorIterator(Class<E> type, Cursor cursor) {
+            this.type = type;
+            this.cursor = cursor;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor != null && !cursor.isClosed() && !cursor.isAfterLast();
+        }
+
+        @Override
+        public E next() {
+            E entity = null;
+            if (cursor == null || cursor.isAfterLast()) {
+                throw new NoSuchElementException();
+            }
+
+            if (cursor.isBeforeFirst()) {
+                cursor.moveToFirst();
+            }
+
+            try {
+                entity = type.getDeclaredConstructor().newInstance();
+                entity.inflate(cursor);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                cursor.moveToNext();
+                if (cursor.isAfterLast()) {
+                    cursor.close();
+                }
+            }
+            return entity;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+
+    }
+
 }
