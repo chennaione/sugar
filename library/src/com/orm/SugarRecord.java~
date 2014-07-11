@@ -307,8 +307,6 @@ public class SugarRecord<T>{
                 } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
                     field.set(this,
                             cursor.getShort(columnIndex));
-                } else if (fieldType.equals(BigDecimal.class)) {
-                    field.set(this, new BigDecimal(cursor.getString(columnIndex)));
                 } else if (fieldType.equals(Timestamp.class)) {
                     long l = cursor.getLong(columnIndex);
                     field.set(this, new Timestamp(l));
