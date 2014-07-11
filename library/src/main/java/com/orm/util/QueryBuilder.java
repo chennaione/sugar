@@ -4,6 +4,7 @@ import com.orm.SugarRecord;
 
 import java.lang.RuntimeException;
 import java.lang.StringBuilder;
+import java.math.BigDecimal;
 
 public class QueryBuilder {
 
@@ -34,7 +35,8 @@ public class QueryBuilder {
             return "FLOAT";
         }
 
-        if ((type.equals(String.class)) || (type.equals(Character.TYPE))) {
+        if ((type.equals(String.class)) || (type.equals(Character.TYPE)) ||
+                (type.equals(BigDecimal.class))) {
             return "TEXT";
         }
 

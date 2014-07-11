@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -94,6 +95,12 @@ public class ReflectionUtil {
                     values.put(columnName, (Double) columnValue);
                 } else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
                     values.put(columnName, (Boolean) columnValue);
+                } else if (columnType.equals(BigDecimal.class)) {
+                    try {
+                        values.put(columnName, column.get(object).toString());
+                    } catch (NullPointerException e) {
+                        values.putNull(columnName);
+                    }
                 } else if (Timestamp.class.equals(columnType)) {
                     try {
                         values.put(columnName, ((Timestamp) column.get(object)).getTime());
@@ -168,6 +175,9 @@ public class ReflectionUtil {
             } else if (fieldType.equals(short.class) || fieldType.equals(Short.class)) {
                 field.set(object,
                         cursor.getShort(columnIndex));
+            } else if (fieldType.equals(BigDecimal.class)) {
+                String val = cursor.getString(columnIndex);
+                field.set(object, val != null && val.equals("null") ? null : new BigDecimal(val));
             } else if (fieldType.equals(Timestamp.class)) {
                 long l = cursor.getLong(columnIndex);
                 field.set(object, new Timestamp(l));
