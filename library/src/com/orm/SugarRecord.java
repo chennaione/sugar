@@ -113,7 +113,11 @@ public class SugarRecord<T>{
                             values.put(columnName, (Long) null);
                         }
                     } else {
-                        values.put(columnName, String.valueOf(columnValue));
+                        if (columnValue == null) {
+                            values.putNull(columnName);
+                        } else {
+                            values.put(columnName, String.valueOf(columnValue));
+                        }
                     }
                 }
 
