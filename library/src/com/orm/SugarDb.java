@@ -173,6 +173,9 @@ public class SugarDb extends SQLiteOpenHelper {
                 }
                 sb.append(", ").append(columnName).append(" ").append(columnType);
                 if(column.isAnnotationPresent(NotNull.class)) {
+                    if (columnType.endsWith(" NULL")) {
+                        sb.delete(sb.length() - 5, sb.length());
+                    }
                     sb.append(" NOT NULL");
                 }
                 if(column.isAnnotationPresent(Unique.class)) {
