@@ -56,23 +56,29 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
     }
 
     private void mergeConditions(Condition[] conditions, Condition.Type type) {
+        StringBuilder toAppend = new StringBuilder("");
         for (Condition condition : conditions) {
 
-            if (!"".equals(whereClause)) {
-                whereClause += " " + type.name() + " ";
+            if (toAppend.length() != 0) {
+                toAppend.append(" " + type.name() + " ");
             }
 
             if(Condition.Check.LIKE.equals(condition.getCheck()) || Condition.Check.NOT_LIKE.equals(condition.getCheck())){
 
-                whereClause += condition.getProperty() + condition.getCheckSymbol() + "'" + condition.getValue().toString() +"'";
+                toAppend.append(condition.getProperty() + condition.getCheckSymbol() + "'" + condition.getValue().toString() + "'");
 
             }else{
 
-                whereClause += condition.getProperty() + condition.getCheckSymbol() + "? ";
+                toAppend.append(condition.getProperty() + condition.getCheckSymbol() + "? ");
                 args.add(condition.getValue());
             }
 
         }
+        
+        if (!"".equals(whereClause)) {
+            whereClause += " " + type.name() + " ";
+        }
+        whereClause += "(" + toAppend + ")";
     }
 
     public Select<T> whereOr(Condition... args) {
