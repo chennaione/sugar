@@ -122,9 +122,7 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
     String toSql() {
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT * FROM");
-
-        sql.append("FROM ");
+        sql.append("SELECT * FROM ");
 
         sql.append(SugarRecord.getTableName(this.record) + " ");
 
