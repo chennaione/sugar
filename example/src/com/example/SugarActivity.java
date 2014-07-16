@@ -2,11 +2,8 @@ package com.example;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
-import com.orm.Database;
-import com.orm.SugarApp;
+import com.orm.SugarRecord;
 
 public class SugarActivity extends Activity
 {
@@ -16,9 +13,9 @@ public class SugarActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-         Note.deleteAll(Note.class);
-        TextNote.deleteAll(TextNote.class);
-        Tag.deleteAll(Tag.class);
+        SugarRecord.deleteAll(Note.class);
+        SugarRecord.deleteAll(TextNote.class);
+        SugarRecord.deleteAll(Tag.class);
         initDb();
         Intent intent = new Intent(this, NoteListActivity.class);
         startActivity(intent);

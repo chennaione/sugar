@@ -7,11 +7,9 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
-import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -19,30 +17,18 @@ import static com.orm.SugarApp.getSugarContext;
 
 public class SugarRecord<T>{
 
-    @Ignore
-    String tableName = getSqlName();
-
     protected Long id = null;
-
-    public void delete() {
-        SQLiteDatabase db = getSugarContext().getDatabase().getDB();
-        db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
-    }
 
     public static <T extends SugarRecord<?>> void deleteAll(Class<T> type) {
         Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
-        sqLiteDatabase.delete(getTableName(type), null, null);
+        sqLiteDatabase.delete(StringUtil.toSQLName(type), null, null);
     }
 
     public static <T extends SugarRecord<?>> void deleteAll(Class<T> type, String whereClause, String... whereArgs ) {
         Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
-        sqLiteDatabase.delete(getTableName(type), whereClause, whereArgs);
-    }
-
-    public long save() {
-        return save(getSugarContext().getDatabase().getDB());
+        sqLiteDatabase.delete(StringUtil.toSQLName(type), whereClause, whereArgs);
     }
 
     @SuppressWarnings("deprecation")
@@ -70,9 +56,150 @@ public class SugarRecord<T>{
 
     }
 
+    public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
+        return find(type, null, null, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> T findById(Class<T> type, Long id) {
+        List<T> list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        if (list.isEmpty()) return null;
+        return list.get(0);
+    }
+
+    public static <T extends SugarRecord<?>> T findById(Class<T> type, Integer id) {
+        return findById(type, Long.valueOf(id));
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
+        return findAsIterator(type, null, null, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+                                                                        String whereClause, String... whereArgs) {
+        return findAsIterator(type, whereClause, whereArgs, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
+        return new CursorIterator<T>(type, c);
+    }
+
+    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
+                                                                    String whereClause, String[] whereArgs,
+                                                                    String groupBy, String orderBy, String limit) {
+
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        Cursor c = sqLiteDatabase.query(StringUtil.toSQLName(type), null,
+                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        return new CursorIterator<T>(type, c);
+    }
+
+    public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
+                                                       String whereClause, String... whereArgs) {
+        return find(type, whereClause, whereArgs, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> List<T> findWithQuery(Class<T> type, String query, String... arguments){
+
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        T entity;
+        List<T> toRet = new ArrayList<T>();
+        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
+
+        try {
+            while (c.moveToNext()) {
+                entity = type.getDeclaredConstructor().newInstance();
+                entity.inflate(c);
+                toRet.add(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            c.close();
+        }
+        return toRet;
+    }
+
+    public static void executeQuery(String query, String... arguments){
+        getSugarContext().getDatabase().getDB().execSQL(query, arguments);
+    }
+
+    public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
+                                                       String whereClause, String[] whereArgs,
+                                                       String groupBy, String orderBy, String limit) {
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        T entity;
+        List<T> toRet = new ArrayList<T>();
+        Cursor c = sqLiteDatabase.query(StringUtil.toSQLName(type), null,
+                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        try {
+            while (c.moveToNext()) {
+                entity = type.getDeclaredConstructor().newInstance();
+                entity.inflate(c);
+                toRet.add(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            c.close();
+        }
+        return toRet;
+    }
+
+    public static <T extends SugarRecord<?>> long count(Class<?> type) {
+        return count(type, null, null, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
+            String whereClause, String[] whereArgs) {
+    	return count(type, whereClause, whereArgs, null, null, null);
+    }
+
+    public static <T extends SugarRecord<?>> long count(Class<?> type,
+            String whereClause, String[] whereArgs,
+            String groupBy, String orderBy, String limit) {
+
+    	Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+
+        long toRet = -1;
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where "  + whereClause : "";
+        SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + StringUtil.toSQLName(type) + filter);
+
+        if (whereArgs != null) {
+            for (int i = whereArgs.length; i != 0; i--) {
+                sqLiteStatament.bindString(i, whereArgs[i - 1]);
+            }
+        }
+
+        try {
+            toRet = sqLiteStatament.simpleQueryForLong();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteStatament.close();
+        }
+
+        return toRet;
+    }
+
+    public void delete() {
+        SQLiteDatabase db = getSugarContext().getDatabase().getDB();
+        db.delete(StringUtil.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
+    }
+
+    public long save() {
+        return save(getSugarContext().getDatabase().getDB());
+    }
+
     long save(SQLiteDatabase db) {
 
-        List<Field> columns = getTableFields();
+        List<Field> columns = SugarDb.getTableFields(getClass());
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
             column.setAccessible(true);
@@ -124,148 +251,16 @@ public class SugarRecord<T>{
             }
         }
 
-        id = db.insertWithOnConflict(getSqlName(), null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        id = db.insertWithOnConflict(StringUtil.toSQLName(getClass()), null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
         Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
         return id;
     }
 
-    public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
-        return find(type, null, null, null, null, null);
-    }
-
-    public static <T extends SugarRecord<?>> T findById(Class<T> type, Long id) {
-        List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
-        if (list.isEmpty()) return null;
-        return list.get(0);
-    }
-
-    public static <T extends SugarRecord<?>> T findById(Class<T> type, Integer id) {
-        return findById(type, Long.valueOf(id));
-    }
-
-    public static <T extends SugarRecord<?>> Iterator<T> findAll(Class<T> type) {
-        return findAsIterator(type, null, null, null, null, null);
-    }
-
-    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
-                                                                        String whereClause, String... whereArgs) {
-        return findAsIterator(type, whereClause, whereArgs, null, null, null);
-    }
-
-    public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
-        Database db = getSugarContext().getDatabase();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
-        return new CursorIterator<T>(type, c);
-    }
-
-    public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
-                                                                    String whereClause, String[] whereArgs,
-                                                                    String groupBy, String orderBy, String limit) {
-
-        Database db = getSugarContext().getDatabase();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-        Cursor c = sqLiteDatabase.query(getTableName(type), null,
-                whereClause, whereArgs, groupBy, null, orderBy, limit);
-        return new CursorIterator<T>(type, c);
-    }
-
-    public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
-                                                       String whereClause, String... whereArgs) {
-        return find(type, whereClause, whereArgs, null, null, null);
-    }
-
-    public static <T extends SugarRecord<?>> List<T> findWithQuery(Class<T> type, String query, String... arguments){
-
-        Database db = getSugarContext().getDatabase();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-        T entity;
-        List<T> toRet = new ArrayList<T>();
-        Cursor c = sqLiteDatabase.rawQuery(query, arguments);
-
-        try {
-            while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor().newInstance();
-                entity.inflate(c);
-                toRet.add(entity);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            c.close();
-        }
-        return toRet;
-    }
-
-    public static void executeQuery(String query, String... arguments){
-        getSugarContext().getDatabase().getDB().execSQL(query, arguments);
-    }
-
-    public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
-                                                       String whereClause, String[] whereArgs,
-                                                       String groupBy, String orderBy, String limit) {
-        Database db = getSugarContext().getDatabase();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-        T entity;
-        List<T> toRet = new ArrayList<T>();
-        Cursor c = sqLiteDatabase.query(getTableName(type), null,
-                whereClause, whereArgs, groupBy, null, orderBy, limit);
-        try {
-            while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor().newInstance();
-                entity.inflate(c);
-                toRet.add(entity);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            c.close();
-        }
-        return toRet;
-    }
-
-    public static <T extends SugarRecord<?>> long count(Class<?> type) {
-        return count(type, null, null, null, null, null);
-    }
-    
-    public static <T extends SugarRecord<?>> long count(Class<?> type,
-            String whereClause, String[] whereArgs) {
-    	return count(type, whereClause, whereArgs, null, null, null);
-    }
-    
-    public static <T extends SugarRecord<?>> long count(Class<?> type,
-            String whereClause, String[] whereArgs,
-            String groupBy, String orderBy, String limit) {
-    	
-    	Database db = getSugarContext().getDatabase();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-
-        long toRet = -1;
-        String filter = (!TextUtils.isEmpty(whereClause)) ? " where "  + whereClause : "";
-        SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + getTableName(type) + filter);
-
-        if (whereArgs != null) {
-            for (int i = whereArgs.length; i != 0; i--) {
-                sqLiteStatament.bindString(i, whereArgs[i - 1]);
-            }
-        }
-
-        try {
-            toRet = sqLiteStatament.simpleQueryForLong();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            sqLiteStatament.close();
-        }
-        
-    	return toRet;
-    }
-
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
         Map<Field, Long> entities = new HashMap<Field, Long>();
-        List<Field> columns = getTableFields();
+        List<Field> columns = SugarDb.getTableFields(getClass());
         for (Field field : columns) {
             field.setAccessible(true);
             try {
@@ -350,45 +345,6 @@ public class SugarRecord<T>{
             } catch (IllegalAccessException e) {
             }
         }
-    }
-
-    public List<Field> getTableFields() {
-        List<Field> fieldList = SugarConfig.getFields(getClass());
-        if(fieldList != null) return fieldList;
-
-        Log.d("Sugar", "Fetching properties");
-        List<Field> typeFields = new ArrayList<Field>();
-
-        getAllFields(typeFields, getClass());
-
-        List<Field> toStore = new ArrayList<Field>();
-        for (Field field : typeFields) {
-            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers())&& !Modifier.isTransient(field.getModifiers())) {
-                toStore.add(field);
-            }
-        }
-
-        SugarConfig.setFields(getClass(), toStore);
-        return toStore;
-    }
-
-    private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
-        Collections.addAll(fields, type.getDeclaredFields());
-
-        if (type.getSuperclass() != null) {
-            fields = getAllFields(fields, type.getSuperclass());
-        }
-
-        return fields;
-    }
-
-    public String getSqlName() {
-        return getTableName(getClass());
-    }
-
-
-    public static String getTableName(Class<?> type) {
-        return StringUtil.toSQLNameDefault(type.getSimpleName());
     }
 
     public Long getId() {

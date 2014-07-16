@@ -1,35 +1,22 @@
 package com.orm;
 
-import static com.orm.SugarConfig.getDatabaseVersion;
-import static com.orm.SugarConfig.getDebugEnabled;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import com.orm.dsl.Column;
-import com.orm.dsl.NotNull;
-import com.orm.dsl.Unique;
-
+import com.orm.dsl.*;
 import dalvik.system.DexFile;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.*;
+
+import static com.orm.SugarConfig.getDatabaseVersion;
+import static com.orm.SugarConfig.getDebugEnabled;
 
 public class SugarDb extends SQLiteOpenHelper {
     private Context context;
@@ -40,16 +27,45 @@ public class SugarDb extends SQLiteOpenHelper {
 
     }
 
-    private <T extends SugarRecord<?>> List<T> getDomainClasses(Context context) {
-        List<T> domainClasses = new ArrayList<T>();
+    public static List<Field> getTableFields(Class table) {
+        List<Field> fieldList = SugarConfig.getFields(table);
+        if (fieldList != null) return fieldList;
+
+        Log.d("Sugar", "Fetching properties");
+        List<Field> typeFields = new ArrayList<Field>();
+
+        getAllFields(typeFields, table);
+
+        List<Field> toStore = new ArrayList<Field>();
+        for (Field field : typeFields) {
+            if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
+                toStore.add(field);
+            }
+        }
+
+        SugarConfig.setFields(table, toStore);
+        return toStore;
+    }
+
+    private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+        Collections.addAll(fields, type.getDeclaredFields());
+
+        if (type.getSuperclass() != null) {
+            fields = getAllFields(fields, type.getSuperclass());
+        }
+
+        return fields;
+    }
+
+    private List<Class> getDomainClasses(Context context) {
+        List<Class> domainClasses = new ArrayList<Class>();
         try {
             for (String className : getAllClasses(context)) {
                 if (className.startsWith(SugarConfig.getDomainPackageName(context))) {
-                    T domainClass = getDomainClass(className, context);
+                    Class domainClass = getDomainClass(className, context);
                     if (domainClass != null) domainClasses.add(domainClass);
                 }
             }
-
         } catch (IOException e) {
             Log.e("Sugar", e.getMessage());
         } catch (PackageManager.NameNotFoundException e) {
@@ -59,8 +75,7 @@ public class SugarDb extends SQLiteOpenHelper {
         return domainClasses;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends SugarRecord<?>> T getDomainClass(String className, Context context) {
+    private Class getDomainClass(String className, Context context) {
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
@@ -68,29 +83,18 @@ public class SugarDb extends SQLiteOpenHelper {
             Log.e("Sugar", e.getMessage());
         }
 
-        if ((discoveredClass == null) ||
-                (!SugarRecord.class.isAssignableFrom(discoveredClass)) ||
-                SugarRecord.class.equals(discoveredClass) ||
-                Modifier.isAbstract(discoveredClass.getModifiers())) {
-            return null;
+        if ((discoveredClass != null) &&
+                ((SugarRecord.class.isAssignableFrom(discoveredClass) &&
+                        !SugarRecord.class.equals(discoveredClass)) ||
+                        discoveredClass.isAnnotationPresent(Table.class)) &&
+                !Modifier.isAbstract(discoveredClass.getModifiers())) {
+
+            Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
+            return discoveredClass;
+
         } else {
-            try {
-                Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
-                return (T) discoveredClass.getDeclaredConstructor().newInstance();
-
-            } catch (InstantiationException e) {
-                Log.e("Sugar", e.getMessage());
-            } catch (IllegalAccessException e) {
-                Log.e("Sugar", e.getMessage());
-            } catch (NoSuchMethodException e) {
-                Log.e("Sugar", e.getMessage());
-            } catch (InvocationTargetException e) {
-                Log.e("Sugar", e.getMessage());
-            }
+            return null;
         }
-
-        return null;
-
     }
 
     private List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
@@ -119,7 +123,7 @@ public class SugarDb extends SQLiteOpenHelper {
         }
         return classNames;
     }
-    
+
     private void populateFiles(File path, List<String> fileNames, String parent) {
         if (path.isDirectory()) {
             for (File newPath : path.listFiles()) {
@@ -152,17 +156,20 @@ public class SugarDb extends SQLiteOpenHelper {
         createDatabase(sqLiteDatabase);
     }
 
-    private <T extends SugarRecord<?>> void createDatabase(SQLiteDatabase sqLiteDatabase) {
-        List<T> domainClasses = getDomainClasses(context);
-        for (T domain : domainClasses) {
+    private void createDatabase(SQLiteDatabase sqLiteDatabase) {
+        List<Class> domainClasses = getDomainClasses(context);
+        for (Class domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
         }
     }
 
-    private <T extends SugarRecord<?>> void createTable(T table, SQLiteDatabase sqLiteDatabase) {
+    private <T extends SugarRecord<?>> void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
         Log.i("Sugar", "create table");
-        List<Field> fields = table.getTableFields();
-        StringBuilder sb = new StringBuilder("CREATE TABLE ").append(table.getSqlName()).append(
+        List<Field> fields = getTableFields(table);
+
+        String tableName = StringUtil.toSQLName(table);
+
+        StringBuilder sb = new StringBuilder("CREATE TABLE ").append(tableName).append(
                 " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
@@ -211,7 +218,7 @@ public class SugarDb extends SQLiteOpenHelper {
         }
         sb.append(" ) ");
 
-        Log.i("Sugar", "creating table " + table.getSqlName());
+        Log.i("Sugar", "creating table " + tableName);
 
         if (!"".equals(sb.toString()))
             sqLiteDatabase.execSQL(sb.toString());
@@ -232,11 +239,11 @@ public class SugarDb extends SQLiteOpenHelper {
     /**
      * Create the tables that do not exist.
      */
-    private <T extends SugarRecord<?>> void doUpgrade(SQLiteDatabase sqLiteDatabase) {
-        List<T> domainClasses = getDomainClasses(context);
-        for (T domain : domainClasses) {
+    private void doUpgrade(SQLiteDatabase sqLiteDatabase) {
+        List<Class> domainClasses = getDomainClasses(context);
+        for (Class domain : domainClasses) {
             try {// we try to do a select, if fails then (?) there isn't the table
-                sqLiteDatabase.query(domain.tableName, null, null, null, null, null, null);
+                sqLiteDatabase.query(StringUtil.toSQLName(domain), null, null, null, null, null, null);
             } catch (SQLiteException e) {
                 Log.i("Sugar", String.format("creating table on update (error was '%s')", e.getMessage()));
                 createTable(domain, sqLiteDatabase);
@@ -244,10 +251,10 @@ public class SugarDb extends SQLiteOpenHelper {
         }
     }
 
-    private <T extends SugarRecord<?>> void deleteTables(SQLiteDatabase sqLiteDatabase) {
-        List<T> tables = getDomainClasses(this.context);
-        for (T table : tables) {
-            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + table.getSqlName());
+    private void deleteTables(SQLiteDatabase sqLiteDatabase) {
+        List<Class> tables = getDomainClasses(this.context);
+        for (Class table : tables) {
+            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + StringUtil.toSQLName(table));
         }
     }
 

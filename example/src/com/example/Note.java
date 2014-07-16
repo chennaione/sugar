@@ -2,7 +2,9 @@ package com.example;
 
 import com.orm.SugarRecord;
 import com.orm.dsl.Column;
+import com.orm.dsl.Table;
 
+@Table(name = "Note")
 public class Note extends SugarRecord<Note>{
 
     @Column(name = "noteId", unique = true, notNull = true)
@@ -42,20 +44,20 @@ public class Note extends SugarRecord<Note>{
         return title;
     }
 
-    public String getDescription() {
-        return description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Tag getTag() {
-        return tag;
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description){
         this.description = description;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public Tag getTag() {
+        return tag;
     }
 
     @Override

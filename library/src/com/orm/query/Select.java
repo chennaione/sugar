@@ -1,5 +1,6 @@
 package com.orm.query;
 
+import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
 import java.util.ArrayList;
@@ -130,7 +131,7 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
 
         sql.append("SELECT * FROM ");
 
-        sql.append(SugarRecord.getTableName(this.record) + " ");
+        sql.append(StringUtil.toSQLName(this.record) + " ");
 
         if (whereClause != null) {
             sql.append("WHERE " + whereClause + " ");
