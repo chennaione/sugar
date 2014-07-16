@@ -32,9 +32,9 @@ public class SugarActivity extends Activity
         t2.save();
 
         Note n1 = new Note( 10, "note1", "description1", t1);
-        Note n2 = new Note(10, "note12", "description2", t1);
-        Note n3 = new Note( 10, "note13", "description3", t2);
-        Note n4 = new Note( 10, "note4", "description4", t2);
+        Note n2 = new Note(11, "note12", "description2", t1);
+        Note n3 = new Note( 12, "note13", "description3", t2);
+        Note n4 = new Note( 13, "note4", "description4", t2);
 
          TextNote textNote = new TextNote();
          textNote.desc = "Test";

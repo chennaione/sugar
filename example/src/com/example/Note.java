@@ -1,10 +1,13 @@
 package com.example;
 
-import android.content.Context;
 import com.orm.SugarRecord;
+import com.orm.dsl.Column;
 
 public class Note extends SugarRecord<Note>{
+
+    @Column(name = "noteId", unique = true, notNull = true)
     private int noteId;
+
     private String title;
     private String description;
    private String name;

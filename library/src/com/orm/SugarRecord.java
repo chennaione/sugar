@@ -1,7 +1,6 @@
 package com.orm;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -10,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.orm.dsl.Ignore;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -80,7 +78,7 @@ public class SugarRecord<T>{
             column.setAccessible(true);
             Class<?> columnType = column.getType();
             try {
-                String columnName = StringUtil.toSQLName(column.getName());
+                String columnName = StringUtil.toSQLName(column);
                 Object columnValue = column.get(this);
                 if (SugarRecord.class.isAssignableFrom(columnType)) {
                     values.put(columnName,
@@ -272,7 +270,7 @@ public class SugarRecord<T>{
             field.setAccessible(true);
             try {
                 Class fieldType = field.getType();
-                String colName = StringUtil.toSQLName(field.getName());
+                String colName = StringUtil.toSQLName(field);
 
                 int columnIndex = cursor.getColumnIndex(colName);
 
@@ -390,7 +388,7 @@ public class SugarRecord<T>{
 
 
     public static String getTableName(Class<?> type) {
-        return StringUtil.toSQLName(type.getSimpleName());
+        return StringUtil.toSQLNameDefault(type.getSimpleName());
     }
 
     public Long getId() {

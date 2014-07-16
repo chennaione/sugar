@@ -25,6 +25,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.orm.dsl.Column;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.Unique;
 
@@ -60,7 +61,6 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @SuppressWarnings("unchecked")
     private <T extends SugarRecord<?>> T getDomainClass(String className, Context context) {
-        Log.i("Sugar", "domain class");
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
@@ -70,11 +70,14 @@ public class SugarDb extends SQLiteOpenHelper {
 
         if ((discoveredClass == null) ||
                 (!SugarRecord.class.isAssignableFrom(discoveredClass)) ||
+                SugarRecord.class.equals(discoveredClass) ||
                 Modifier.isAbstract(discoveredClass.getModifiers())) {
             return null;
         } else {
             try {
+                Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
                 return (T) discoveredClass.getDeclaredConstructor().newInstance();
+
             } catch (InstantiationException e) {
                 Log.e("Sugar", e.getMessage());
             } catch (IllegalAccessException e) {
@@ -163,7 +166,7 @@ public class SugarDb extends SQLiteOpenHelper {
                 " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
-            String columnName = StringUtil.toSQLName(column.getName());
+            String columnName = StringUtil.toSQLName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
             if (columnType != null) {
@@ -171,15 +174,38 @@ public class SugarDb extends SQLiteOpenHelper {
                 if (columnName.equalsIgnoreCase("Id")) {
                     continue;
                 }
-                sb.append(", ").append(columnName).append(" ").append(columnType);
-                if(column.isAnnotationPresent(NotNull.class)) {
-                    if (columnType.endsWith(" NULL")) {
-                        sb.delete(sb.length() - 5, sb.length());
+
+                if(column.isAnnotationPresent(Column.class)){
+                    Column columnAnnotation = column.getAnnotation(Column.class);
+                    columnName = columnAnnotation.name();
+
+                    sb.append(", ").append(columnName).append(" ").append(columnType);
+
+                    if (columnAnnotation.notNull()) {
+                        if (columnType.endsWith(" NULL")) {
+                            sb.delete(sb.length() - 5, sb.length());
+                        }
+                        sb.append(" NOT NULL");
                     }
-                    sb.append(" NOT NULL");
-                }
-                if(column.isAnnotationPresent(Unique.class)) {
-                    sb.append(" UNIQUE");
+
+                    if (columnAnnotation.unique()) {
+                        sb.append(" UNIQUE");
+                    }
+
+                }else {
+
+                    sb.append(", ").append(columnName).append(" ").append(columnType);
+
+                    if (column.isAnnotationPresent(NotNull.class)) {
+                        if (columnType.endsWith(" NULL")) {
+                            sb.delete(sb.length() - 5, sb.length());
+                        }
+                        sb.append(" NOT NULL");
+                    }
+
+                    if (column.isAnnotationPresent(Unique.class)) {
+                        sb.append(" UNIQUE");
+                    }
                 }
             }
         }

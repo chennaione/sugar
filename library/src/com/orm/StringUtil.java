@@ -1,7 +1,11 @@
 package com.orm;
 
+import com.orm.dsl.Column;
+
+import java.lang.reflect.Field;
+
 public class StringUtil {
-    public static String toSQLName(String javaNotation) {
+    public static String toSQLNameDefault(String javaNotation) {
             if(javaNotation.equalsIgnoreCase("_id"))
                     return "_id";
 
@@ -35,4 +39,12 @@ public class StringUtil {
             return sb.toString();
     }
 
+    public static String toSQLName(Field field){
+        if(field.isAnnotationPresent(Column.class)){
+            Column annotation = field.getAnnotation(Column.class);
+            return annotation.name();
+        }
+
+        return toSQLNameDefault(field.getName());
+    }
 }
