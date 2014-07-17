@@ -1,13 +1,13 @@
 package com.orm.query;
 
-import com.orm.StringUtil;
 import com.orm.SugarRecord;
+import com.orm.util.NamingHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Select<T extends SugarRecord<?>> implements Iterable {
+public class Select<T> implements Iterable {
 
     private Class<T> record;
     private String[] arguments;
@@ -23,7 +23,7 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
         this.record = record;
     }
 
-    public static <T extends SugarRecord<T>> Select<T> from(Class<T> record) {
+    public static <T> Select<T> from(Class<T> record) {
         return new Select<T>(record);
     }
 
@@ -107,7 +107,7 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
 
         if(arguments == null) arguments = convertArgs(args);
 
-        return T.find(record, whereClause, arguments, groupBy, orderBy, limit);
+        return SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, limit);
 
     }
     
@@ -122,7 +122,7 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
 
         if(arguments == null) arguments = convertArgs(args);
 
-        List<T> list = T.find(record, whereClause, arguments, groupBy, orderBy, "1");
+        List<T> list = SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, "1");
         return list.size() > 0 ? list.get(0) : null;
     }
     
@@ -131,7 +131,7 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
 
         sql.append("SELECT * FROM ");
 
-        sql.append(StringUtil.toSQLName(this.record) + " ");
+        sql.append(NamingHelper.toSQLName(this.record) + " ");
 
         if (whereClause != null) {
             sql.append("WHERE " + whereClause + " ");
@@ -174,6 +174,6 @@ public class Select<T extends SugarRecord<?>> implements Iterable {
     public Iterator<T> iterator() {
         if(arguments == null) arguments = convertArgs(args);
 
-        return T.findAsIterator(record, whereClause, arguments, groupBy, orderBy, limit);
+        return SugarRecord.findAsIterator(record, whereClause, arguments, groupBy, orderBy, limit);
     }
 }

@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import static com.orm.SugarRecord.save;
+
 
 public class AddNoteActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
@@ -39,8 +41,8 @@ public class AddNoteActivity extends Activity {
         save.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Tag tag = new Tag(tagBox.getText().toString());
-                tag.save();
-                new Note( 10, titleBox.getText().toString(), descBox.getText().toString(),tag).save();
+                save(tag);
+                save(new Note(10 + (int) (10 * Math.random()), titleBox.getText().toString(), descBox.getText().toString(), tag));
                 Intent intent = new Intent(AddNoteActivity.this, NoteListActivity.class);
                 startActivity(intent);
             }

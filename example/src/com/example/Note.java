@@ -1,11 +1,10 @@
 package com.example;
 
-import com.orm.SugarRecord;
 import com.orm.dsl.Column;
 import com.orm.dsl.Table;
 
 @Table(name = "Note")
-public class Note extends SugarRecord<Note>{
+public class Note {
 
     @Column(name = "noteId", unique = true, notNull = true)
     private int noteId;
@@ -62,7 +61,7 @@ public class Note extends SugarRecord<Note>{
 
     @Override
     public String toString() {
-        return  title + "id: " + id + " - " + tag + " " + tag.getId();
+        return title + "id: " + noteId;
 
     }
 }

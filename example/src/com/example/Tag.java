@@ -1,9 +1,9 @@
 package com.example;
 
-import android.content.Context;
-import com.orm.SugarRecord;
+import com.orm.dsl.Table;
 
-public class Tag extends SugarRecord<Tag>{
+@Table(name = "tag")
+public class Tag {
     private String name;
 
     public Tag(String name) {

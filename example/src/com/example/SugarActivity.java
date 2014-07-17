@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import com.orm.SugarRecord;
 
+import static com.orm.SugarRecord.save;
+
 public class SugarActivity extends Activity
 {
     /** Called when the activity is first created. */
@@ -16,6 +18,7 @@ public class SugarActivity extends Activity
         SugarRecord.deleteAll(Note.class);
         SugarRecord.deleteAll(TextNote.class);
         SugarRecord.deleteAll(Tag.class);
+        SugarRecord.deleteAll(NewNote.class);
         initDb();
         Intent intent = new Intent(this, NoteListActivity.class);
         startActivity(intent);
@@ -25,8 +28,8 @@ public class SugarActivity extends Activity
 
         Tag t1 = new Tag("tag1");
         Tag t2 = new Tag("tag2");
-        t1.save();
-        t2.save();
+         save(t1);
+         save(t2);
 
         Note n1 = new Note( 10, "note1", "description1", t1);
         Note n2 = new Note(11, "note12", "description2", t1);
@@ -36,23 +39,25 @@ public class SugarActivity extends Activity
          TextNote textNote = new TextNote();
          textNote.desc = "Test";
 
-         textNote.save();
-        n1.save();
-        n2.save();
-        n3.save();
-        n4.save();
+         save(textNote);
+         save(n1);
+         save(n2);
+         save(n3);
+         save(n4);
 
          n1.setDescription("matrix");
          n1.setTitle("atrix");
-         n1.save();
+         save(n1);
          n2.setDescription("matrix");
          n2.setTitle("satrix");
-         n2.save();
+         save(n2);
          n3.setDescription("matrix");
          n3.setTitle("batrix");
-         n3.save();
-         
-        
+         save(n3);
 
-    }
+         NewNote newNote = new NewNote();
+         newNote.name = "name";
+         save(newNote);
+
+     }
 }

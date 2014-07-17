@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-
+import com.orm.SugarRecord;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
@@ -19,8 +19,9 @@ public class NoteListActivity extends ListActivity {
         setContentView(R.layout.notelist);
 
         List<Note> notes = Select.from(Note.class).orderBy("title").list();//Note.listAll(Note.class);
+        List<NewNote> list = SugarRecord.listAll(NewNote.class);
 
-        setListAdapter(new ArrayAdapter<Note>(this,android.R.layout.simple_list_item_1, notes));
+        setListAdapter(new ArrayAdapter<Note>(this, android.R.layout.simple_list_item_1, notes));
 
         findViewById(R.id.Button01).setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {

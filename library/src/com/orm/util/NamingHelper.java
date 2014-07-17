@@ -1,11 +1,11 @@
-package com.orm;
+package com.orm.util;
 
 import com.orm.dsl.Column;
 import com.orm.dsl.Table;
 
 import java.lang.reflect.Field;
 
-public class StringUtil {
+public class NamingHelper {
     public static String toSQLNameDefault(String javaNotation) {
         if (javaNotation.equalsIgnoreCase("_id"))
             return "_id";
@@ -54,6 +54,6 @@ public class StringUtil {
             Table annotation = table.getAnnotation(Table.class);
             return annotation.name();
         }
-        return StringUtil.toSQLNameDefault(table.getSimpleName());
+        return NamingHelper.toSQLNameDefault(table.getSimpleName());
     }
 }
