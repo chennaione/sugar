@@ -213,7 +213,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
         if(table.getClass().isAnnotationPresent(Table.class)) {
             Table tableAnnonation = table.getClass().getAnnotation(Table.class);
-            if(tableAnnonation.unique() != "") {
+            if(!"".equals(tableAnnonation.unique())) {
                 sb.append(", UNIQUE ( ").append(table.getClass().getAnnotation(Table.class).unique()).append(" )");
             }
         }
