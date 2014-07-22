@@ -25,6 +25,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.orm.dsl.Table;
 import com.orm.dsl.Column;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.Unique;
@@ -209,6 +210,14 @@ public class SugarDb extends SQLiteOpenHelper {
                 }
             }
         }
+
+        if(table.getClass().isAnnotationPresent(Table.class)) {
+            Table tableAnnonation = table.getClass().getAnnotation(Table.class);
+            if(!"".equals(tableAnnonation.unique())) {
+                sb.append(", UNIQUE ( ").append(table.getClass().getAnnotation(Table.class).unique()).append(" )");
+            }
+        }
+
         sb.append(" ) ");
 
         Log.i("Sugar", "creating table " + table.getSqlName());

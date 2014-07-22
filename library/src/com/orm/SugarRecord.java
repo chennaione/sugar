@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 import com.orm.dsl.Ignore;
+import com.orm.dsl.Table;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -343,7 +344,7 @@ public class SugarRecord<T>{
 
         for (Field f : entities.keySet()) {
             try {
-                f.set(this, findById((Class<? extends SugarRecord<?>>) f.getType(), 
+                f.set(this, findById((Class<? extends SugarRecord<?>>) f.getType(),
                         entities.get(f)));
             } catch (SQLiteException e) {
             } catch (IllegalArgumentException e) {
@@ -388,7 +389,11 @@ public class SugarRecord<T>{
 
 
     public static String getTableName(Class<?> type) {
-        return StringUtil.toSQLNameDefault(type.getSimpleName());
+        if(type.isAnnotationPresent(Table.class)) {
+            return type.getAnnotation(Table.class).name();
+        } else {
+            return StringUtil.toSQLNameDefault(type.getSimpleName());
+        }
     }
 
     public Long getId() {
