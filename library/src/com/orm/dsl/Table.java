@@ -7,4 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Table
 {
     String name();
+    String unique() default "";
 }
