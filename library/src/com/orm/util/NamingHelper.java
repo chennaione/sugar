@@ -52,6 +52,9 @@ public class NamingHelper {
 
         if (table.isAnnotationPresent(Table.class)) {
             Table annotation = table.getAnnotation(Table.class);
+            if ("".equals(annotation.name())) {
+                return NamingHelper.toSQLNameDefault(table.getSimpleName());
+            }
             return annotation.name();
         }
         return NamingHelper.toSQLNameDefault(table.getSimpleName());

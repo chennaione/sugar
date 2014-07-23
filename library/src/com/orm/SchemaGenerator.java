@@ -24,11 +24,11 @@ import java.util.List;
 
 import static com.orm.util.ReflectionUtil.getDomainClasses;
 
-public class DatabaseCreator {
+public class SchemaGenerator {
 
     private Context context;
 
-    public DatabaseCreator(Context context) {
+    public SchemaGenerator(Context context) {
         this.context = context;
     }
 

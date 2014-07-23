@@ -10,22 +10,22 @@ import static com.orm.util.SugarConfig.getDatabaseVersion;
 import static com.orm.util.SugarConfig.getDebugEnabled;
 
 public class SugarDb extends SQLiteOpenHelper {
-    private final DatabaseCreator databaseCreator;
+    private final SchemaGenerator schemaGenerator;
     private SQLiteDatabase sqLiteDatabase;
 
     public SugarDb(Context context) {
         super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
-        databaseCreator = new DatabaseCreator(context);
+        schemaGenerator = new SchemaGenerator(context);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        databaseCreator.createDatabase(sqLiteDatabase);
+        schemaGenerator.createDatabase(sqLiteDatabase);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        databaseCreator.doUpgrade(sqLiteDatabase, oldVersion, newVersion);
+        schemaGenerator.doUpgrade(sqLiteDatabase, oldVersion, newVersion);
     }
 
     public synchronized SQLiteDatabase getDB() {

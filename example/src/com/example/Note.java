@@ -6,6 +6,8 @@ import com.orm.dsl.Table;
 @Table(name = "Note")
 public class Note {
 
+    private long id;
+
     @Column(name = "noteId", unique = true, notNull = true)
     private int noteId;
 

@@ -1,4 +1,4 @@
-package com.orm.dsl;
+package com.orm.util;
 import java.util.*;
 
 public class Collection {
