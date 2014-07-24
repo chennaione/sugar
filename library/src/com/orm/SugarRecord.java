@@ -202,7 +202,9 @@ public class SugarRecord {
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
-        ReflectionUtil.setFieldValueForId(object, id);
+        if (SugarRecord.class.isAssignableFrom(object.getClass())) {
+            ReflectionUtil.setFieldValueForId(object, id);
+        }
 
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
         return id;
