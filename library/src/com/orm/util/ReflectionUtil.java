@@ -76,6 +76,12 @@ public class ReflectionUtil {
                     values.put(columnName, (Double) columnValue);
                 } else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
                     values.put(columnName, (Boolean) columnValue);
+                } else if (Timestamp.class.equals(columnType)) {
+                    try {
+                        values.put(columnName, ((Timestamp) column.get(object)).getTime());
+                    } catch (NullPointerException e) {
+                        values.put(columnName, (Long) null);
+                    }
                 } else if (Date.class.equals(columnType)) {
                     try {
                         values.put(columnName, ((Date) column.get(object)).getTime());
