@@ -7,7 +7,7 @@ public class SugarTransactionHelper {
 
     public static void doInTansaction(SugarTransactionHelper.Callback callback) {
 
-        SQLiteDatabase database = SugarApp.getSugarContext().getDatabase().getDB();
+        SQLiteDatabase database = SugarApp.getSugarContext().getSugarDb().getDB();
 
         database.beginTransaction();
 

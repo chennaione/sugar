@@ -1,4 +1,4 @@
-package com.orm;
+package com.orm.util;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;

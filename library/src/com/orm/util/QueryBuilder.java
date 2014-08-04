@@ -1,4 +1,6 @@
-package com.orm;
+package com.orm.util;
+
+import com.orm.SugarRecord;
 
 public class QueryBuilder {
 

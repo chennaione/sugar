@@ -1,4 +1,4 @@
-package com.orm;
+package com.orm.util;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
