@@ -24,17 +24,33 @@ public class NamingHelper {
             return "_id";
         }
 
-        List<String> words = new LinkedList<String>();
-        StringBuilder currentWord = new StringBuilder();
-        for(int i=0; i< camelCased.length(); i++){
-            char c = camelCased.charAt(i);
-            if(Character.isUpperCase(c)){
-                if(currentWord.length() == 0) words.add(currentWord.toString());
-                currentWord = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        char[] buf = camelCased.toCharArray();
+
+        for (int i = 0; i < buf.length; i++) {
+            char prevChar = (i > 0) ? buf[i - 1] : 0;
+            char c = buf[i];
+            char nextChar = (i < buf.length - 1) ? buf[i + 1] : 0;
+            boolean isFirstChar = (i == 0);
+
+            if (isFirstChar || Character.isLowerCase(c) || Character.isDigit(c)) {
+                sb.append(Character.toUpperCase(c));
+            } else if (Character.isUpperCase(c)) {
+                if (Character.isLetterOrDigit(prevChar)) {
+                    if (Character.isLowerCase(prevChar)) {
+                        sb.append('_').append(Character.toUpperCase(c));
+                    } else if (nextChar > 0 && Character.isLowerCase(nextChar)) {
+                        sb.append('_').append(Character.toUpperCase(c));
+                    } else {
+                        sb.append(c);
+                    }
+                } else {
+                    sb.append(c);
+                }
             }
-            currentWord.append(Character.toUpperCase(c));
         }
-        return TextUtils.join("_", words);
+
+        return sb.toString();
     }
 
     /**
