@@ -36,4 +36,7 @@ public class SugarDb extends SQLiteOpenHelper {
         return this.sqLiteDatabase;
     }
 
+    public static void dropTestDatabase() {
+        SugarApp.getSugarContext().deleteDatabase(SugarConfig.getDatabaseName(SugarApp.getSugarContext(), true));
+    }
 }
