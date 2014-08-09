@@ -173,7 +173,7 @@ public class ReflectionUtil {
     public static void setFieldValueForId(Object object, Long value) {
 
         try {
-            Field field = object.getClass().getField("id");
+            Field field = object.getClass().getField("sugarRecordId");
 
             field.setAccessible(true);
             field.set(object, value);

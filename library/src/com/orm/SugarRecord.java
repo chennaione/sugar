@@ -17,7 +17,7 @@ import static com.orm.SugarApp.getSugarContext;
 
 public class SugarRecord {
 
-    protected Long id = null;
+    protected Long sugarRecordId = null;
 
     public static <T> void deleteAll(Class<T> type) {
         SugarDb db = getSugarContext().getSugarDb();
@@ -243,11 +243,11 @@ public class SugarRecord {
     }
 
     public Long getId() {
-        return id;
+        return sugarRecordId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.sugarRecordId = id;
     }
 
     static class CursorIterator<E> implements Iterator<E> {
