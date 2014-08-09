@@ -188,7 +188,7 @@ public class ReflectionUtil {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
             for (String className : getAllClasses(context)) {
-                if (className.startsWith(SugarConfig.getDomainPackageName(context))) {
+                if (className.startsWith(ManifestHelper.getDomainPackageName(context))) {
                     Class domainClass = getDomainClass(className, context);
                     if (domainClass != null) domainClasses.add(domainClass);
                 }
