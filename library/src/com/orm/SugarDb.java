@@ -3,18 +3,20 @@ package com.orm;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.orm.util.ManifestHelper;
 import com.orm.util.SugarConfig;
 import com.orm.util.SugarCursorFactory;
 
-import static com.orm.util.SugarConfig.getDatabaseVersion;
-import static com.orm.util.SugarConfig.getDebugEnabled;
+import static com.orm.util.ManifestHelper.getDatabaseVersion;
+import static com.orm.util.ManifestHelper.getDebugEnabled;
 
 public class SugarDb extends SQLiteOpenHelper {
     private final SchemaGenerator schemaGenerator;
     private SQLiteDatabase sqLiteDatabase;
 
     public SugarDb(Context context) {
-        super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
+        super(context, ManifestHelper.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
         schemaGenerator = new SchemaGenerator(context);
     }
 
