@@ -5,6 +5,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,10 +18,19 @@ public class SugarConfig {
     static Map<Class<?>, List<Field>> fields = new HashMap<Class<?>, List<Field>>();
 
     public static String getDatabaseName(Context context) {
+        return getDatabaseName(context, isTestEnviroment(context));
+    }
+
+    public static String getDatabaseName(Context context,
+        Boolean isTestEnviroment) {
         String databaseName = getMetaDataString(context, "DATABASE");
 
         if (databaseName == null) {
             databaseName = "Sugar.db";
+        }
+
+        if (isTestEnviroment(context)) {
+            databaseName = "test" + databaseName;
         }
 
         return databaseName;
@@ -108,5 +119,31 @@ public class SugarConfig {
         }
 
         return value;
+    }
+
+    public static boolean isLibraryLoaded(Context context, String name) {
+        Boolean value = false;
+
+        PackageManager pm = context.getPackageManager();
+        try {
+            String[] libraries = pm.getSystemSharedLibraryNames();
+
+            for (String library : libraries) {
+                if (library.equals(name)) {
+                    value = true;
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            Log.d("sugar", "Couldn't find config value: " + name);
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+    @SuppressLint("NewApi")
+    public static Boolean isTestEnviroment(Context context) {
+        return (ActivityManager.isRunningInTestHarness() || isLibraryLoaded(context, "android.test.runner"));
     }
 }
