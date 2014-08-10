@@ -1,5 +1,13 @@
 package com.orm;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import android.util.Log;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -38,5 +46,31 @@ public class SugarDb extends SQLiteOpenHelper {
 
     public static void dropTestDatabase() {
         SugarApp.getSugarContext().deleteDatabase(SugarConfig.getDatabaseName(SugarApp.getSugarContext(), true));
+    }
+
+    public static void prepareTestDatabase() {
+        File dbFile = SugarApp.getSugarContext().getDatabasePath(
+                SugarConfig.getDatabaseName(SugarApp.getSugarContext(), false));
+        File dbFileTest = SugarApp.getSugarContext().getDatabasePath(
+                SugarConfig.getDatabaseName(SugarApp.getSugarContext(), true));
+
+        if (dbFile.exists()) {
+            try {
+                InputStream in = new FileInputStream(dbFile);
+                OutputStream out = new FileOutputStream(dbFileTest);
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                Log.d("sugar",
+                        "Couldn't copy develop database to tests database");
+                e.printStackTrace();
+            }
+        }
     }
 }
