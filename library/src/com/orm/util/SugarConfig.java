@@ -25,13 +25,12 @@ public class SugarConfig {
         return databaseName;
     }
 
-    public static void setFields(Class<?> clazz, List<Field> fieldz){
+    public static void setFields(Class<?> clazz, List<Field> fieldz) {
          fields.put(clazz, fieldz);
     }
 
-    public static List<Field> getFields(Class<?> clazz){
-
-        if(fields.containsKey(clazz)){
+    public static List<Field> getFields(Class<?> clazz) {
+        if (fields.containsKey(clazz)) {
             List<Field> list = fields.get(clazz);
             return Collections.synchronizedList(list);
         }
@@ -39,14 +38,13 @@ public class SugarConfig {
         return null;
     }
 
-    public static void clearCache(){
+    public static void clearCache() {
         fields.clear();
         fields = new HashMap<Class<?>, List<Field>>();
     }
 
     public static int getDatabaseVersion(Context context) {
         Integer databaseVersion = getMetaDataInteger(context, "VERSION");
-
         if ((databaseVersion == null) || (databaseVersion == 0)) {
             databaseVersion = 1;
         }
@@ -54,9 +52,8 @@ public class SugarConfig {
         return databaseVersion;
     }
 
-    public static String getDomainPackageName(Context context){
+    public static String getDomainPackageName(Context context) {
         String domainPackageName = getMetaDataString(context, "DOMAIN_PACKAGE_NAME");
-
         if (domainPackageName == null) {
             domainPackageName = "";
         }
@@ -70,13 +67,13 @@ public class SugarConfig {
 
     public static String getMetaDataString(Context context, String name) {
         String value = null;
-
         PackageManager pm = context.getPackageManager();
+
         try {
             ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 128);
             value = ai.metaData.getString(name);
         } catch (Exception e) {
-            Log.d("sugar", "Couldn't find config value: " + name);
+            Log.d("Sugar", "Couldn't find config value: " + name);
         }
 
         return value;
@@ -84,13 +81,13 @@ public class SugarConfig {
 
     public static Integer getMetaDataInteger(Context context, String name) {
         Integer value = null;
-
         PackageManager pm = context.getPackageManager();
+
         try {
             ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 128);
             value = ai.metaData.getInt(name);
         } catch (Exception e) {
-            Log.d("sugar", "Couldn't find config value: " + name);
+            Log.d("Sugar", "Couldn't find config value: " + name);
         }
 
         return value;
@@ -98,13 +95,13 @@ public class SugarConfig {
 
     public static Boolean getMetaDataBoolean(Context context, String name) {
         Boolean value = false;
-
         PackageManager pm = context.getPackageManager();
+
         try {
             ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 128);
             value = ai.metaData.getBoolean(name);
         } catch (Exception e) {
-            Log.d("sugar", "Couldn't find config value: " + name);
+            Log.d("Sugar", "Couldn't find config value: " + name);
         }
 
         return value;

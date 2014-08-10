@@ -42,14 +42,14 @@ public class SchemaGenerator {
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         List<Class> domainClasses = getDomainClasses(context);
         for (Class domain : domainClasses) {
-            try {// we try to do a select, if fails then (?) there isn't the table
+            try {  // we try to do a select, if fails then (?) there isn't the table
                 sqLiteDatabase.query(NamingHelper.toSQLName(domain), null, null, null, null, null, null);
             } catch (SQLiteException e) {
-                Log.i("Sugar", String.format("creating table on update (error was '%s')", e.getMessage()));
+                Log.i("Sugar", String.format("Creating table on update (error was '%s')",
+                        e.getMessage()));
                 createTable(domain, sqLiteDatabase);
             }
         }
-
         executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion);
     }
 
@@ -61,14 +61,14 @@ public class SchemaGenerator {
     }
 
     private boolean executeSugarUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
         boolean isSuccess = false;
+
         try {
             List<String> files = Arrays.asList(this.context.getAssets().list("sugar_upgrades"));
             Collections.sort(files, new NumberComparator());
-
             for (String file : files) {
                 Log.i("Sugar", "filename : " + file);
+
                 try {
                     int version = Integer.valueOf(file.replace(".sql", ""));
 
@@ -79,6 +79,7 @@ public class SchemaGenerator {
                 } catch (NumberFormatException e) {
                     Log.i("Sugar", "not a sugar script. ignored." + file);
                 }
+
             }
         } catch (IOException e) {
             Log.e("Sugar", e.getMessage());
@@ -100,24 +101,21 @@ public class SchemaGenerator {
             Log.e("Sugar", e.getMessage());
         }
 
-        Log.i("Sugar", "script executed");
+        Log.i("Sugar", "Script executed");
     }
 
     private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
-        Log.i("Sugar", "create table");
+        Log.i("Sugar", "Create table");
         List<Field> fields = ReflectionUtil.getTableFields(table);
-
         String tableName = NamingHelper.toSQLName(table);
-
-        StringBuilder sb = new StringBuilder("CREATE TABLE ").append(tableName).append(
-                " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
+        StringBuilder sb = new StringBuilder("CREATE TABLE ");
+        sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
             String columnName = NamingHelper.toSQLName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
             if (columnType != null) {
-
                 if (columnName.equalsIgnoreCase("Id")) {
                     continue;
                 }
@@ -140,7 +138,6 @@ public class SchemaGenerator {
                     }
 
                 } else {
-
                     sb.append(", ").append(columnName).append(" ").append(columnType);
 
                     if (column.isAnnotationPresent(NotNull.class)) {
@@ -156,9 +153,9 @@ public class SchemaGenerator {
                 }
             }
         }
-        sb.append(" ) ");
 
-        Log.i("Sugar", "creating table " + tableName);
+        sb.append(" ) ");
+        Log.i("Sugar", "Creating table " + tableName);
 
         if (!"".equals(sb.toString())) {
             try {
@@ -166,7 +163,6 @@ public class SchemaGenerator {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
         }
     }
 

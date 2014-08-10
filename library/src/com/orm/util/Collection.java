@@ -36,4 +36,5 @@ public class Collection {
             this.value = value;
         }
     }
+
 }

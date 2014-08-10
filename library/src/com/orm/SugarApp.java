@@ -1,6 +1,6 @@
 package com.orm;
 
-public class SugarApp extends android.app.Application{
+public class SugarApp extends android.app.Application {
 
     private static SugarApp sugarContext;
     private SugarDb sugarDb;
@@ -9,7 +9,7 @@ public class SugarApp extends android.app.Application{
         return sugarContext;
     }
 
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         SugarApp.sugarContext = this;
         this.sugarDb = new SugarDb(this);
@@ -21,7 +21,7 @@ public class SugarApp extends android.app.Application{
      * emulated process environments such as an emulator or
      * Robolectric Android mock.
      */
-    public void onTerminate(){
+    public void onTerminate() {
         if (this.sugarDb != null) {
             this.sugarDb.getDB().close();
         }
@@ -31,4 +31,5 @@ public class SugarApp extends android.app.Application{
     protected SugarDb getSugarDb() {
         return sugarDb;
     }
+
 }

@@ -16,7 +16,6 @@ public class Select<T> implements Iterable {
     private String groupBy;
     private String limit;
     private String offset;
-
     private List<Object> args = new ArrayList<Object>();
 
     public Select(Class<T> record) {
@@ -42,8 +41,6 @@ public class Select<T> implements Iterable {
         return this;
     }
 
-
-
     public Select<T> where(String whereClause) {
         this.whereClause = whereClause;
         return this;
@@ -59,26 +56,32 @@ public class Select<T> implements Iterable {
     private void mergeConditions(Condition[] conditions, Condition.Type type) {
         StringBuilder toAppend = new StringBuilder("");
         for (Condition condition : conditions) {
-
             if (toAppend.length() != 0) {
-                toAppend.append(" " + type.name() + " ");
+                toAppend.append(" ").append(type.name()).append(" ");
             }
 
-            if(Condition.Check.LIKE.equals(condition.getCheck()) || Condition.Check.NOT_LIKE.equals(condition.getCheck())){
+            if (Condition.Check.LIKE.equals(condition.getCheck()) ||
+                    Condition.Check.NOT_LIKE.equals(condition.getCheck())) {
+                toAppend
+                    .append(condition.getProperty())
+                    .append(condition.getCheckSymbol())
+                    .append("'")
+                    .append(condition.getValue().toString())
+                    .append("'");
 
-                toAppend.append(condition.getProperty() + condition.getCheckSymbol() + "'" + condition.getValue().toString() + "'");
-
-            }else{
-
-                toAppend.append(condition.getProperty() + condition.getCheckSymbol() + "? ");
+            } else {
+                toAppend
+                    .append(condition.getProperty())
+                    .append(condition.getCheckSymbol())
+                    .append("? ");
                 args.add(condition.getValue());
             }
-
         }
         
         if (!"".equals(whereClause)) {
             whereClause += " " + type.name() + " ";
         }
+
         whereClause += "(" + toAppend + ")";
     }
 
@@ -104,23 +107,25 @@ public class Select<T> implements Iterable {
     }
 
     public List<T> list() {
-
-        if(arguments == null) arguments = convertArgs(args);
+        if (arguments == null) {
+            arguments = convertArgs(args);
+        }
 
         return SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, limit);
-
     }
     
     public long count() {
+        if (arguments == null) {
+            arguments = convertArgs(args);
+        }
     	
-    	if(arguments == null) arguments = convertArgs(args);
-    	
-    	return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
+        return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
     }
 
     public T first() {
-
-        if(arguments == null) arguments = convertArgs(args);
+        if (arguments == null) {
+            arguments = convertArgs(args);
+        }
 
         List<T> list = SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, "1");
         return list.size() > 0 ? list.get(0) : null;
@@ -128,25 +133,22 @@ public class Select<T> implements Iterable {
     
     String toSql() {
         StringBuilder sql = new StringBuilder();
-
-        sql.append("SELECT * FROM ");
-
-        sql.append(NamingHelper.toSQLName(this.record) + " ");
+        sql.append("SELECT * FROM ").append(NamingHelper.toSQLName(this.record)).append(" ");
 
         if (whereClause != null) {
-            sql.append("WHERE " + whereClause + " ");
+            sql.append("WHERE ").append(whereClause).append(" ");
         }
 
         if (orderBy != null) {
-            sql.append("ORDER BY " + orderBy + " ");
+            sql.append("ORDER BY ").append(orderBy).append(" ");
         }
 
         if (limit != null) {
-            sql.append("LIMIT " + limit + " ");
+            sql.append("LIMIT ").append(limit).append(" ");
         }
 
         if (offset != null) {
-            sql.append("OFFSET " + offset + " ");
+            sql.append("OFFSET ").append(offset).append(" ");
         }
 
         return sql.toString();
@@ -156,14 +158,14 @@ public class Select<T> implements Iterable {
         return whereClause;
     }
 
-    String[] getArgs(){
+    String[] getArgs() {
         return convertArgs(args);
     }
 
     private String[] convertArgs(List<Object> argsList) {
         String[] argsArray = new String[argsList.size()];
 
-        for(int i=0; i< argsList.size();i++){
+        for (int i = 0; i < argsList.size(); i++) {
              argsArray[i] = argsList.get(i).toString();
         }
 
@@ -172,8 +174,11 @@ public class Select<T> implements Iterable {
 
     @Override
     public Iterator<T> iterator() {
-        if(arguments == null) arguments = convertArgs(args);
+        if (arguments == null) {
+            arguments = convertArgs(args);
+        }
 
         return SugarRecord.findAsIterator(record, whereClause, arguments, groupBy, orderBy, limit);
     }
+
 }

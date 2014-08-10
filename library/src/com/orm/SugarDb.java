@@ -10,11 +10,13 @@ import static com.orm.util.SugarConfig.getDatabaseVersion;
 import static com.orm.util.SugarConfig.getDebugEnabled;
 
 public class SugarDb extends SQLiteOpenHelper {
+
     private final SchemaGenerator schemaGenerator;
     private SQLiteDatabase sqLiteDatabase;
 
     public SugarDb(Context context) {
-        super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
+        super(context, SugarConfig.getDatabaseName(context),
+                new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
         schemaGenerator = new SchemaGenerator(context);
     }
 

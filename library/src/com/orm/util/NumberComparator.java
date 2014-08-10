@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class NumberComparator implements Comparator<Object> {
 
-    static char charAt(String s, int i) {
+    private static char charAt(String s, int i) {
         if (i >= s.length()) {
             return '\000';
         }
@@ -12,7 +12,7 @@ public class NumberComparator implements Comparator<Object> {
         return s.charAt(i);
     }
 
-    int compareRight(String a, String b) {
+    private int compareRight(String a, String b) {
         int bias = 0;
         int ia = 0;
         int ib = 0;
@@ -97,4 +97,5 @@ public class NumberComparator implements Comparator<Object> {
             ib++;
         }
     }
+
 }

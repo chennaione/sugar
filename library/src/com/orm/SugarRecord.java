@@ -39,21 +39,19 @@ public class SugarRecord {
     @SuppressWarnings("deprecation")
     public static <T> void saveInTx(Collection<T> objects) {
         SQLiteDatabase sqLiteDatabase = getSugarContext().getSugarDb().getDB();
-
-        try{
+        try {
             sqLiteDatabase.beginTransaction();
             sqLiteDatabase.setLockingEnabled(false);
-            for(T object: objects){
+            for (T object: objects) {
                 SugarRecord.save(object);
             }
             sqLiteDatabase.setTransactionSuccessful();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
-        }finally {
+        } finally {
             sqLiteDatabase.endTransaction();
             sqLiteDatabase.setLockingEnabled(true);
         }
-
     }
 
     public static <T> List<T> listAll(Class<T> type) {
@@ -74,8 +72,7 @@ public class SugarRecord {
         return findAsIterator(type, null, null, null, null, null);
     }
 
-    public static <T> Iterator<T> findAsIterator(Class<T> type,
-                                                                        String whereClause, String... whereArgs) {
+    public static <T> Iterator<T> findAsIterator(Class<T> type, String whereClause, String... whereArgs) {
         return findAsIterator(type, whereClause, whereArgs, null, null, null);
     }
 
@@ -86,24 +83,19 @@ public class SugarRecord {
         return new CursorIterator<T>(type, c);
     }
 
-    public static <T> Iterator<T> findAsIterator(Class<T> type,
-                                                                    String whereClause, String[] whereArgs,
-                                                                    String groupBy, String orderBy, String limit) {
-
+    public static <T> Iterator<T> findAsIterator(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
-        Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null,
-                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+                groupBy, null, orderBy, limit);
         return new CursorIterator<T>(type, c);
     }
 
-    public static <T> List<T> find(Class<T> type,
-                                                       String whereClause, String... whereArgs) {
+    public static <T> List<T> find(Class<T> type, String whereClause, String... whereArgs) {
         return find(type, whereClause, whereArgs, null, null, null);
     }
 
     public static <T> List<T> findWithQuery(Class<T> type, String query, String... arguments) {
-
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
@@ -121,22 +113,21 @@ public class SugarRecord {
         } finally {
             c.close();
         }
+
         return toRet;
     }
 
-    public static void executeQuery(String query, String... arguments){
+    public static void executeQuery(String query, String... arguments) {
         getSugarContext().getSugarDb().getDB().execSQL(query, arguments);
     }
 
-    public static <T> List<T> find(Class<T> type,
-                                                       String whereClause, String[] whereArgs,
-                                                       String groupBy, String orderBy, String limit) {
+    public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
         List<T> toRet = new ArrayList<T>();
-        Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null,
-                whereClause, whereArgs, groupBy, null, orderBy, limit);
+        Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+                groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
@@ -155,15 +146,11 @@ public class SugarRecord {
         return count(type, null, null, null, null, null);
     }
 
-    public static <T> long count(Class<?> type,
-            String whereClause, String[] whereArgs) {
+    public static <T> long count(Class<?> type, String whereClause, String[] whereArgs) {
     	return count(type, whereClause, whereArgs, null, null, null);
     }
 
-    public static <T> long count(Class<?> type,
-            String whereClause, String[] whereArgs,
-            String groupBy, String orderBy, String limit) {
-
+    public static <T> long count(Class<?> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
 
@@ -193,25 +180,24 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
-
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
             ReflectionUtil.addFieldValueToColumn(values, column, object);
         }
 
-        long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
+                SQLiteDatabase.CONFLICT_REPLACE);
 
         if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ReflectionUtil.setFieldValueForId(object, id);
         }
-
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
+
         return id;
     }
 
     private static void inflate(Cursor cursor, Object object) {
-
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
 
         for (Field field : columns) {
@@ -286,6 +272,7 @@ public class SugarRecord {
                     cursor.close();
                 }
             }
+
             return entity;
         }
 
@@ -293,8 +280,6 @@ public class SugarRecord {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-
-
     }
 
 }

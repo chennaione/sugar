@@ -6,9 +6,11 @@ import com.orm.dsl.Table;
 import java.lang.reflect.Field;
 
 public class NamingHelper {
+
     public static String toSQLNameDefault(String javaNotation) {
-        if (javaNotation.equalsIgnoreCase("_id"))
+        if (javaNotation.equalsIgnoreCase("_id")) {
             return "_id";
+        }
 
         StringBuilder sb = new StringBuilder();
         char[] buf = javaNotation.toCharArray();
@@ -49,7 +51,6 @@ public class NamingHelper {
     }
 
     public static String toSQLName(Class<?> table) {
-
         if (table.isAnnotationPresent(Table.class)) {
             Table annotation = table.getAnnotation(Table.class);
             if ("".equals(annotation.name())) {
@@ -57,6 +58,8 @@ public class NamingHelper {
             }
             return annotation.name();
         }
+
         return NamingHelper.toSQLNameDefault(table.getSimpleName());
     }
+
 }
