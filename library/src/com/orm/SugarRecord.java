@@ -76,6 +76,25 @@ public class SugarRecord {
         return findAsIterator(type, whereClause, whereArgs, null, null, null);
     }
 
+    public static <T extends SugarRecord<?>> T findFirst(Class<T> type,
+                                                         String whereClause, String... whereArgs) {
+        List<T> resList = find(type, whereClause, whereArgs, null, null, null);
+        if (resList.size() > 0 ) {
+            return resList.get(0);
+        }
+        return null;
+    }
+
+    public static <T extends SugarRecord<?>> T findFirst(Class<T> type,
+                                                         String whereClause, String[] whereArgs,
+                                                         String groupBy, String orderBy, String limit) {
+        List<T> resList = find(type, whereClause, whereArgs, groupBy, orderBy, limit);
+        if (resList.size() > 0 ) {
+            return resList.get(0);
+        }
+        return null;
+    }
+
     public static <T> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
