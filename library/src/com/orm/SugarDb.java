@@ -54,8 +54,8 @@ public class SugarDb extends SQLiteOpenHelper {
         File dbFileTest = SugarApp.getSugarContext().getDatabasePath(
                 SugarConfig.getDatabaseName(SugarApp.getSugarContext(), true));
 
-        if (dbFile.exists()) {
-            try {
+        try {
+            if (dbFile.exists()) {
                 InputStream in = new FileInputStream(dbFile);
                 OutputStream out = new FileOutputStream(dbFileTest);
 
@@ -66,11 +66,11 @@ public class SugarDb extends SQLiteOpenHelper {
                 }
                 in.close();
                 out.close();
-            } catch (IOException e) {
-                Log.d("sugar",
-                        "Couldn't copy develop database to tests database");
-                e.printStackTrace();
             }
+            Log.d("Sugar", "Copy database from development to tests");
+        } catch (IOException e) {
+            Log.d("Sugar", "Couldn't copy development database to tests database");
+            e.printStackTrace();
         }
     }
 }
