@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class SugarConfig {
             databaseName = "Sugar.db";
         }
 
-        if (isTestEnviroment(context)) {
+        if (isTestEnviroment) {
             databaseName = "test" + databaseName;
         }
 
@@ -121,29 +120,17 @@ public class SugarConfig {
         return value;
     }
 
-    public static boolean isLibraryLoaded(Context context, String name) {
-        Boolean value = false;
-
-        PackageManager pm = context.getPackageManager();
-        try {
-            String[] libraries = pm.getSystemSharedLibraryNames();
-
-            for (String library : libraries) {
-                if (library.equals(name)) {
-                    value = true;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            Log.d("sugar", "Couldn't find config value: " + name);
-            e.printStackTrace();
-        }
-
-        return value;
+    public static Boolean isTestEnviroment(Context context) {
+        return (isClassLoaded(getDomainPackageName(context) + ".SugarTest"));
     }
 
-    @SuppressLint("NewApi")
-    public static Boolean isTestEnviroment(Context context) {
-        return (ActivityManager.isRunningInTestHarness() || isLibraryLoaded(context, "android.test.runner"));
+    private static Boolean isClassLoaded(String name) {
+        try {
+            Class.forName(name);
+            Log.d("Sugar", "Found class: " + name);
+            return true;
+        } catch( ClassNotFoundException e ) {
+            return false;
+        }
     }
 }
