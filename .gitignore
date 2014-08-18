@@ -4,5 +4,6 @@ library/gen
 library/.project
 library/.classpath
 library/library.iml
+library/.gradle
 *.class
 .DS_Store
