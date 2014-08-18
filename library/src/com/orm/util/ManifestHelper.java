@@ -11,10 +11,6 @@ import android.util.Log;
 public class ManifestHelper {
 
     /**
-     * TODO document the meaning of this 128 flag.
-     */
-    private final static int FLAG = 128;
-    /**
      * Key for the database name meta data.
      */
     public final static String METADATA_DATABASE = "DATABASE";
@@ -94,7 +90,8 @@ public class ManifestHelper {
 
         PackageManager pm = context.getPackageManager();
         try {
-            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), FLAG);
+            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(),
+                    PackageManager.GET_META_DATA);
             value = ai.metaData.getString(name);
         } catch (Exception e) {
             Log.d("sugar", "Couldn't find config value: " + name);
@@ -108,7 +105,8 @@ public class ManifestHelper {
 
         PackageManager pm = context.getPackageManager();
         try {
-            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), FLAG);
+            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(),
+                    PackageManager.GET_META_DATA);
             value = ai.metaData.getInt(name);
         } catch (Exception e) {
             Log.d("sugar", "Couldn't find config value: " + name);
@@ -122,7 +120,8 @@ public class ManifestHelper {
 
         PackageManager pm = context.getPackageManager();
         try {
-            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), FLAG);
+            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(),
+                    PackageManager.GET_META_DATA);
             value = ai.metaData.getBoolean(name);
         } catch (Exception e) {
             Log.d("sugar", "Couldn't find config value: " + name);
