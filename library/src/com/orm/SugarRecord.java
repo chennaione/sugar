@@ -217,6 +217,7 @@ public class SugarRecord {
     public void delete() {
         SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
         db.delete(NamingHelper.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
+        Log.i("Sugar", getClass().getSimpleName() + " deleted : " + getId().toString()});
     }
 
     public long save() {
