@@ -1,4 +1,4 @@
-# Sugar ORM
+# Sugar ORM ![travis status](https://travis-ci.org/satyan/sugar.svg?branch=master)
 
 Insanely easy way to work with Android databases.
 
