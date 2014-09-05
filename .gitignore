@@ -6,3 +6,4 @@ library/.classpath
 library/library.iml
 *.class
 .DS_Store
+.idea/*
