@@ -107,10 +107,10 @@ public class SugarRecord<T>{
                         else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
                             values.put(columnName, (Boolean) columnValue);
                         }
-                        else if (Date.class.equals(columnType)) {
+                        else if (Date.class.equals(columnType) && column.get(this) != null) {
                             values.put(columnName, ((Date) column.get(this)).getTime());
                         }
-                        else if (Calendar.class.equals(columnType)) {
+                        else if (Calendar.class.equals(columnType) && column.get(this) != null) {
                             values.put(columnName, ((Calendar) column.get(this)).getTimeInMillis());
                         }else{
                             values.put(columnName, String.valueOf(columnValue));
