@@ -64,7 +64,7 @@ public class SugarRecord<T>{
             }
             sqLiteDatabase.setTransactionSuccessful();
         }catch (Exception e){
-            Log.i("Sugar", "Error in saving in transaction " + e.getMessage());
+            Log.e("Sugar", "Error in saving in transaction " + e.getMessage());
         }finally {
             sqLiteDatabase.endTransaction();
             sqLiteDatabase.setLockingEnabled(true);
@@ -129,7 +129,7 @@ public class SugarRecord<T>{
         else
             db.update(getSqlName(), values, "ID = ?", new String[]{String.valueOf(id)});
 
-        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
+        Log.d("Sugar", getClass().getSimpleName() + " saved : " + id);
     }
 
     public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
