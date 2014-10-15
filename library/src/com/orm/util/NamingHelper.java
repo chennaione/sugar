@@ -38,9 +38,9 @@ public class NamingHelper {
             } else if (Character.isUpperCase(c)) {
                 if (Character.isLetterOrDigit(prevChar)) {
                     if (Character.isLowerCase(prevChar)) {
-                        sb.append('_').append(Character.toUpperCase(c));
+                        sb.append('_').append(c);
                     } else if (nextChar > 0 && Character.isLowerCase(nextChar)) {
-                        sb.append('_').append(Character.toUpperCase(c));
+                        sb.append('_').append(c);
                     } else {
                         sb.append(c);
                     }
