@@ -19,6 +19,7 @@ public class SugarTransactionHelper {
         } catch (Throwable e) {
             Log.d(SugarTransactionHelper.class.getSimpleName(),
                     "Could execute callback within transaction", e);
+            throw e;
         } finally {
             database.endTransaction();
         }
