@@ -20,6 +20,7 @@ public class SugarApp extends android.app.Application{
     public void onTerminate(){
         if (this.database != null) {
             this.database.getDB().close();
+            SugarCache.dispose();
         }
         super.onTerminate();
     }

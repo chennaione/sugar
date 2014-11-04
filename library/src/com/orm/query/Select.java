@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public class Select<T extends SugarRecord<?>> implements Iterable {
 
     private Class<T> record;

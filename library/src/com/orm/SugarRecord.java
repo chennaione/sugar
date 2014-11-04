@@ -1,7 +1,6 @@
 package com.orm;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -10,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.orm.dsl.Ignore;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -47,12 +45,10 @@ public class SugarRecord<T>{
         return save(getSugarContext().getDatabase().getDB());
     }
 
-    @SuppressWarnings("deprecation")
     public static <T extends SugarRecord<?>> void saveInTx(T... objects ) {
         saveInTx(Arrays.asList(objects));
     }
 
-    @SuppressWarnings("deprecation")
     public static <T extends SugarRecord<?>> void saveInTx(Collection<T> objects ) {
         SQLiteDatabase sqLiteDatabase = getSugarContext().getDatabase().getDB();
 
@@ -72,7 +68,8 @@ public class SugarRecord<T>{
 
     }
 
-    long save(SQLiteDatabase db) {
+    @SuppressWarnings("rawtypes")
+	long save(SQLiteDatabase db) {
 
         List<Field> columns = getTableFields();
         ContentValues values = new ContentValues(columns.size());
@@ -264,7 +261,7 @@ public class SugarRecord<T>{
     	return toRet;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     void inflate(Cursor cursor) {
         Map<Field, Long> entities = new HashMap<Field, Long>();
         List<Field> columns = getTableFields();
@@ -345,8 +342,12 @@ public class SugarRecord<T>{
 
         for (Field f : entities.keySet()) {
             try {
-                f.set(this, findById((Class<? extends SugarRecord<?>>) f.getType(), 
-                        entities.get(f)));
+            	SugarRecord<?> entity = SugarCache.getEntity((Class<? extends SugarRecord<?>>) f.getType(), entities.get(f));
+            	if (entity == null) {
+            		entity = findById((Class<? extends SugarRecord<?>>) f.getType(), entities.get(f));
+            		SugarCache.addEntity(entity);
+            	}
+                f.set(this, entity);
             } catch (SQLiteException e) {
             } catch (IllegalArgumentException e) {
             } catch (IllegalAccessException e) {

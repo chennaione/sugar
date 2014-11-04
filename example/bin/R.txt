@@ -1,0 +1,7 @@
+int drawable icon 0x7f020000
+int id Button01 0x7f050002
+int id LinearLayout01 0x7f050001
+int id layout 0x7f050000
+int layout main 0x7f030000
+int layout notelist 0x7f030001
+int string app_name 0x7f040000

@@ -32,11 +32,15 @@ import dalvik.system.DexFile;
 
 public class SugarDb extends SQLiteOpenHelper {
     private Context context;
+    
+    public Context getContext() {
+    	return this.context;
+    }
 
-    public SugarDb(Context context) {
+	public SugarDb(Context context) {
         super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
         this.context = context;
-
+        SugarCache.initialize(this);
     }
 
     private <T extends SugarRecord<?>> List<T> getDomainClasses(Context context) {
