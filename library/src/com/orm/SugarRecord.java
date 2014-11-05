@@ -27,6 +27,7 @@ public class SugarRecord<T>{
     public void delete() {
         SQLiteDatabase db = getSugarContext().getDatabase().getDB();
         db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
+        SugarCache.removeEntity(this);
     }
 
     public static <T extends SugarRecord<?>> void deleteAll(Class<T> type) {
