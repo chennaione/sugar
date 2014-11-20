@@ -112,6 +112,12 @@ public class ReflectionUtil {
                     } catch (NullPointerException e) {
                         values.put(columnName, (Long) null);
                     }
+                } else if (columnType.equals(byte[].class)) {
+                    if (columnValue == null) {
+                        values.put(columnName, "".getBytes());
+                    } else {
+                        values.put(columnName, (byte[]) columnValue);
+                    }
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
@@ -153,9 +159,6 @@ public class ReflectionUtil {
             } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
                 field.set(object,
                         cursor.getString(columnIndex).equals("1"));
-            } else if (field.getType().getName().equals("[B")) {
-                field.set(object,
-                        cursor.getBlob(columnIndex));
             } else if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
                 field.set(object,
                         cursor.getInt(columnIndex));
@@ -176,6 +179,13 @@ public class ReflectionUtil {
                 Calendar c = Calendar.getInstance();
                 c.setTimeInMillis(l);
                 field.set(object, c);
+            } else if (fieldType.equals(byte[].class)) {
+                byte[] bytes = cursor.getBlob(columnIndex);
+                if (bytes == null) {
+                    field.set(object, "".getBytes());
+                } else {
+                    field.set(object, cursor.getBlob(columnIndex));
+                }
             } else if (Enum.class.isAssignableFrom(fieldType)) {
                 try {
                     Method valueOf = field.getType().getMethod("valueOf", String.class);
