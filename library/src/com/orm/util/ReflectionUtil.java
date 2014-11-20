@@ -94,6 +94,8 @@ public class ReflectionUtil {
                     } catch (NullPointerException e) {
                         values.put(columnName, (Long) null);
                     }
+                } else if (columnType == byte[].class && columnValue != null && columnValue instanceof byte[]) { // fix: handle byte[] for blob data
+                    values.put(columnName, (byte[])columnValue);
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
@@ -158,6 +160,9 @@ public class ReflectionUtil {
                 Calendar c = Calendar.getInstance();
                 c.setTimeInMillis(l);
                 field.set(object, c);
+            } else if (fieldType.equals(byte[].class)) {  // fix: handle retrieving byte[]
+                byte[] l = cursor.getBlob(columnIndex);
+                field.set(object, l);
             } else if (Enum.class.isAssignableFrom(fieldType)) {
                 try {
                     Method valueOf = field.getType().getMethod("valueOf", String.class);
