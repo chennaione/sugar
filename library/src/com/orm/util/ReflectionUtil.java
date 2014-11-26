@@ -194,10 +194,8 @@ public class ReflectionUtil {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
             for (String className : getAllClasses(context)) {
-                if (className.startsWith(ManifestHelper.getDomainPackageName(context))) {
-                    Class domainClass = getDomainClass(className, context);
-                    if (domainClass != null) domainClasses.add(domainClass);
-                }
+                Class domainClass = getDomainClass(className, context);
+                if (domainClass != null) domainClasses.add(domainClass);
             }
         } catch (IOException e) {
             Log.e("Sugar", e.getMessage());
@@ -233,13 +231,15 @@ public class ReflectionUtil {
 
 
     private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+        String packageName = ManifestHelper.getDomainPackageName(context);
         String path = getSourcePath(context);
         List<String> classNames = new ArrayList<String>();
         try {
             DexFile dexfile = new DexFile(path);
             Enumeration<String> dexEntries = dexfile.entries();
             while (dexEntries.hasMoreElements()) {
-                classNames.add(dexEntries.nextElement());
+                String className = dexEntries.nextElement();
+                if (className.startsWith(packageName)) classNames.add(className);
             }
         } catch (NullPointerException e) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -252,7 +252,9 @@ public class ReflectionUtil {
                     for (File filePath : classDirectory.listFiles()) {
                         populateFiles(filePath, fileNames, "");
                     }
-                    classNames.addAll(fileNames);
+                    for (String fileName : fileNames) {
+                        if (fileName.startsWith(packageName)) classNames.add(fileName);
+                    }
                 }
             }
         }
