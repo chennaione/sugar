@@ -201,10 +201,13 @@ public class SugarRecord {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
 
         for (Field field : columns) {
-            if (field.getClass().isAnnotationPresent(Table.class)) {
+        	field.setAccessible(true);
+            Class<?> fieldType = field.getType();
+            if (fieldType.isAnnotationPresent(Table.class) ||
+                    SugarRecord.class.isAssignableFrom(fieldType)) {
                 try {
                     long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
-                    field.set(object, (id > 0) ? findById(field.getType(), id) : null);
+                    field.set(object, (id > 0) ? findById(fieldType, id) : null);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
