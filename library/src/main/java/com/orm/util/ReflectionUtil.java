@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.Log;
+
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Table;
-import dalvik.system.DexFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+
+import dalvik.system.DexFile;
 
 public class ReflectionUtil {
 
@@ -175,12 +182,25 @@ public class ReflectionUtil {
             Log.e("field set error", e.getMessage());
         }
     }
+    
+    private static Field getDeepField(String fieldName, Class<?> type) throws NoSuchFieldException {
+        try {
+            Field field = type.getDeclaredField(fieldName);
+            return field;
+        } catch (NoSuchFieldException e) {
+            Class superclass = type.getSuperclass();
+            if (superclass != null) {
+                Field field = getDeepField(fieldName, superclass);
+                return field;
+            } else {
+                throw e;
+            }
+        }
+    }
 
     public static void setFieldValueForId(Object object, Long value) {
-
         try {
-            Field field = object.getClass().getField("id");
-
+            Field field = getDeepField("id", object.getClass());
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalAccessException e) {
