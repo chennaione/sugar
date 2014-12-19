@@ -201,6 +201,7 @@ public class SugarRecord {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
 
         for (Field field : columns) {
+        	field.setAccessible(true);
             if (field.getType().isAnnotationPresent(Table.class)) {
                 try {
                     long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
