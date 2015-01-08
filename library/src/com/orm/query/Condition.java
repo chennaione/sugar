@@ -12,7 +12,9 @@ public class Condition {
         LESSER_THAN(" < "),
         NOT_EQUALS (" != "),
         LIKE(" LIKE "),
-        NOT_LIKE(" NOT LIKE ");
+        NOT_LIKE(" NOT LIKE "),
+        IS_NULL(" IS NULL "),
+        IS_NOT_NULL(" IS NOT NULL ");
 
         private String symbol;
 
@@ -40,6 +42,9 @@ public class Condition {
     }
 
     public Condition eq(Object value) {
+        if (value == null) {
+            return isNull();
+        }
         this.value = value;
         check = Check.EQUALS;
         return this;
@@ -58,6 +63,9 @@ public class Condition {
     }
 
     public Condition notEq(Object value) {
+        if (value == null) {
+            return isNotNull();
+        }
         this.value = value;
         check = Check.NOT_EQUALS;
         return this;
@@ -72,6 +80,18 @@ public class Condition {
     public Condition lt(Object value) {
         this.value = value;
         check = Check.LESSER_THAN;
+        return this;
+    }
+
+    public Condition isNull() {
+        this.value = null;
+        check = Check.IS_NULL;
+        return this;
+    }
+
+    public Condition isNotNull() {
+        this.value = null;
+        check = Check.IS_NOT_NULL;
         return this;
     }
 
