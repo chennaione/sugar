@@ -68,7 +68,11 @@ public class Select<T> implements Iterable {
                     .append("'")
                     .append(condition.getValue().toString())
                     .append("'");
-
+            } else if (Condition.Check.IS_NULL.equals(condition.getCheck()) ||
+                    Condition.Check.IS_NOT_NULL.equals(condition.getCheck())) {
+                toAppend
+                    .append(condition.getProperty())
+                    .append(condition.getCheckSymbol());
             } else {
                 toAppend
                     .append(condition.getProperty())
