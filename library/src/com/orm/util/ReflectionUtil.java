@@ -244,8 +244,8 @@ public class ReflectionUtil {
         } catch (NullPointerException e) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Enumeration<URL> urls = classLoader.getResources("");
-            List<String> fileNames = new ArrayList<String>();
             while (urls.hasMoreElements()) {
+                List<String> fileNames = new ArrayList<String>();
                 String classDirectoryName = urls.nextElement().getFile();
                 if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
                     File classDirectory = new File(classDirectoryName);
