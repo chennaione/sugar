@@ -5,7 +5,7 @@ import android.util.Log;
 
 public class SugarTransactionHelper {
 
-    public static void doInTansaction(SugarTransactionHelper.Callback callback) {
+    public static void doInTransaction(SugarTransactionHelper.Callback callback) {
         SQLiteDatabase database = SugarContext.getSugarContext().getSugarDb().getDB();
         database.beginTransaction();
 
@@ -22,11 +22,9 @@ public class SugarTransactionHelper {
         } finally {
             database.endTransaction();
         }
-
     }
 
     public static interface Callback {
         void manipulateInTransaction();
     }
-
 }
