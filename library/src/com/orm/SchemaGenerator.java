@@ -37,6 +37,7 @@ public class SchemaGenerator {
         for (Class domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
         }
+        executeSugarUpgrade(sqLiteDatabase, 0, 1); // run sql in initial migration (1.sql) to seed db
     }
 
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
