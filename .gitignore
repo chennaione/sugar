@@ -10,3 +10,8 @@ library/.gradle
 *.idea
 example/gen
 */local.properties
+
+testing/bin
+testing/gen
+testing/.project
+testing/.classpath
