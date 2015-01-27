@@ -94,6 +94,8 @@ public class ReflectionUtil {
                     } catch (NullPointerException e) {
                         values.put(columnName, (Long) null);
                     }
+                } else if (columnType.getName().equals("[B")) {
+                	values.put(columnName, (byte []) columnValue);
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
