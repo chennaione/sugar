@@ -1,10 +1,16 @@
 package com.example;
 
-import android.content.Context;
-import com.orm.SugarRecord;
+import com.orm.dsl.Column;
+import com.orm.dsl.Table;
 
-public class Note extends SugarRecord<Note>{
+@Table(name = "Note")
+public class Note {
+
+    private long id;
+
+    @Column(name = "noteId", unique = true, notNull = true)
     private int noteId;
+
     private String title;
     private String description;
    private String name;
@@ -39,25 +45,25 @@ public class Note extends SugarRecord<Note>{
         return title;
     }
 
-    public String getDescription() {
-        return description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Tag getTag() {
-        return tag;
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description){
         this.description = description;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public Tag getTag() {
+        return tag;
     }
 
     @Override
     public String toString() {
-        return  title + "id: " + id + " - " + tag + " " + tag.getId();
+        return title + "id: " + noteId;
 
     }
 }

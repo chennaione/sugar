@@ -5,19 +5,20 @@ import android.util.Log;
 
 public class SugarTransactionHelper {
 
-    public static void doInTansaction(SugarTransactionHelper.Callback callback) {
-
-        SQLiteDatabase database = SugarApp.getSugarContext().getDatabase().getDB();
-
+    public static void doInTransaction(SugarTransactionHelper.Callback callback) {
+        SQLiteDatabase database = SugarContext.getSugarContext().getSugarDb().getDB();
         database.beginTransaction();
 
         try {
-            Log.d(SugarTransactionHelper.class.getSimpleName(), "callback executing within transaction");
+            Log.d(SugarTransactionHelper.class.getSimpleName(),
+                    "Callback executing within transaction");
             callback.manipulateInTransaction();
             database.setTransactionSuccessful();
-            Log.d(SugarTransactionHelper.class.getSimpleName(), "callback successfully executed within transaction");
+            Log.d(SugarTransactionHelper.class.getSimpleName(),
+                    "Callback successfully executed within transaction");
         } catch (Throwable e) {
-            Log.d(SugarTransactionHelper.class.getSimpleName(), "could execute callback within transaction", e);
+            Log.d(SugarTransactionHelper.class.getSimpleName(),
+                    "Could execute callback within transaction", e);
         } finally {
             database.endTransaction();
         }

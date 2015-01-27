@@ -1,10 +1,10 @@
-package com.orm;
+package com.example;
 
 import com.orm.SugarContext;
 
 import android.app.Application;
 
-public class SugarApp extends Application {
+public class ClientApp extends Application {
 
     @Override
     public void onCreate() {

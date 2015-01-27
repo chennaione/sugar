@@ -4,5 +4,9 @@ library/gen
 library/.project
 library/.classpath
 library/library.iml
+library/.gradle
 *.class
 .DS_Store
+*.idea
+example/gen
+*/local.properties
