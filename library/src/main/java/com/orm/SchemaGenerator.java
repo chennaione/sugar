@@ -1,10 +1,11 @@
 package com.orm;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.util.Log;
+
 import com.orm.dsl.Column;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.Unique;
@@ -41,13 +42,11 @@ public class SchemaGenerator {
 
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         List<Class> domainClasses = getDomainClasses(context);
+        String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
         for (Class domain : domainClasses) {
-            try {  // we try to do a select, if fails then (?) there isn't the table
-                sqLiteDatabase.query(NamingHelper.toSQLName(domain), null, null, null, null, null, null);
-            } catch (SQLiteException e) {
-                Log.i("Sugar", String.format("Creating table on update (error was '%s')",
-                        e.getMessage()));
-                createTable(domain, sqLiteDatabase);
+            Cursor c = sqLiteDatabase.rawQuery(String.format(sql, NamingHelper.toSQLName(domain)), null);
+            if (c.moveToFirst() && c.getInt(0) == 0) {
+            	createTable(domain, sqLiteDatabase);
             }
         }
         executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion);
