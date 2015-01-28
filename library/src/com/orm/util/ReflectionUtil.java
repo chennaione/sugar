@@ -175,11 +175,30 @@ public class ReflectionUtil {
             Log.e("field set error", e.getMessage());
         }
     }
+    
+    /**
+     * Lookup a field in the specified class and all the superclasses
+     * 
+     * @param cls
+     * @param name
+     * @return
+     * @throws NoSuchFieldException
+     */
+    public static Field getField(Class<?> cls, String name) throws NoSuchFieldException {
+    	try {
+    		Field field = cls.getDeclaredField(name);
+    		return field;
+        } catch (NoSuchFieldException e) {
+        	if (cls.getSuperclass() != null)
+        		return getField(cls.getSuperclass(), name);
+        	throw e;
+        }
+    }
 
     public static void setFieldValueForId(Object object, Long value) {
 
         try {
-            Field field = object.getClass().getField("id");
+            Field field = getField(object.getClass(), "id");
 
             field.setAccessible(true);
             field.set(object, value);
@@ -188,6 +207,20 @@ public class ReflectionUtil {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
+    }
+    
+    public static Long getFieldValueForId(Object object) {
+    	try {
+            Field field = getField(object.getClass(), "id");
+
+            field.setAccessible(true);
+            return field.getLong(object);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    	return null;
     }
 
     public static List<Class> getDomainClasses(Context context) {
