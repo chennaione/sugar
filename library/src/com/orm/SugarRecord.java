@@ -23,11 +23,19 @@ public class SugarRecord {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(NamingHelper.toSQLName(type), null, null);
+        db.removeFromCache(type);
     }
 
     public static <T> void deleteAll(Class<T> type, String whereClause, String... whereArgs) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
+        
+        Iterator<T> records = SugarRecord.findAsIterator(type, whereClause, whereArgs);
+        // TODO: a bit inefficient, but I cannot think of another way to do it
+        while (records.hasNext()) {
+        	T entity = records.next();
+        	db.removeFromCache(type, ReflectionUtil.getFieldValueForId(entity));
+        }
         sqLiteDatabase.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
     }
 
@@ -99,14 +107,19 @@ public class SugarRecord {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
+        Long id;
         List<T> toRet = new ArrayList<T>();
         Cursor c = sqLiteDatabase.rawQuery(query, arguments);
 
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity);
-                toRet.add(entity);
+                id = getId(c);
+            	if ((entity = db.getFromCache(type, id)) == null) {
+            		entity = type.getDeclaredConstructor().newInstance();
+            		SugarRecord.inflate(c, entity);
+            		db.putInCache(type, id, entity);
+            	}
+            	toRet.add(entity);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,14 +138,19 @@ public class SugarRecord {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
+        Long id;
         List<T> toRet = new ArrayList<T>();
         Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
                 groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity);
-                toRet.add(entity);
+            	id = getId(c);
+            	if ((entity = db.getFromCache(type, id)) == null) {
+            		entity = type.getDeclaredConstructor().newInstance();
+            		SugarRecord.inflate(c, entity);
+            		db.putInCache(type, id, entity);
+            	}
+            	toRet.add(entity);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,6 +158,13 @@ public class SugarRecord {
             c.close();
         }
         return toRet;
+    }
+    
+    static Long getId(Cursor cursor) {
+    	int columnIndex = cursor.getColumnIndex("ID");
+    	if (columnIndex >= 0) 
+    		return cursor.getLong(columnIndex);
+    	return null;
     }
 
     public static <T> long count(Class<?> type) {
@@ -179,7 +204,8 @@ public class SugarRecord {
         return save(getSugarContext().getSugarDb().getDB(), object);
     }
 
-    static long save(SQLiteDatabase db, Object object) {
+    @SuppressWarnings("unchecked")
+	static <T> long save(SQLiteDatabase db, T object) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
@@ -191,6 +217,7 @@ public class SugarRecord {
 
         if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ReflectionUtil.setFieldValueForId(object, id);
+            getSugarContext().getSugarDb().putInCache((Class<T>) object.getClass(), id, object);
         }
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
@@ -215,8 +242,10 @@ public class SugarRecord {
     }
 
     public void delete() {
-        SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
-        db.delete(NamingHelper.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
+    	SugarDb db = getSugarContext().getSugarDb();
+        SQLiteDatabase sqlDb = db.getDB();
+        sqlDb.delete(NamingHelper.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
+        db.removeFromCache(getClass(), getId());
         Log.i("Sugar", getClass().getSimpleName() + " deleted : " + getId().toString());
     }
 
@@ -240,10 +269,13 @@ public class SugarRecord {
     static class CursorIterator<E> implements Iterator<E> {
         Class<E> type;
         Cursor cursor;
+        SugarDb db;
+        
 
         public CursorIterator(Class<E> type, Cursor cursor) {
             this.type = type;
             this.cursor = cursor;
+            db = getSugarContext().getSugarDb();
         }
 
         @Override
@@ -254,6 +286,7 @@ public class SugarRecord {
         @Override
         public E next() {
             E entity = null;
+            Long id;
             if (cursor == null || cursor.isAfterLast()) {
                 throw new NoSuchElementException();
             }
@@ -263,8 +296,12 @@ public class SugarRecord {
             }
 
             try {
-                entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(cursor, entity);
+            	id = getId(cursor);
+            	if ((entity = db.getFromCache(type, id)) == null) {
+            		entity = type.getDeclaredConstructor().newInstance();
+            		SugarRecord.inflate(cursor, entity);
+            		db.putInCache(type, id, entity);
+            	}
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

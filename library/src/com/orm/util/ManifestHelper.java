@@ -15,11 +15,12 @@ public class ManifestHelper {
      */
     public final static String METADATA_DATABASE = "DATABASE";
     /**
-     * Key for the database verison meta data.
+     * Key for the database version meta data.
      */
     public final static String METADATA_VERSION = "VERSION";
     public final static String METADATA_DOMAIN_PACKAGE_NAME = "DOMAIN_PACKAGE_NAME";
     public final static String METADATA_QUERY_LOG = "QUERY_LOG";
+    public final static String METADATA_OBJECT_CACHE = "OBJECT_CACHE";
     /**
      * The default name for the database unless specified in the AndroidManifest.
      */
@@ -83,6 +84,16 @@ public class ManifestHelper {
      */
     public static boolean getDebugEnabled(Context context) {
         return getMetaDataBoolean(context, METADATA_QUERY_LOG);
+    }
+    
+    /**
+     * Grabs the object cache flag from the manifest.
+     *
+     * @param context  the {@link android.content.Context} of the Android application
+     * @return true if the object cache flag is enabled
+     */
+    public static boolean getObjectCacheEnabled(Context context) {
+    	return getMetaDataBoolean(context, METADATA_OBJECT_CACHE);
     }
 
     private static String getMetaDataString(Context context, String name) {
