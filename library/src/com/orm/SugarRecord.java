@@ -190,7 +190,7 @@ public class SugarRecord {
                 SQLiteDatabase.CONFLICT_REPLACE);
 
         if (SugarRecord.class.isAssignableFrom(object.getClass())) {
-            ReflectionUtil.setFieldValueForId(object, id);
+            ((SugarRecord) object).setId(id);
         }
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
