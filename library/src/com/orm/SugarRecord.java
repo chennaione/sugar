@@ -23,6 +23,8 @@ public class SugarRecord {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         sqLiteDatabase.delete(NamingHelper.toSQLName(type), null, null);
+        // added to clear the SQLlite Sequence
+        sqLiteDatabase.delete("sqlite_sequence", "where name=?", NamingHelper.toSQLName(type));
     }
 
     public static <T> void deleteAll(Class<T> type, String whereClause, String... whereArgs) {
