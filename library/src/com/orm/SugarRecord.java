@@ -54,6 +54,29 @@ public class SugarRecord {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    public static <T> void deleteInTx(T... objects) {
+        deleteInTx(Arrays.asList(objects));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T> void deleteInTx(Collection<T> objects) {
+        SQLiteDatabase sqLiteDatabase = getSugarContext().getSugarDb().getDB();
+        try {
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for (T object : objects) {
+                SugarRecord.delete(object);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.i("Sugar", "Error in deleting in transaction " + e.getMessage());
+        } finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
+    }
+
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
@@ -218,6 +241,14 @@ public class SugarRecord {
         SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
         db.delete(NamingHelper.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
         Log.i("Sugar", getClass().getSimpleName() + " deleted : " + getId().toString());
+    }
+    
+    public static void delete(Object object) {
+        if (!(object instanceof SugarRecord)) {
+            Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - not a sugarRecord");
+            return;
+        }
+        ((SugarRecord) object).delete();
     }
 
     public long save() {
