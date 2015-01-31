@@ -180,21 +180,37 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
+        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
             ReflectionUtil.addFieldValueToColumn(values, column, object);
         }
 
+        boolean isSugarEntity = isSugarEntity(object);
+        if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put("id", entitiesMap.get(object));
+        }
+
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
                 SQLiteDatabase.CONFLICT_REPLACE);
 
+        //TODO should we remove the id field from SugarRecord?
         if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ReflectionUtil.setFieldValueForId(object, id);
         }
+
+        if (isSugarEntity) {
+            entitiesMap.put(object, id);
+        }
+
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
         return id;
+    }
+
+    private static boolean isSugarEntity(Object object) {
+        return object.getClass().isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(object.getClass());
     }
 
     private static void inflate(Cursor cursor, Object object) {
