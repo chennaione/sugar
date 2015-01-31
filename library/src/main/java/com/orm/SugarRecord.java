@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static com.orm.SugarContext.getSugarContext;
@@ -248,13 +249,13 @@ public class SugarRecord {
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object);
+            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             if (column.getName() == "id") {
                 idField = column;
             }
         }
 
-        boolean isSugarEntity = isSugarEntity(object);
+        boolean isSugarEntity = isSugarEntity(object.getClass());
         if (isSugarEntity && entitiesMap.containsKey(object)) {
                 values.put("id", entitiesMap.get(object));
         }
@@ -282,8 +283,8 @@ public class SugarRecord {
         return id;
     }
 
-    private static boolean isSugarEntity(Object object) {
-        return object.getClass().isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(object.getClass());
+    public static boolean isSugarEntity(Class<?> objectClass) {
+        return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
 
     private static void inflate(Cursor cursor, Object object) {
@@ -292,8 +293,7 @@ public class SugarRecord {
         for (Field field : columns) {
         	field.setAccessible(true);
             Class<?> fieldType = field.getType();
-            if (fieldType.isAnnotationPresent(Table.class) ||
-                    SugarRecord.class.isAssignableFrom(fieldType)) {
+            if (isSugarEntity(fieldType)) {
                 try {
                     long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
                     field.set(object, (id > 0) ? findById(fieldType, id) : null);
