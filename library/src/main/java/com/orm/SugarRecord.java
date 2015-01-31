@@ -243,6 +243,7 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
+        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
@@ -251,6 +252,11 @@ public class SugarRecord {
             if (column.getName() == "id") {
                 idField = column;
             }
+        }
+
+        boolean isSugarEntity = isSugarEntity(object);
+        if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put("id", entitiesMap.get(object));
         }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
@@ -264,6 +270,8 @@ public class SugarRecord {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
+            } else {
+                entitiesMap.put(object, id);
             }
         } else if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ((SugarRecord) object).setId(id);
@@ -272,6 +280,10 @@ public class SugarRecord {
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
         return id;
+    }
+
+    private static boolean isSugarEntity(Object object) {
+        return object.getClass().isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(object.getClass());
     }
 
     private static void inflate(Cursor cursor, Object object) {
