@@ -50,6 +50,17 @@ public class ReflectionUtil {
 
         return fields;
     }
+    
+    private static Field getDeepField(String fieldName, Class<?> type) {
+    	for(Field field :type.getDeclaredFields())
+    		if(field.getName().equals(fieldName))
+    			return field;
+    	
+    	if(type.getSuperclass() != null)
+    		return getDeepField(fieldName, type.getSuperclass());
+    	
+    	return null;
+    }
 
     public static void addFieldValueToColumn(ContentValues values, Field column, Object object) {
         column.setAccessible(true);
@@ -179,13 +190,11 @@ public class ReflectionUtil {
     public static void setFieldValueForId(Object object, Long value) {
 
         try {
-            Field field = object.getClass().getField("id");
-
+            Field field = getDeepField("id", object.getClass());
+            
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
