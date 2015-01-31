@@ -51,14 +51,16 @@ public class ReflectionUtil {
         return fields;
     }
 
-    public static void addFieldValueToColumn(ContentValues values, Field column, Object object) {
+    public static void addFieldValueToColumn(ContentValues values, Field column, Object object, Map<Object,Long> entitiesMap) {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
             String columnName = NamingHelper.toSQLName(column);
             Object columnValue = column.get(object);
 
-            if (SugarRecord.class.isAssignableFrom(columnType)) {
+            if(SugarRecord.isSugarEntity(columnType) && entitiesMap.containsKey(columnValue)){
+                values.put(columnName, entitiesMap.get(columnValue));
+            } else if (SugarRecord.class.isAssignableFrom(columnType)) {
                 values.put(columnName,
                         (columnValue != null)
                                 ? String.valueOf(((SugarRecord) columnValue).getId())

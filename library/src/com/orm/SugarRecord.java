@@ -184,10 +184,10 @@ public class SugarRecord {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object);
+            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
         }
 
-        boolean isSugarEntity = isSugarEntity(object);
+        boolean isSugarEntity = isSugarEntity(object.getClass());
         if (isSugarEntity && entitiesMap.containsKey(object)) {
                 values.put("id", entitiesMap.get(object));
         }
@@ -209,15 +209,16 @@ public class SugarRecord {
         return id;
     }
 
-    private static boolean isSugarEntity(Object object) {
-        return object.getClass().isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(object.getClass());
+    public static boolean isSugarEntity(Class<?> objectClass) {
+        return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
 
     private static void inflate(Cursor cursor, Object object) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
 
         for (Field field : columns) {
-            if (field.getClass().isAnnotationPresent(Table.class)) {
+            Class<?> fieldType = field.getType();
+            if (isSugarEntity(fieldType)) {
                 try {
                     long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
                     field.set(object, (id > 0) ? findById(field.getType(), id) : null);
