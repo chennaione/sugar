@@ -2,15 +2,21 @@ package com.orm;
 
 import android.content.Context;
 
+import com.google.common.collect.MapMaker;
+
+import java.util.concurrent.ConcurrentMap;
+
 public class SugarContext {
 
     private static SugarContext instance = null;
     private SugarDb sugarDb;
     private Context context;
+    private ConcurrentMap<Object, Long> entitiesMap;
 
     private SugarContext(Context context) {
         this.context = context;
         this.sugarDb = new SugarDb(context);
+        this.entitiesMap = new MapMaker().weakKeys().makeMap();
     }
     
     public static SugarContext getSugarContext() {
@@ -47,4 +53,7 @@ public class SugarContext {
         return sugarDb;
     }
 
+    ConcurrentMap<Object, Long> getEntitiesMap() {
+        return entitiesMap;
+    }
 }

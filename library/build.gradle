@@ -12,6 +12,7 @@ buildscript {
 
     dependencies {
         compile 'com.android.support:support-v4:21.0.3'
+        compile group: 'com.google.guava', name: 'guava', version: '12.0'
     }
 
     android {
