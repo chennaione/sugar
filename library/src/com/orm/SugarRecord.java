@@ -17,7 +17,7 @@ import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
 
-    protected Long id = null;
+    private Long id = null;
 
     public static <T> void deleteAll(Class<T> type) {
         SugarDb db = getSugarContext().getSugarDb();
