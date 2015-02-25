@@ -11,7 +11,9 @@ import android.util.Log;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
+import com.orm.util.QueryBuilder;
 
+import java.lang.String;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,6 +102,11 @@ public class SugarRecord {
 
     public static <T> T findById(Class<T> type, Integer id) {
         return findById(type, Long.valueOf(id));
+    }
+
+    public static <T> List<T> findById(Class<T> type, String[] ids) {
+        String whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        return find(type, whereClause, ids);
     }
 
     public static <T> Iterator<T> findAll(Class<T> type) {

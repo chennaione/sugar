@@ -2,6 +2,9 @@ package com.orm.util;
 
 import com.orm.SugarRecord;
 
+import java.lang.RuntimeException;
+import java.lang.StringBuilder;
+
 public class QueryBuilder {
 
     public static String getColumnType(Class<?> type) {
@@ -38,4 +41,16 @@ public class QueryBuilder {
         return "";
     }
 
+    public static String generatePlaceholders(int numberOfArgs) {
+        if (numberOfArgs < 1) {
+            throw new RuntimeException("The number of arguments must be greater than or equal to 1.");
+        }
+
+        StringBuilder stringBuilder = new StringBuilder(numberOfArgs * 2 - 1);
+        stringBuilder.append("?");
+        for (int i = 1; i < numberOfArgs; i++) {
+            stringBuilder.append(",?");
+        }
+        return stringBuilder.toString();
+    }
 }
