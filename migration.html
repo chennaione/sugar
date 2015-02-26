@@ -52,6 +52,9 @@ android:name="com.orm.SugarApp">
             <li>
               <p class="lead">Sugar takes care of upgrading the database from its present version to the upgraded version. For eg: if the database is currently at version <code>1</code> and the upgraded version is <code>4</code>, it'd look for <code>2.sql</code>, <code>3.sql</code> and <code>4.sql</code> and execute all of the present files in that order.</p>
             </li>
+            <li>
+              <p class="lead">Note that Sugar will automatically create tables for new entities, so your migration script only needs to cater for alterations to existing tables.</p>
+            </li>
           </ul>
         </section>
 
