@@ -3,7 +3,7 @@ package com.orm;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
-import dalvik.system.DexFile;
+
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteException;
 import net.sqlcipher.database.SQLiteOpenHelper;
@@ -15,16 +15,21 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
-import static com.orm.SugarConfig.getDatabaseVersion;
+import dalvik.system.DexFile;
+
 import static com.orm.SugarConfig.getDebugEnabled;
 
 public class SugarDb extends SQLiteOpenHelper {
     private Context context;
 
     public SugarDb(Context context) {
-        super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
+        super(context, SugarConfig.getDatabaseName(context), new SugarCursorFactory(getDebugEnabled(context)), SugarConfig.getDatabaseVersion(context));
         this.context = context;
 
     }

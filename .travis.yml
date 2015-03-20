@@ -1,0 +1,13 @@
+language: android
+android:
+  components:
+    - sys-img-x86-android-17
+    - build-tools-19.1.0
+    - android-17
+    - android-19
+
+before_script:
+  - cd library
+
+script:
+  - ant all
