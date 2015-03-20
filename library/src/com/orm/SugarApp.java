@@ -7,6 +7,7 @@ public class SugarApp extends android.app.Application{
 
     public void onCreate(){
         super.onCreate();
+        SugarConfig.loadDefaults(this);
         SugarApp.sugarContext = this;
         this.database = new Database(this);
     }
@@ -24,5 +25,18 @@ public class SugarApp extends android.app.Application{
 
     protected Database getDatabase() {
         return database;
+    }
+
+    protected void setDatabasePassword(String encryptionKey) {
+        SugarConfig.setDatabasePassword(encryptionKey);
+    }
+    protected void setDBVersion(Integer version) {
+        SugarConfig.setDatabaseVersion(version);
+    }
+    protected void setDomainPackageName(String packageName) {
+        SugarConfig.setDomainPackageName(packageName);
+    }
+    protected void setDatabaseName(String databaseName) {
+        SugarConfig.setDatabaseName(databaseName);
     }
 }

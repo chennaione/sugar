@@ -15,13 +15,44 @@ public class SugarConfig {
 
     static Map<Class<?>, List<Field>> fields = new HashMap<Class<?>, List<Field>>();
 
+    private static String databasePassword = "DEFAULT_ENCRYPTION_KEY";
+    private static Integer databaseVersion = 1;
+    private static String databaseName = "Sugar.db";
+    private static String domainPackageName = "";
+
+    private static boolean databasePasswordSet = false;
+    private static boolean databaseVersionSet = false;
+    private static boolean databaseNameSet = false;
+    private static boolean domainPackageNameSet = false;
+
+    public static void loadDefaults(Context context) {
+        if(!databaseVersionSet) databaseVersion = getMetaDataInteger(context, "VERSION");
+        if(!databasePasswordSet) databasePassword = getMetaDataString(context, "ENCRYPTION_KEY");
+        if(!domainPackageNameSet) domainPackageName = getMetaDataString(context, "DOMAIN_PACKAGE_NAME");
+        if(!databaseNameSet) databaseName = getMetaDataString(context, "DATABASE");
+    }
+
+    public static void setDatabasePassword(String encryptionKey) {
+        databasePassword = encryptionKey;
+        databasePasswordSet = true;
+    }
+
+    public static void setDatabaseVersion(Integer version) {
+        databaseVersion = version;
+        databaseVersionSet = true;
+    }
+
+    public static void setDatabaseName(String dbName) {
+        databaseName = dbName;
+        databaseNameSet = true;
+    }
+
+    public static void setDomainPackageName(String packageName) {
+        domainPackageName = packageName;
+        domainPackageNameSet = true;
+    }
+
     public static String getDatabaseName(Context context) {
-        String databaseName = getMetaDataString(context, "DATABASE");
-
-        if (databaseName == null) {
-            databaseName = "Sugar.db";
-        }
-
         return databaseName;
     }
 
@@ -45,32 +76,14 @@ public class SugarConfig {
     }
 
     public static int getDatabaseVersion(Context context) {
-        Integer databaseVersion = getMetaDataInteger(context, "VERSION");
-
-        if ((databaseVersion == null) || (databaseVersion == 0)) {
-            databaseVersion = 1;
-        }
-
         return databaseVersion;
     }
 
     public static String getDatabasePassword(Context context) {
-        String encryptionKey = getMetaDataString(context, "ENCRYPTION_KEY");
-
-        if ((encryptionKey == null) || (encryptionKey.trim().equals(""))) {
-            encryptionKey = "DEFAULT_ENCRYPTION_KEY";
-        }
-
-        return encryptionKey;
+        return databasePassword;
     }
 
     public static String getDomainPackageName(Context context){
-        String domainPackageName = getMetaDataString(context, "DOMAIN_PACKAGE_NAME");
-
-        if (domainPackageName == null) {
-            domainPackageName = "";
-        }
-
         return domainPackageName;
     }
 
