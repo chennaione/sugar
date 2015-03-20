@@ -48,6 +48,5 @@
   </target>
 
   <target name="all" depends="clean, compile" description="build all modules"/>
-  <target name="travis-all" depends="clean, compile-travis" description="build all modules for travis"/>
   
 </project>
