@@ -10,4 +10,4 @@ before_script:
   - cd library
 
 script:
-  - ant travis-all
+  - ant all
