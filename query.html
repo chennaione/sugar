@@ -62,7 +62,7 @@ Condition.prop("prop").eq(2))
 .list();
 {% endhighlight %}
         </div>
-        <p class="lead">Property names are not converted currently. So, it'd be the table column names (conversion eg: testUnderscore => test_underscore). You could fine few more examples in the <a href="https://github.com/satyan/sugar/blob/master/library/test/com/orm/query/SelectTest.java">SelectTest.java</a> class.
+        <p class="lead">Property names are not converted currently. So, it'd be the table column names (conversion eg: testUnderscore => test_underscore, which can be obtained by calling StringUtil.toSQLName("testUnderscore")). You could fine few more examples in the <a href="https://github.com/satyan/sugar/blob/master/library/test/com/orm/query/SelectTest.java">SelectTest.java</a> class.
         </p>
       </section>
 
