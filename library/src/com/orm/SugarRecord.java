@@ -57,6 +57,10 @@ public class SugarRecord {
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
+    
+    public static <T> List<T> listAll(Class<T> type, String orderBy) {
+        return find(type, null, null, null, orderBy, null);
+    }
 
     public static <T> T findById(Class<T> type, Long id) {
         List<T> list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
