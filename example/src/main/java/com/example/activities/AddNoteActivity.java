@@ -9,11 +9,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.R;
+import static com.orm.SugarRecord.save;
+
 import com.example.models.Note;
 import com.example.models.Tag;
-
-import static com.orm.SugarRecord.save;
+import com.example.R;
 
 
 public class AddNoteActivity extends Activity {
@@ -51,6 +51,5 @@ public class AddNoteActivity extends Activity {
                 startActivity(intent);
             }
         });
-
     }
 }

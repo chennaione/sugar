@@ -5,15 +5,13 @@ import com.orm.dsl.Table;
 
 @Table(name = "Note")
 public class Note {
-
     private long id;
 
     @Column(name = "noteId", unique = true, notNull = true)
     private int noteId;
-
     private String title;
     private String description;
-   private String name;
+    private String name;
     private Integer noteNumber = 2;
     private Float tagNumber = 4.0f;
     private float tagNo = 5.0f;
@@ -23,7 +21,7 @@ public class Note {
     private double noteTagNumber = 24.4;
     private Tag tag;
 
-    public Note(){
+    public Note() {
     }
 
     public Note(int noteId, String title, String description, Tag tag) {
@@ -53,7 +51,7 @@ public class Note {
         return description;
     }
 
-    public void setDescription(String description){
+    public void setDescription(String description) {
         this.description = description;
     }
 

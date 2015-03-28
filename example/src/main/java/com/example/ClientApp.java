@@ -1,11 +1,10 @@
 package com.example;
 
-import com.orm.SugarContext;
-
 import android.app.Application;
 
-public class ClientApp extends Application {
+import com.orm.SugarContext;
 
+public class ClientApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
@@ -17,5 +16,4 @@ public class ClientApp extends Application {
         super.onTerminate();
         SugarContext.terminate();
     }
-
 }
