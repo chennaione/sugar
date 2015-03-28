@@ -5,8 +5,5 @@ android:
     - build-tools-21.1.2
     - android-21
 
-before_script:
-  - cd library
-
 script:
-  - gradle clean build test
+  - gradle clean build test example:jacocoTestReport
