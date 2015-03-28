@@ -75,6 +75,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 }
 
 coveralls {
+    sourceDirs = files('example/src/main/java').flatten() + files('library/src/main/java').flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 
