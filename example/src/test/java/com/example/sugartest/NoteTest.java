@@ -2,15 +2,15 @@ package com.example.sugartest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
 
 import com.example.models.Note;
 import com.example.models.Tag;
 
 
-@RunWith(RobolectricTestRunner.class)
-@Config(emulateSdk = 18, manifest = "example/src/main/AndroidManifest.xml")
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(emulateSdk=18)
 public class NoteTest {
     @Test
     public void simpleNoteTest() throws Exception {
