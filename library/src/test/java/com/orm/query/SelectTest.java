@@ -1,9 +1,8 @@
 package com.orm.query;
 
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import static com.orm.query.Condition.prop;
 import static junit.framework.Assert.assertEquals;
 
 public class SelectTest {

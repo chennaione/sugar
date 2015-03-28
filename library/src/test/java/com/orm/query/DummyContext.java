@@ -19,7 +19,37 @@ import android.view.Display;
 
 import java.io.*;
 
-public class DummyContext extends Context{
+public class DummyContext extends Context {
+    @Override
+    public File getCodeCacheDir() {
+        return null;
+    }
+
+    @Override
+    public File[] getExternalFilesDirs(String type) {
+        return null;
+    }
+
+    @Override
+    public File[] getExternalCacheDirs() {
+        return null;
+    }
+
+    @Override
+    public File getNoBackupFilesDir() {
+        return null;
+    }
+
+    @Override
+    public File[] getObbDirs() {
+        return null;
+    }
+
+    @Override
+    public File[] getExternalMediaDirs() {
+        return null;
+    }
+
     @Override
     public AssetManager getAssets() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.

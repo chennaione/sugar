@@ -22,6 +22,7 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:21.0.3'
+    testCompile 'junit:junit:4.12'
 }
 
 task libraryJar(type: Jar) {

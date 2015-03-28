@@ -1,6 +1,7 @@
 package com.orm;
 
 import com.orm.util.NamingHelper;
+
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
