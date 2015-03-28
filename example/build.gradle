@@ -97,3 +97,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
         }
     }
 }
+
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+}
