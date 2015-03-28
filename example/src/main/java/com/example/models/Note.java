@@ -1,4 +1,4 @@
-package com.example;
+package com.example.models;
 
 import com.orm.dsl.Column;
 import com.orm.dsl.Table;

@@ -1,4 +1,4 @@
-package com.example;
+package com.example.models;
 
 import android.content.Context;
 import com.orm.dsl.Table;

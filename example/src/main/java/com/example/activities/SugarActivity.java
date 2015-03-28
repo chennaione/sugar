@@ -1,8 +1,14 @@
-package com.example;
+package com.example.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.example.R;
+import com.example.models.NewNote;
+import com.example.models.Note;
+import com.example.models.Tag;
+import com.example.models.TextNote;
 import com.orm.SugarRecord;
 
 import static com.orm.SugarRecord.save;

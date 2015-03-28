@@ -1,4 +1,4 @@
-package com.example;
+package com.example.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.R;
+import com.example.models.Note;
+import com.example.models.Tag;
 
 import static com.orm.SugarRecord.save;
 
