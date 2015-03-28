@@ -42,3 +42,4 @@ project.properties
 build/
 .gradle/
 .idea
+*.iml
