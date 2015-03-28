@@ -29,8 +29,8 @@ android {
 }
 
 dependencies {
+    compile project (':library')
     compile 'com.android.support:support-v4:21.0.3'
-    compile files('../library/build/libs/sugar-1.3.1.jar')
     testCompile 'org.robolectric:robolectric:2.4'
     testCompile 'junit:junit:4.12'
 }
