@@ -1,4 +1,5 @@
 language: android
+
 android:
   components:
     - sys-img-armeabi-v7a-android-21
@@ -6,4 +7,8 @@ android:
     - android-21
 
 script:
-  - gradle clean build test example:jacocoTestReport
+  - gradle clean library:build library:PublishToMavenLocal example:build test example:jacocoTestReport
+
+cache:
+  directories:
+    - $HOME/.m2
