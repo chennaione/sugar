@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.robolectric'
 apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
 
 android {
     compileSdkVersion 21
