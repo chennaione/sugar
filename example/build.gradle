@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.robolectric'
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
 
 android {
     compileSdkVersion 21
@@ -17,14 +15,6 @@ android {
         release {
             minifyEnabled false
         }
-
-        debug {
-            testCoverageEnabled true
-        }
-    }
-
-    jacoco {
-        version "0.7.1.201405082137"
     }
 }
 
@@ -60,44 +50,4 @@ robolectric {
     afterTest { descriptor, result ->
         println "Executing test for ${descriptor.name} with result: ${result.resultType}"
     }
-}
-
-
-jacoco {
-    toolVersion "0.7.1.201405082137"
-}
-
-def coverageSourceDirs = [
-    'src/main/java',
-]
-
-task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports after running tests."
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-    classDirectories = fileTree(
-        dir: './build/intermediates/classes/debug',
-        excludes: ['**/R*.class',
-                   '**/*$InjectAdapter.class',
-                   '**/*$ModuleAdapter.class',
-                   '**/*$ViewInjector*.class'
-        ])
-    sourceDirectories = files(coverageSourceDirs)
-    executionData = files("$buildDir/jacoco/testDebug.exec")
-    // Bit hacky but fixes https://code.google.com/p/android/issues/detail?id=69174.
-    // We iterate through the compiled .class tree and rename $$ to $.
-    doFirst {
-        new File("$buildDir/intermediates/classes/").eachFileRecurse { file ->
-            if (file.name.contains('$$')) {
-                file.renameTo(file.path.replace('$$', '$'))
-            }
-        }
-    }
-}
-
-coveralls {
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
 }

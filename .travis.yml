@@ -7,7 +7,7 @@ android:
     - android-21
 
 script:
-  - gradle clean library:build library:libraryJar example:build test example:jacocoTestReport example:coveralls
+  - gradle clean build coveralls
 
 cache:
   directories:
