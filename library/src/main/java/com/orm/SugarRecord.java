@@ -3,15 +3,22 @@ package com.orm;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -156,20 +163,24 @@ public class SugarRecord {
 
         long toRet = -1;
         String filter = (!TextUtils.isEmpty(whereClause)) ? " where "  + whereClause : "";
-        SQLiteStatement sqLiteStatament = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + NamingHelper.toSQLName(type) + filter);
+        SQLiteStatement sqliteStatement;
+        try {
+            sqliteStatement = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + NamingHelper.toSQLName(type) + filter);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return toRet;
+        }
 
         if (whereArgs != null) {
             for (int i = whereArgs.length; i != 0; i--) {
-                sqLiteStatament.bindString(i, whereArgs[i - 1]);
+                sqliteStatement.bindString(i, whereArgs[i - 1]);
             }
         }
 
         try {
-            toRet = sqLiteStatament.simpleQueryForLong();
-        } catch (Exception e) {
-            e.printStackTrace();
+            toRet = sqliteStatement.simpleQueryForLong();
         } finally {
-            sqLiteStatament.close();
+            sqliteStatement.close();
         }
 
         return toRet;
