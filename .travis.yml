@@ -1,0 +1,14 @@
+language: android
+
+android:
+  components:
+    - sys-img-armeabi-v7a-android-21
+    - build-tools-21.1.2
+    - android-21
+
+script:
+  - gradle clean build coveralls
+
+cache:
+  directories:
+    - $HOME/.m2
