@@ -193,16 +193,30 @@ public class SugarRecord {
     static long save(SQLiteDatabase db, Object object) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
+        Field idField = null;
         for (Field column : columns) {
             ReflectionUtil.addFieldValueToColumn(values, column, object);
+            if (column.getName() == "id") {
+                idField = column;
+            }
         }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
                 SQLiteDatabase.CONFLICT_REPLACE);
 
-        if (SugarRecord.class.isAssignableFrom(object.getClass())) {
+        if (object.getClass().isAnnotationPresent(Table.class)) {
+            if (idField != null) {
+                idField.setAccessible(true);
+                try {
+                    idField.set(object, new Long(id));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ((SugarRecord) object).setId(id);
         }
+
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
         return id;
