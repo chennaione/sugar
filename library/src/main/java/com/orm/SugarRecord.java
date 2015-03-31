@@ -76,11 +76,11 @@ public class SugarRecord {
     }
 
     public static <T> T first(Class<T>type){
-        return findById(type, 0);
+        return findById(type, 1);
     }
 
     public static <T> T last(Class<T>type){
-        return findById(type, count(type) - 1);
+        return findById(type, count(type));
     }
 
     public static <T> Iterator<T> findAll(Class<T> type) {
