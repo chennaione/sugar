@@ -11,24 +11,30 @@ import org.robolectric.annotation.Config;
 import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(emulateSdk=18)
 public class HelperRecordTests {
     @Test
     public void firstHelperTest() {
-        save(new FloatFieldExtendedModel(0.25F));
-        save(new FloatFieldExtendedModel(0.5F));
+
+        Float firstObjectFloat = new Float(25F);
+        Float lastObjectFloat = new Float(50F);
+        save(new FloatFieldExtendedModel(firstObjectFloat));
+        save(new FloatFieldExtendedModel(lastObjectFloat));
         FloatFieldExtendedModel model = SugarRecord.first(FloatFieldExtendedModel.class);
-        assertEquals(model.getFloat(), 0.25F);
+        assertEquals(firstObjectFloat, model.getFloat() );
     }
 
     @Test
     public void lastHelperTest() {
-        save(new FloatFieldExtendedModel(0.25F));
-        save(new FloatFieldExtendedModel(0.5F));
-        FloatFieldExtendedModel model = SugarRecord.findById(FloatFieldExtendedModel.class);
-        assertEquals(model.getFloat(), 0.5F);
+        Float firstObjectFloat = new Float(25F);
+        Float lastObjectFloat = new Float(50F);
+        save(new FloatFieldExtendedModel(firstObjectFloat));
+        save(new FloatFieldExtendedModel(lastObjectFloat));
+        FloatFieldExtendedModel model = SugarRecord.last(FloatFieldExtendedModel.class);
+        assertEquals(lastObjectFloat, model.getFloat() );
     }
 
     @Test
@@ -45,9 +51,9 @@ public class HelperRecordTests {
 
     @Test
     public void oneItemHelperTest() {
-        save(new FloatFieldExtendedModel(0.25F));
+        save(new FloatFieldExtendedModel(new Float(25F)));
         FloatFieldExtendedModel firstModel = SugarRecord.first(FloatFieldExtendedModel.class);
         FloatFieldExtendedModel lastModel = SugarRecord.last(FloatFieldExtendedModel.class);
-        assertEquals(firstModel.getFloat(), lastModel.getFloat() );
+        assertEquals(firstModel.getFloat(), lastModel.getFloat());
     }
 }
