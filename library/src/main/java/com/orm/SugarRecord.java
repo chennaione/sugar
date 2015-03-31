@@ -109,6 +109,14 @@ public class SugarRecord {
         return find(type, whereClause, ids);
     }
 
+    public static <T> T first(Class<T>type){
+        return findById(type, 0);
+    }
+
+    public static <T> T last(Class<T>type){
+        return findById(type, count(type) - 1);
+    }
+
     public static <T> Iterator<T> findAll(Class<T> type) {
         return findAsIterator(type, null, null, null, null, null);
     }
