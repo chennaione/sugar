@@ -270,17 +270,46 @@ public class SugarRecord {
     }
 
     public void delete() {
-        SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
-        db.delete(NamingHelper.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
-        Log.i("Sugar", getClass().getSimpleName() + " deleted : " + getId().toString());
+        Long id = getId();
+        Class<?> type = getClass();
+        if (id != null && id > 0L) {
+            SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
+            db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()});
+            Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+        } else {
+            Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
+            return;
+        }
     }
     
     public static void delete(Object object) {
-        if (!(object instanceof SugarRecord)) {
-            Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - not a sugarRecord");
+        Class<?> type = object.getClass();
+        if (type.isAnnotationPresent(Table.class)) {
+            try {
+                Field field = type.getDeclaredField("id");
+                field.setAccessible(true);
+                Long id = (Long) field.get(object);
+                if (id != null && id > 0L) {
+                    SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
+                    db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()});
+                    Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+                } else {
+                    Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - object has not been saved");
+                    return;
+                }
+            } catch (NoSuchFieldException e) {
+                Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
+                return;
+            } catch (IllegalAccessException e) {
+                Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
+                return;
+            }
+        } else if (SugarRecord.class.isAssignableFrom(type)) {
+            ((SugarRecord) object).delete();
+        } else {
+            Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
             return;
         }
-        ((SugarRecord) object).delete();
     }
 
     public long save() {
