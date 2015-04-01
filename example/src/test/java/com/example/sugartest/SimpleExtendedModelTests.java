@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -88,7 +89,7 @@ public class SimpleExtendedModelTests {
         SimpleExtendedModel model = new SimpleExtendedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        model.delete();
+        SugarRecord.delete(model);
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
@@ -108,6 +109,32 @@ public class SimpleExtendedModelTests {
         }
         SugarRecord.deleteAll(SimpleExtendedModel.class, "id > ?", new String[]{"1"});
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionFewTest() throws Exception {
+        SimpleExtendedModel first = new SimpleExtendedModel();
+        SimpleExtendedModel second = new SimpleExtendedModel();
+        SimpleExtendedModel third = new SimpleExtendedModel();
+        save(first);
+        save(second);
+        save(third);
+        assertEquals(3L, SugarRecord.count(SimpleExtendedModel.class));
+        SugarRecord.deleteInTx(first, second, third);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionManyTest() throws Exception {
+        List<SimpleExtendedModel> models = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            SimpleExtendedModel model = new SimpleExtendedModel();
+            models.add(model);
+            save(model);
+        }
+        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
+        SugarRecord.deleteInTx(models);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test

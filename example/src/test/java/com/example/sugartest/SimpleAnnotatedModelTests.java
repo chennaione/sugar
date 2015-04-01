@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -77,6 +78,15 @@ public class SimpleAnnotatedModelTests {
     }
 
     @Test
+    public void deleteTest() throws Exception {
+        SimpleAnnotatedModel model = new SimpleAnnotatedModel();
+        save(model);
+        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+        SugarRecord.delete(model);
+        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+    }
+
+    @Test
     public void deleteAllTest() throws Exception {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
@@ -92,6 +102,32 @@ public class SimpleAnnotatedModelTests {
         }
         SugarRecord.deleteAll(SimpleAnnotatedModel.class, "id > ?", new String[]{"1"});
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionFewTest() throws Exception {
+        SimpleAnnotatedModel first = new SimpleAnnotatedModel();
+        SimpleAnnotatedModel second = new SimpleAnnotatedModel();
+        SimpleAnnotatedModel third = new SimpleAnnotatedModel();
+        save(first);
+        save(second);
+        save(third);
+        assertEquals(3L, SugarRecord.count(SimpleAnnotatedModel.class));
+        SugarRecord.deleteInTx(first, second, third);
+        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionManyTest() throws Exception {
+        List<SimpleAnnotatedModel> models = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            SimpleAnnotatedModel model = new SimpleAnnotatedModel();
+            models.add(model);
+            save(model);
+        }
+        assertEquals(100L, SugarRecord.count(SimpleAnnotatedModel.class));
+        SugarRecord.deleteInTx(models);
+        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
