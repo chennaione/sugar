@@ -110,11 +110,15 @@ public class SugarRecord {
     }
 
     public static <T> T first(Class<T>type){
-        return findById(type, 1);
+        List<T> list = findWithQuery(type, "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ROWID ASC LIMIT 1" );
+        if (list.isEmpty()) return null;
+        return list.get(0);
     }
 
     public static <T> T last(Class<T>type){
-        return findById(type, count(type));
+        List<T> list = findWithQuery(type, "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ROWID DESC LIMIT 1");
+        if (list.isEmpty()) return null;
+        return list.get(0);
     }
 
     public static <T> Iterator<T> findAll(Class<T> type) {
