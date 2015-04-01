@@ -193,6 +193,62 @@ public class SimpleAnnotatedModelTests {
     }
 
     @Test
+    public void findByIdStringsNullTest() throws Exception {
+        save(new SimpleAnnotatedModel());
+        assertEquals(0, SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{""}).size());
+    }
+
+    @Test
+    public void findByIdStringsOneTest() throws Exception {
+        save(new SimpleAnnotatedModel());
+        List<SimpleAnnotatedModel> models =
+                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1"});
+        assertEquals(1, models.size());
+        assertEquals(new Long(1L), models.get(0).getId());
+    }
+
+    @Test
+    public void findByIdStringsTwoTest() throws Exception {
+        save(new SimpleAnnotatedModel());
+        save(new SimpleAnnotatedModel());
+        save(new SimpleAnnotatedModel());
+        List<SimpleAnnotatedModel> models =
+                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1", "3"});
+        assertEquals(2, models.size());
+        assertEquals(new Long(1L), models.get(0).getId());
+        assertEquals(new Long(3L), models.get(1).getId());
+    }
+
+    @Test
+    public void findByIdStringsManyTest() throws Exception {
+        for (int i = 1; i <= 10; i++) {
+            save(new SimpleAnnotatedModel());
+        }
+        List<SimpleAnnotatedModel> models =
+                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1", "3", "6", "10"});
+        assertEquals(4, models.size());
+        assertEquals(new Long(1L), models.get(0).getId());
+        assertEquals(new Long(3L), models.get(1).getId());
+        assertEquals(new Long(6L), models.get(2).getId());
+        assertEquals(new Long(10L), models.get(3).getId());
+    }
+
+    @Test
+    public void findByIdStringsOrderTest() throws Exception {
+        for (int i = 1; i <= 10; i++) {
+            save(new SimpleAnnotatedModel());
+        }
+        List<SimpleAnnotatedModel> models =
+                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"10", "6", "3", "1"});
+        assertEquals(4, models.size());
+        // The order of the query doesn't matter
+        assertEquals(new Long(1L), models.get(0).getId());
+        assertEquals(new Long(3L), models.get(1).getId());
+        assertEquals(new Long(6L), models.get(2).getId());
+        assertEquals(new Long(10L), models.get(3).getId());
+    }
+
+    @Test
     public void findByIdNullTest() throws Exception {
         save(new SimpleAnnotatedModel());
         assertNull(SugarRecord.findById(SimpleAnnotatedModel.class, 2L));
