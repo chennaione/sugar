@@ -87,6 +87,14 @@ public class SimpleAnnotatedModelTests {
     }
 
     @Test
+    public void deleteUnsavedTest() throws Exception {
+        SimpleAnnotatedModel model = new SimpleAnnotatedModel();
+        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        SugarRecord.delete(model);
+        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+    }
+
+    @Test
     public void deleteAllTest() throws Exception {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());

@@ -94,6 +94,14 @@ public class SimpleExtendedModelTests {
     }
 
     @Test
+    public void deleteUnsavedTest() throws Exception {
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        SugarRecord.delete(model);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
     public void deleteAllTest() throws Exception {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
