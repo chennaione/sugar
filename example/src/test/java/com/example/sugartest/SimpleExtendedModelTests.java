@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -88,7 +89,15 @@ public class SimpleExtendedModelTests {
         SimpleExtendedModel model = new SimpleExtendedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        model.delete();
+        SugarRecord.delete(model);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteUnsavedTest() throws Exception {
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        SugarRecord.delete(model);
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
@@ -108,6 +117,32 @@ public class SimpleExtendedModelTests {
         }
         SugarRecord.deleteAll(SimpleExtendedModel.class, "id > ?", new String[]{"1"});
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionFewTest() throws Exception {
+        SimpleExtendedModel first = new SimpleExtendedModel();
+        SimpleExtendedModel second = new SimpleExtendedModel();
+        SimpleExtendedModel third = new SimpleExtendedModel();
+        save(first);
+        save(second);
+        save(third);
+        assertEquals(3L, SugarRecord.count(SimpleExtendedModel.class));
+        SugarRecord.deleteInTx(first, second, third);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionManyTest() throws Exception {
+        List<SimpleExtendedModel> models = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            SimpleExtendedModel model = new SimpleExtendedModel();
+            models.add(model);
+            save(model);
+        }
+        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
+        SugarRecord.deleteInTx(models);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
@@ -162,6 +197,62 @@ public class SimpleExtendedModelTests {
     public void findByIdIntegerTest() throws Exception {
         save(new SimpleExtendedModel());
         assertEquals(new Long(1L), SugarRecord.findById(SimpleExtendedModel.class, 1).getId());
+    }
+
+    @Test
+    public void findByIdStringsNullTest() throws Exception {
+        save(new SimpleExtendedModel());
+        assertEquals(0, SugarRecord.findById(SimpleExtendedModel.class, new String[]{""}).size());
+    }
+
+    @Test
+    public void findByIdStringsOneTest() throws Exception {
+        save(new SimpleExtendedModel());
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1"});
+        assertEquals(1, models.size());
+        assertEquals(new Long(1L), models.get(0).getId());
+    }
+
+    @Test
+    public void findByIdStringsTwoTest() throws Exception {
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1", "3"});
+        assertEquals(2, models.size());
+        assertEquals(new Long(1L), models.get(0).getId());
+        assertEquals(new Long(3L), models.get(1).getId());
+    }
+
+    @Test
+    public void findByIdStringsManyTest() throws Exception {
+        for (int i = 1; i <= 10; i++) {
+            save(new SimpleExtendedModel());
+        }
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1", "3", "6", "10"});
+        assertEquals(4, models.size());
+        assertEquals(new Long(1L), models.get(0).getId());
+        assertEquals(new Long(3L), models.get(1).getId());
+        assertEquals(new Long(6L), models.get(2).getId());
+        assertEquals(new Long(10L), models.get(3).getId());
+    }
+
+    @Test
+    public void findByIdStringsOrderTest() throws Exception {
+        for (int i = 1; i <= 10; i++) {
+            save(new SimpleExtendedModel());
+        }
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"10", "6", "3", "1"});
+        assertEquals(4, models.size());
+        // The order of the query doesn't matter
+        assertEquals(new Long(1L), models.get(0).getId());
+        assertEquals(new Long(3L), models.get(1).getId());
+        assertEquals(new Long(6L), models.get(2).getId());
+        assertEquals(new Long(10L), models.get(3).getId());
     }
 
     @Test

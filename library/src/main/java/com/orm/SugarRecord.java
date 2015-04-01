@@ -11,7 +11,9 @@ import android.util.Log;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
+import com.orm.util.QueryBuilder;
 
+import java.lang.String;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,8 +63,35 @@ public class SugarRecord {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    public static <T> void deleteInTx(T... objects) {
+        deleteInTx(Arrays.asList(objects));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T> void deleteInTx(Collection<T> objects) {
+        SQLiteDatabase sqLiteDatabase = getSugarContext().getSugarDb().getDB();
+        try {
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for (T object : objects) {
+                SugarRecord.delete(object);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.i("Sugar", "Error in deleting in transaction " + e.getMessage());
+        } finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
+    }
+
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
+    }
+    
+    public static <T> List<T> listAll(Class<T> type, String orderBy) {
+        return find(type, null, null, null, orderBy, null);
     }
 
     public static <T> T findById(Class<T> type, Long id) {
@@ -73,6 +102,11 @@ public class SugarRecord {
 
     public static <T> T findById(Class<T> type, Integer id) {
         return findById(type, Long.valueOf(id));
+    }
+
+    public static <T> List<T> findById(Class<T> type, String[] ids) {
+        String whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        return find(type, whereClause, ids);
     }
 
     public static <T> T first(Class<T>type){
@@ -255,9 +289,46 @@ public class SugarRecord {
     }
 
     public void delete() {
-        SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
-        db.delete(NamingHelper.toSQLName(getClass()), "Id=?", new String[]{getId().toString()});
-        Log.i("Sugar", getClass().getSimpleName() + " deleted : " + getId().toString());
+        Long id = getId();
+        Class<?> type = getClass();
+        if (id != null && id > 0L) {
+            SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
+            db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()});
+            Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+        } else {
+            Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
+            return;
+        }
+    }
+    
+    public static void delete(Object object) {
+        Class<?> type = object.getClass();
+        if (type.isAnnotationPresent(Table.class)) {
+            try {
+                Field field = type.getDeclaredField("id");
+                field.setAccessible(true);
+                Long id = (Long) field.get(object);
+                if (id != null && id > 0L) {
+                    SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
+                    db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()});
+                    Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+                } else {
+                    Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - object has not been saved");
+                    return;
+                }
+            } catch (NoSuchFieldException e) {
+                Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
+                return;
+            } catch (IllegalAccessException e) {
+                Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
+                return;
+            }
+        } else if (SugarRecord.class.isAssignableFrom(type)) {
+            ((SugarRecord) object).delete();
+        } else {
+            Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
+            return;
+        }
     }
 
     public long save() {
