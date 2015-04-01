@@ -80,5 +80,25 @@ public class SelectTest {
         assertEquals("2", where.getArgs()[1]);
     }
 
+    @Test
+    public void testIsNull() {
+        Select where = Select.from(TestRecord.class).where(Condition.prop("test").isNull());
+        assertEquals("(test IS NULL )", where.getWhereCond());
+        assertEquals(0, where.getArgs().length);
 
+        where = Select.from(TestRecord.class).where(Condition.prop("test").eq(null));
+        assertEquals("(test IS NULL )", where.getWhereCond());
+        assertEquals(0, where.getArgs().length);
+    }
+
+    @Test
+    public void testIsNotNull() {
+        Select where = Select.from(TestRecord.class).where(Condition.prop("test").isNotNull());
+        assertEquals("(test IS NOT NULL )", where.getWhereCond());
+        assertEquals(0, where.getArgs().length);
+
+        where = Select.from(TestRecord.class).where(Condition.prop("test").notEq(null));
+        assertEquals("(test IS NOT NULL )", where.getWhereCond());
+        assertEquals(0, where.getArgs().length);
+    }
 }
