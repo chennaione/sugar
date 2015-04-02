@@ -109,15 +109,21 @@ public class SugarRecord {
         return find(type, whereClause, ids);
     }
 
-    public static <T> T first(Class<T>type){
-        List<T> list = findWithQuery(type, "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ROWID ASC LIMIT 1" );
-        if (list.isEmpty()) return null;
+    public static <T> T first(Class<T>type) {
+        List<T> list = findWithQuery(type,
+                "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ID ASC LIMIT 1");
+        if (list.isEmpty()) {
+            return null;
+        }
         return list.get(0);
     }
 
-    public static <T> T last(Class<T>type){
-        List<T> list = findWithQuery(type, "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ROWID DESC LIMIT 1");
-        if (list.isEmpty()) return null;
+    public static <T> T last(Class<T>type) {
+        List<T> list = findWithQuery(type,
+                "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ID DESC LIMIT 1");
+        if (list.isEmpty()) {
+            return null;
+        }
         return list.get(0);
     }
 
