@@ -28,16 +28,16 @@ public class SugarRecord {
 
     protected Long id = null;
 
-    public static <T> void deleteAll(Class<T> type) {
+    public static <T> int deleteAll(Class<T> type) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
-        sqLiteDatabase.delete(NamingHelper.toSQLName(type), null, null);
+        return sqLiteDatabase.delete(NamingHelper.toSQLName(type), null, null);
     }
 
-    public static <T> void deleteAll(Class<T> type, String whereClause, String... whereArgs) {
+    public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
-        sqLiteDatabase.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+        return sqLiteDatabase.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
     }
 
     @SuppressWarnings("deprecation")
@@ -294,20 +294,20 @@ public class SugarRecord {
         }
     }
 
-    public void delete() {
+    public boolean delete() {
         Long id = getId();
         Class<?> type = getClass();
         if (id != null && id > 0L) {
             SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
-            db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()});
             Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+            return db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
         } else {
             Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
-            return;
+            return false;
         }
     }
     
-    public static void delete(Object object) {
+    public static boolean delete(Object object) {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
             try {
@@ -316,24 +316,25 @@ public class SugarRecord {
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
                     SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
-                    db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()});
+                    boolean deleted = db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
                     Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+                    return deleted;
                 } else {
                     Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - object has not been saved");
-                    return;
+                    return false;
                 }
             } catch (NoSuchFieldException e) {
                 Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
-                return;
+                return false;
             } catch (IllegalAccessException e) {
                 Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
-                return;
+                return false;
             }
         } else if (SugarRecord.class.isAssignableFrom(type)) {
-            ((SugarRecord) object).delete();
+            return ((SugarRecord) object).delete();
         } else {
             Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
-            return;
+            return false;
         }
     }
 
