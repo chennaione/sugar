@@ -165,7 +165,7 @@ public class SugarRecord {
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity);
+                SugarRecord.inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
         } catch (Exception e) {
@@ -191,7 +191,7 @@ public class SugarRecord {
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity);
+                SugarRecord.inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
         } catch (Exception e) {
@@ -287,8 +287,11 @@ public class SugarRecord {
         return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
 
-    private static void inflate(Cursor cursor, Object object) {
+    private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
+        if (!entitiesMap.containsKey(object)) {
+            entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+        }
 
         for (Field field : columns) {
         	field.setAccessible(true);
@@ -355,7 +358,7 @@ public class SugarRecord {
 
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
-        inflate(cursor, this);
+        inflate(cursor, this, getSugarContext().getEntitiesMap());
     }
 
     public Long getId() {
@@ -393,7 +396,7 @@ public class SugarRecord {
 
             try {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(cursor, entity);
+                SugarRecord.inflate(cursor, entity, getSugarContext().getEntitiesMap());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
