@@ -51,7 +51,7 @@ public class SugarRecord {
             sqLiteDatabase.beginTransaction();
             sqLiteDatabase.setLockingEnabled(false);
             for (T object: objects) {
-                SugarRecord.save(object);
+                save(object);
             }
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -167,7 +167,7 @@ public class SugarRecord {
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity, getSugarContext().getEntitiesMap());
+                inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
         } catch (Exception e) {
@@ -193,7 +193,7 @@ public class SugarRecord {
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity, getSugarContext().getEntitiesMap());
+                inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
         } catch (Exception e) {
@@ -316,7 +316,7 @@ public class SugarRecord {
         Class<?> type = getClass();
         if (id != null && id > 0L) {
             SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
-            Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+            Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
             return db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
         } else {
             Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
@@ -334,7 +334,7 @@ public class SugarRecord {
                 if (id != null && id > 0L) {
                     SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
                     boolean deleted = db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
-                    Log.i("Sugar", type.getSimpleName() + " deleted : " + id.toString());
+                    Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
                     return deleted;
                 } else {
                     Log.i("Sugar", "Cannot delete object: " + object.getClass().getSimpleName() + " - object has not been saved");
@@ -399,7 +399,7 @@ public class SugarRecord {
 
             try {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(cursor, entity, getSugarContext().getEntitiesMap());
+                inflate(cursor, entity, getSugarContext().getEntitiesMap());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

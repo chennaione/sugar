@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
+@SuppressWarnings("ALL")
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(emulateSdk=18)
 public class SimpleExtendedModelTests {
@@ -103,6 +105,18 @@ public class SimpleExtendedModelTests {
     }
 
     @Test
+    public void deleteWrongTest() throws Exception {
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        save(model);
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+        Field idField = model.getClass().getSuperclass().getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(model, Long.MAX_VALUE);
+        assertFalse(SugarRecord.delete(model));
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
     public void deleteAllTest() throws Exception {
         int elementNumber = 100;
         for (int i = 1; i <= elementNumber; i++) {
@@ -129,9 +143,9 @@ public class SimpleExtendedModelTests {
         SimpleExtendedModel third = new SimpleExtendedModel();
         save(first);
         save(second);
-        save(third);
-        assertEquals(3L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(3, SugarRecord.deleteInTx(first, second, third));
+        // Not saving last model
+        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(2, SugarRecord.deleteInTx(first, second, third));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
@@ -142,10 +156,13 @@ public class SimpleExtendedModelTests {
         for (int i = 1; i <= elementNumber; i++) {
             SimpleExtendedModel model = new SimpleExtendedModel();
             models.add(model);
-            save(model);
+            // Not saving last model
+            if (i < elementNumber) {
+                save(model);
+            }
         }
-        assertEquals(elementNumber, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(elementNumber, SugarRecord.deleteInTx(models));
+        assertEquals(elementNumber - 1, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(elementNumber - 1, SugarRecord.deleteInTx(models));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 

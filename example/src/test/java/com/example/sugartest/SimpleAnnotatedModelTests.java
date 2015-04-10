@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -97,6 +98,18 @@ public class SimpleAnnotatedModelTests {
     }
 
     @Test
+    public void deleteWrongTest() throws Exception {
+        SimpleAnnotatedModel model = new SimpleAnnotatedModel();
+        save(model);
+        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+        Field idField = model.getClass().getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(model, Long.MAX_VALUE);
+        assertFalse(SugarRecord.delete(model));
+        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+    }
+
+    @Test
     public void deleteAllTest() throws Exception {
         int elementNumber = 100;
         for (int i = 1; i <= elementNumber; i++) {
@@ -123,9 +136,9 @@ public class SimpleAnnotatedModelTests {
         SimpleAnnotatedModel third = new SimpleAnnotatedModel();
         save(first);
         save(second);
-        save(third);
-        assertEquals(3L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(3, SugarRecord.deleteInTx(first, second, third));
+        // Not saving last model
+        assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(2, SugarRecord.deleteInTx(first, second, third));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
@@ -136,10 +149,13 @@ public class SimpleAnnotatedModelTests {
         for (int i = 1; i <= elementNumber; i++) {
             SimpleAnnotatedModel model = new SimpleAnnotatedModel();
             models.add(model);
-            save(model);
+            // Not saving last model
+            if (i < elementNumber) {
+                save(model);
+            }
         }
-        assertEquals(elementNumber, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(elementNumber, SugarRecord.deleteInTx(models));
+        assertEquals(elementNumber - 1, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(elementNumber - 1, SugarRecord.deleteInTx(models));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
