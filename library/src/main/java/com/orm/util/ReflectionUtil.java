@@ -61,7 +61,7 @@ public class ReflectionUtil {
     }
 
     public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
-            Map<Object, Long> entitiesMap) {
+                                             Map<Object, Long> entitiesMap) {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
@@ -132,6 +132,8 @@ public class ReflectionUtil {
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
+                    } else if (columnType.isEnum()) {
+                        values.put(columnName, ((Enum) columnValue).name());
                     } else {
                         values.put(columnName, String.valueOf(columnValue));
                     }
@@ -217,7 +219,7 @@ public class ReflectionUtil {
             Log.e("field set error", e.getMessage());
         }
     }
-    
+
     private static Field getDeepField(String fieldName, Class<?> type) throws NoSuchFieldException {
         try {
             Field field = type.getDeclaredField(fieldName);
