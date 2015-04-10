@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
 
 import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -89,7 +90,7 @@ public class SimpleExtendedModelTests {
         SimpleExtendedModel model = new SimpleExtendedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        SugarRecord.delete(model);
+        assertTrue(SugarRecord.delete(model));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
@@ -97,25 +98,27 @@ public class SimpleExtendedModelTests {
     public void deleteUnsavedTest() throws Exception {
         SimpleExtendedModel model = new SimpleExtendedModel();
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
-        SugarRecord.delete(model);
+        assertFalse(SugarRecord.delete(model));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void deleteAllTest() throws Exception {
-        for (int i = 1; i <= 100; i++) {
+        int elementNumber = 100;
+        for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleExtendedModel());
         }
-        SugarRecord.deleteAll(SimpleExtendedModel.class);
+        assertEquals(elementNumber, SugarRecord.deleteAll(SimpleExtendedModel.class));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void deleteAllWhereTest() throws Exception {
-        for (int i = 1; i <= 100; i++) {
+        int elementNumber = 100;
+        for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleExtendedModel());
         }
-        SugarRecord.deleteAll(SimpleExtendedModel.class, "id > ?", new String[]{"1"});
+        assertEquals(elementNumber - 1, SugarRecord.deleteAll(SimpleExtendedModel.class, "id > ?", new String[]{"1"}));
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
@@ -128,20 +131,21 @@ public class SimpleExtendedModelTests {
         save(second);
         save(third);
         assertEquals(3L, SugarRecord.count(SimpleExtendedModel.class));
-        SugarRecord.deleteInTx(first, second, third);
+        assertEquals(3, SugarRecord.deleteInTx(first, second, third));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void deleteInTransactionManyTest() throws Exception {
+        long elementNumber = 100;
         List<SimpleExtendedModel> models = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= elementNumber; i++) {
             SimpleExtendedModel model = new SimpleExtendedModel();
             models.add(model);
             save(model);
         }
-        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
-        SugarRecord.deleteInTx(models);
+        assertEquals(elementNumber, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(elementNumber, SugarRecord.deleteInTx(models));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 

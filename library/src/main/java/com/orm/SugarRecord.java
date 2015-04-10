@@ -30,9 +30,7 @@ public class SugarRecord {
     private Long id = null;
 
     public static <T> int deleteAll(Class<T> type) {
-        SugarDb db = getSugarContext().getSugarDb();
-        SQLiteDatabase sqLiteDatabase = db.getDB();
-        return sqLiteDatabase.delete(NamingHelper.toSQLName(type), null, null);
+        return deleteAll(type, null);
     }
 
     public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
@@ -65,18 +63,21 @@ public class SugarRecord {
     }
 
     @SuppressWarnings("deprecation")
-    public static <T> void deleteInTx(T... objects) {
-        deleteInTx(Arrays.asList(objects));
+    public static <T> int deleteInTx(T... objects) {
+        return deleteInTx(Arrays.asList(objects));
     }
 
     @SuppressWarnings("deprecation")
-    public static <T> void deleteInTx(Collection<T> objects) {
+    public static <T> int deleteInTx(Collection<T> objects) {
         SQLiteDatabase sqLiteDatabase = getSugarContext().getSugarDb().getDB();
+        int deletedRows = 0;
         try {
             sqLiteDatabase.beginTransaction();
             sqLiteDatabase.setLockingEnabled(false);
             for (T object : objects) {
-                SugarRecord.delete(object);
+                if (delete(object)) {
+                    ++deletedRows;
+                }
             }
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -85,6 +86,7 @@ public class SugarRecord {
             sqLiteDatabase.endTransaction();
             sqLiteDatabase.setLockingEnabled(true);
         }
+        return deletedRows;
     }
 
     public static <T> List<T> listAll(Class<T> type) {

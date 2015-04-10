@@ -15,11 +15,13 @@ import java.util.NoSuchElementException;
 
 import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
+@SuppressWarnings("ALL")
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(emulateSdk=18)
 public class SimpleAnnotatedModelTests {
@@ -82,7 +84,7 @@ public class SimpleAnnotatedModelTests {
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        SugarRecord.delete(model);
+        assertTrue(SugarRecord.delete(model));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
@@ -90,25 +92,27 @@ public class SimpleAnnotatedModelTests {
     public void deleteUnsavedTest() throws Exception {
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
-        SugarRecord.delete(model);
+        assertFalse(SugarRecord.delete(model));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteAllTest() throws Exception {
-        for (int i = 1; i <= 100; i++) {
+        int elementNumber = 100;
+        for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleAnnotatedModel());
         }
-        SugarRecord.deleteAll(SimpleAnnotatedModel.class);
+        assertEquals(elementNumber, SugarRecord.deleteAll(SimpleAnnotatedModel.class));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteAllWhereTest() throws Exception {
-        for (int i = 1; i <= 100; i++) {
+        int elementNumber = 100;
+        for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleAnnotatedModel());
         }
-        SugarRecord.deleteAll(SimpleAnnotatedModel.class, "id > ?", new String[]{"1"});
+        assertEquals(elementNumber - 1, SugarRecord.deleteAll(SimpleAnnotatedModel.class, "id > ?", new String[]{"1"}));
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
@@ -121,20 +125,21 @@ public class SimpleAnnotatedModelTests {
         save(second);
         save(third);
         assertEquals(3L, SugarRecord.count(SimpleAnnotatedModel.class));
-        SugarRecord.deleteInTx(first, second, third);
+        assertEquals(3, SugarRecord.deleteInTx(first, second, third));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteInTransactionManyTest() throws Exception {
+        long elementNumber = 100;
         List<SimpleAnnotatedModel> models = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= elementNumber; i++) {
             SimpleAnnotatedModel model = new SimpleAnnotatedModel();
             models.add(model);
             save(model);
         }
-        assertEquals(100L, SugarRecord.count(SimpleAnnotatedModel.class));
-        SugarRecord.deleteInTx(models);
+        assertEquals(elementNumber, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(elementNumber, SugarRecord.deleteInTx(models));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
