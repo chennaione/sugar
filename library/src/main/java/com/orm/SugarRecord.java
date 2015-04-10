@@ -250,7 +250,7 @@ public class SugarRecord {
         Field idField = null;
         for (Field column : columns) {
             ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
-            if (column.getName() == "id") {
+            if (column.getName().equals("id")) {
                 idField = column;
             }
         }
