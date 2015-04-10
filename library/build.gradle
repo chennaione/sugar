@@ -22,11 +22,14 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.google.guava:guava:18.0'
     testCompile 'junit:junit:4.12'
 }
 
 task libraryJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
+    dependsOn assembleRelease
+    from android.sourceSets.main.java.srcDirs,
+         ['build/intermediates/classes/release/'] // Add the release classes into the jar
     baseName 'sugar'
 }
 

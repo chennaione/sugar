@@ -20,13 +20,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
 
-    protected Long id = null;
+    private Long id = null;
 
     public static <T> int deleteAll(Class<T> type) {
         SugarDb db = getSugarContext().getSugarDb();
@@ -164,7 +165,7 @@ public class SugarRecord {
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity);
+                SugarRecord.inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
         } catch (Exception e) {
@@ -190,7 +191,7 @@ public class SugarRecord {
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(c, entity);
+                SugarRecord.inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
         } catch (Exception e) {
@@ -243,14 +244,20 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
+        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object);
+            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             if (column.getName() == "id") {
                 idField = column;
             }
+        }
+
+        boolean isSugarEntity = isSugarEntity(object.getClass());
+        if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put("id", entitiesMap.get(object));
         }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
@@ -264,6 +271,8 @@ public class SugarRecord {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
+            } else {
+                entitiesMap.put(object, id);
             }
         } else if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ((SugarRecord) object).setId(id);
@@ -274,14 +283,20 @@ public class SugarRecord {
         return id;
     }
 
-    private static void inflate(Cursor cursor, Object object) {
+    public static boolean isSugarEntity(Class<?> objectClass) {
+        return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
+    }
+
+    private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
+        if (!entitiesMap.containsKey(object)) {
+            entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+        }
 
         for (Field field : columns) {
         	field.setAccessible(true);
             Class<?> fieldType = field.getType();
-            if (fieldType.isAnnotationPresent(Table.class) ||
-                    SugarRecord.class.isAssignableFrom(fieldType)) {
+            if (isSugarEntity(fieldType)) {
                 try {
                     long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
                     field.set(object, (id > 0) ? findById(fieldType, id) : null);
@@ -344,7 +359,7 @@ public class SugarRecord {
 
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
-        inflate(cursor, this);
+        inflate(cursor, this, getSugarContext().getEntitiesMap());
     }
 
     public Long getId() {
@@ -382,7 +397,7 @@ public class SugarRecord {
 
             try {
                 entity = type.getDeclaredConstructor().newInstance();
-                SugarRecord.inflate(cursor, entity);
+                SugarRecord.inflate(cursor, entity, getSugarContext().getEntitiesMap());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

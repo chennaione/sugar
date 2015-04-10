@@ -3,13 +3,12 @@ package com.example.models;
 import com.orm.dsl.Table;
 
 @Table
-public class StringFieldAnnotatedModel {
+public class StringFieldAnnotatedNoIdModel {
     private String string;
-    private Long id;
 
-    public StringFieldAnnotatedModel() {}
+    public StringFieldAnnotatedNoIdModel() {}
 
-    public StringFieldAnnotatedModel(String string) {
+    public StringFieldAnnotatedNoIdModel(String string) {
         this.string = string;
     }
 

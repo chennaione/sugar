@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 import dalvik.system.DexFile;
 
@@ -59,7 +60,8 @@ public class ReflectionUtil {
         return fields;
     }
 
-    public static void addFieldValueToColumn(ContentValues values, Field column, Object object) {
+    public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
+            Map<Object, Long> entitiesMap) {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
@@ -71,12 +73,14 @@ public class ReflectionUtil {
                 try {
                     field = columnType.getDeclaredField("id");
                     field.setAccessible(true);
+                    values.put(columnName,
+                            (field != null)
+                                    ? String.valueOf(field.get(columnValue)) : "0");
                 } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
+                    if (entitiesMap.containsKey(columnValue)) {
+                        values.put(columnName, entitiesMap.get(columnValue));
+                    }
                 }
-                values.put(columnName,
-                        (field != null)
-                                ? String.valueOf(field.get(columnValue)) : "0");
             } else if (SugarRecord.class.isAssignableFrom(columnType)) {
                 values.put(columnName,
                         (columnValue != null)
