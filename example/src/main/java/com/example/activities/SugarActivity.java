@@ -28,8 +28,6 @@ public class SugarActivity extends Activity
         SugarRecord.deleteAll(Tag.class);
         SugarRecord.deleteAll(NewNote.class);
         initDb();
-        Intent intent = new Intent(this, NoteListActivity.class);
-        startActivity(intent);
     }
 
     private void initDb() {
