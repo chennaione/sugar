@@ -7,7 +7,7 @@ android:
     - android-21
 
 script:
-  - ./gradlew clean build connectedCheck coveralls
+  - gradle clean build connectedCheck coveralls
 
 cache:
   directories:
