@@ -1,5 +1,8 @@
 package com.orm.query;
 
+import android.database.Cursor;
+import android.database.CursorWrapper;
+
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -63,25 +66,25 @@ public class Select<T> implements Iterable {
             if (Condition.Check.LIKE.equals(condition.getCheck()) ||
                     Condition.Check.NOT_LIKE.equals(condition.getCheck())) {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol())
-                    .append("'")
-                    .append(condition.getValue().toString())
-                    .append("'");
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol())
+                        .append("'")
+                        .append(condition.getValue().toString())
+                        .append("'");
             } else if (Condition.Check.IS_NULL.equals(condition.getCheck()) ||
                     Condition.Check.IS_NOT_NULL.equals(condition.getCheck())) {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol());
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol());
             } else {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol())
-                    .append("? ");
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol())
+                        .append("? ");
                 args.add(condition.getValue());
             }
         }
-        
+
         if (!"".equals(whereClause)) {
             whereClause += " " + type.name() + " ";
         }
@@ -117,12 +120,41 @@ public class Select<T> implements Iterable {
 
         return SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, limit);
     }
-    
+
+    public Cursor getCursor() {
+        Cursor raw = SugarRecord.getCursor(record, whereClause, arguments, groupBy, orderBy, limit);
+        CursorWrapper wrapper = new CursorWrapper(raw) {
+            @Override
+            public int getColumnIndexOrThrow(String columnName) throws IllegalArgumentException {
+                try {
+                    return super.getColumnIndexOrThrow(columnName);
+                } catch (IllegalArgumentException e) {
+                    if (columnName.equals("_id"))
+                        return super.getColumnIndexOrThrow("ID");
+                    else
+                        throw e;
+                }
+            }
+
+            @Override
+            public int getColumnIndex(String columnName) {
+                try {
+                    return super.getColumnIndex(columnName);
+                } catch (Exception e) {
+                    if (columnName.equals("_id"))
+                        return super.getColumnIndex("ID");
+                    else
+                        throw e;
+                }
+            }
+        };
+        return wrapper;
+    }
+
     public long count() {
         if (arguments == null) {
             arguments = convertArgs(args);
         }
-    	
         return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
     }
 
@@ -134,7 +166,6 @@ public class Select<T> implements Iterable {
         List<T> list = SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, "1");
         return list.size() > 0 ? list.get(0) : null;
     }
-    
     String toSql() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM ").append(NamingHelper.toSQLName(this.record)).append(" ");
@@ -170,7 +201,7 @@ public class Select<T> implements Iterable {
         String[] argsArray = new String[argsList.size()];
 
         for (int i = 0; i < argsList.size(); i++) {
-             argsArray[i] = argsList.get(i).toString();
+            argsArray[i] = argsList.get(i).toString();
         }
 
         return argsArray;
