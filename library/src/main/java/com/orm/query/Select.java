@@ -1,5 +1,8 @@
 package com.orm.query;
 
+import android.database.Cursor;
+import android.database.CursorWrapper;
+
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -184,5 +187,36 @@ public class Select<T> implements Iterable {
 
         return SugarRecord.findAsIterator(record, whereClause, arguments, groupBy, orderBy, limit);
     }
+
+    public Cursor getCursor() {
+        Cursor raw = SugarRecord.getCursor(record, whereClause, arguments, groupBy, orderBy, limit);
+        CursorWrapper wrapper = new CursorWrapper(raw) {
+            @Override
+            public int getColumnIndexOrThrow(String columnName) throws IllegalArgumentException {
+                try {
+                    return super.getColumnIndexOrThrow(columnName);
+                } catch (IllegalArgumentException e) {
+                    if (columnName.equals("_id"))
+                        return super.getColumnIndexOrThrow("ID");
+                    else
+                        throw e;
+                }
+            }
+
+            @Override
+            public int getColumnIndex(String columnName) {
+                try {
+                    return super.getColumnIndex(columnName);
+                } catch (Exception e) {
+                    if (columnName.equals("_id"))
+                        return super.getColumnIndex("ID");
+                    else
+                        throw e;
+                }
+            }
+        };
+        return wrapper;
+    }
+
 
 }

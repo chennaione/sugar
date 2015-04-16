@@ -10,10 +10,9 @@ import android.util.Log;
 
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
-import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
+import com.orm.util.ReflectionUtil;
 
-import java.lang.String;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +51,7 @@ public class SugarRecord {
         try {
             sqLiteDatabase.beginTransaction();
             sqLiteDatabase.setLockingEnabled(false);
-            for (T object: objects) {
+            for (T object : objects) {
                 SugarRecord.save(object);
             }
             sqLiteDatabase.setTransactionSuccessful();
@@ -90,7 +89,7 @@ public class SugarRecord {
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
-    
+
     public static <T> List<T> listAll(Class<T> type, String orderBy) {
         return find(type, null, null, null, orderBy, null);
     }
@@ -110,7 +109,7 @@ public class SugarRecord {
         return find(type, whereClause, ids);
     }
 
-    public static <T> T first(Class<T>type) {
+    public static <T> T first(Class<T> type) {
         List<T> list = findWithQuery(type,
                 "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ID ASC LIMIT 1");
         if (list.isEmpty()) {
@@ -119,7 +118,7 @@ public class SugarRecord {
         return list.get(0);
     }
 
-    public static <T> T last(Class<T>type) {
+    public static <T> T last(Class<T> type) {
         List<T> list = findWithQuery(type,
                 "SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY ID DESC LIMIT 1");
         if (list.isEmpty()) {
@@ -207,7 +206,7 @@ public class SugarRecord {
     }
 
     public static <T> long count(Class<?> type, String whereClause, String[] whereArgs) {
-    	return count(type, whereClause, whereArgs, null, null, null);
+        return count(type, whereClause, whereArgs, null, null, null);
     }
 
     public static <T> long count(Class<?> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
@@ -215,7 +214,7 @@ public class SugarRecord {
         SQLiteDatabase sqLiteDatabase = db.getDB();
 
         long toRet = -1;
-        String filter = (!TextUtils.isEmpty(whereClause)) ? " where "  + whereClause : "";
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
         SQLiteStatement sqliteStatement;
         try {
             sqliteStatement = sqLiteDatabase.compileStatement("SELECT count(*) FROM " + NamingHelper.toSQLName(type) + filter);
@@ -257,7 +256,7 @@ public class SugarRecord {
 
         boolean isSugarEntity = isSugarEntity(object.getClass());
         if (isSugarEntity && entitiesMap.containsKey(object)) {
-                values.put("id", entitiesMap.get(object));
+            values.put("id", entitiesMap.get(object));
         }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
@@ -294,7 +293,7 @@ public class SugarRecord {
         }
 
         for (Field field : columns) {
-        	field.setAccessible(true);
+            field.setAccessible(true);
             Class<?> fieldType = field.getType();
             if (isSugarEntity(fieldType)) {
                 try {
@@ -321,7 +320,7 @@ public class SugarRecord {
             return;
         }
     }
-    
+
     public static void delete(Object object) {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
@@ -367,6 +366,13 @@ public class SugarRecord {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public static <T> Cursor getCursor(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
+        SugarDb db = getSugarContext().getSugarDb();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        return sqLiteDatabase.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+                groupBy, null, orderBy, limit);
     }
 
     static class CursorIterator<E> implements Iterator<E> {
