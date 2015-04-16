@@ -1,5 +1,7 @@
 package com.orm.query;
 
+import android.database.Cursor;
+
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -110,6 +112,9 @@ public class Select<T> implements Iterable {
         return this;
     }
 
+    public Cursor getCursor() {
+       return SugarRecord.getCursor(record, whereClause, arguments, groupBy, orderBy, limit);
+    }
     public List<T> list() {
         if (arguments == null) {
             arguments = convertArgs(args);
