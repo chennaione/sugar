@@ -4,11 +4,6 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 
 public class SugarCursor extends CursorWrapper {
-    /**
-     * Creates a cursor wrapper.
-     *
-     * @param cursor The underlying cursor to wrap.
-     */
     public SugarCursor(Cursor cursor) {
         super(cursor);
     }
@@ -27,13 +22,8 @@ public class SugarCursor extends CursorWrapper {
 
     @Override
     public int getColumnIndex(String columnName) {
-        try {
-            return super.getColumnIndex(columnName);
-        } catch (Exception e) {
-            if (columnName.equals("_id"))
-                return super.getColumnIndex("ID");
-            else
-                throw e;
-        }
+        if (columnName.equals("_id"))
+            columnName = "ID";
+        return super.getColumnIndex(columnName);
     }
 }

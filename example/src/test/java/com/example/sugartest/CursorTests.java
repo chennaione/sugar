@@ -19,6 +19,7 @@ import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
 import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertSame;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(emulateSdk = 18)
@@ -30,6 +31,20 @@ public class CursorTests {
         for (String col : new String[]{"STR", "INTEGER", "BOOL", "ID"}) {
             assertNotSame("Missing column for field: " + col, -1, c.getColumnIndex(col));
         }
+    }
+    @Test
+    public void testSugarCursor(){
+        save(new SimpleModel());
+        Cursor cursor = Select.from(SimpleModel.class).getCursor();
+        assertNotSame("No _id", -1, cursor.getColumnIndex("_id"));
+        assertSame("_id != ID", cursor.getColumnIndex("_id"), cursor.getColumnIndex("ID"));
+    }
+
+    @Test
+    public void testNoColumn(){
+        save(new SimpleModel());
+        Cursor cursor = Select.from(SimpleModel.class).getCursor();
+        assertSame(-1, cursor.getColumnIndex("nonexistent"));
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
