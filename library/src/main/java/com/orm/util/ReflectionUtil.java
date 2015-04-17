@@ -291,8 +291,9 @@ public class ReflectionUtil {
         String packageName = ManifestHelper.getDomainPackageName(context);
         String path = getSourcePath(context);
         List<String> classNames = new ArrayList<String>();
+        DexFile dexfile = null;
         try {
-            DexFile dexfile = new DexFile(path);
+            dexfile = new DexFile(path);
             Enumeration<String> dexEntries = dexfile.entries();
             while (dexEntries.hasMoreElements()) {
                 String className = dexEntries.nextElement();
@@ -314,6 +315,8 @@ public class ReflectionUtil {
                     }
                 }
             }
+        } finally {
+            if (null != dexfile) dexfile.close();
         }
         return classNames;
     }
