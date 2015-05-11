@@ -286,7 +286,7 @@ public class ReflectionUtil {
         }
     }
 
-private static final String EXTRACTED_NAME_EXT = ".classes";
+    private static final String EXTRACTED_NAME_EXT = ".classes";
     private static final String EXTRACTED_SUFFIX = ".zip";
 
     private static final String SECONDARY_FOLDER_NAME = "code_cache" + File.separator +
