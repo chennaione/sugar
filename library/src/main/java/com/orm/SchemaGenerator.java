@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.orm.dsl.Column;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +29,7 @@ import static com.orm.util.ReflectionUtil.getDomainClasses;
 
 public class SchemaGenerator {
 
+    private static final String TAG = SchemaGenerator.class.getName();
     private Context context;
 
     public SchemaGenerator(Context context) {
@@ -43,14 +46,27 @@ public class SchemaGenerator {
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         List<Class> domainClasses = getDomainClasses(context);
         String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
+
         for (Class domain : domainClasses) {
-            Cursor c = sqLiteDatabase.rawQuery(String.format(sql, NamingHelper.toSQLName(domain)), null);
+            String tableName = NamingHelper.toSQLName(domain);
+            Cursor c = sqLiteDatabase.rawQuery(String.format(sql, tableName), null);
             if (c.moveToFirst() && c.getInt(0) == 0) {
-            	createTable(domain, sqLiteDatabase);
+                createTable(domain, sqLiteDatabase);
+            } else {
+                Cursor resultsQuery = sqLiteDatabase.query(tableName, null, null, null, null, null, null);
+                //Check if columns match vs the one on the domain class
+                ArrayList<String> columnNames = new ArrayList<>();
+                for (int i = 0; i < resultsQuery.getColumnCount(); i++) {
+                    String columnName = resultsQuery.getColumnName(i);
+                    columnNames.add(columnName);
+                }
+                resultsQuery.close();
+                addColumns(domain, columnNames, sqLiteDatabase);
             }
         }
         executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion);
     }
+
 
     public void deleteTables(SQLiteDatabase sqLiteDatabase) {
         List<Class> tables = getDomainClasses(context);
@@ -101,6 +117,43 @@ public class SchemaGenerator {
         }
 
         Log.i("Sugar", "Script executed");
+    }
+
+    private void addColumns(Class<?> table, ArrayList<String> presentColumns, SQLiteDatabase sqLiteDatabase) {
+
+        List<Field> fields = ReflectionUtil.getTableFields(table);
+        String tableName = NamingHelper.toSQLName(table);
+        ArrayList<String> alterCommands = new ArrayList<>();
+        for (Field column : fields) {
+            String columnName = NamingHelper.toSQLName(column);
+            String columnType = QueryBuilder.getColumnType(column.getType());
+
+            if (column.isAnnotationPresent(Column.class)) {
+                Column columnAnnotation = column.getAnnotation(Column.class);
+                columnName = columnAnnotation.name();
+            }
+
+            if (!presentColumns.contains(columnName)) {
+                StringBuilder sb = new StringBuilder("ALTER TABLE ");
+                sb.append(tableName).append(" ADD COLUMN ").append(columnName).append(" ").append(columnType);
+                if (column.isAnnotationPresent(NotNull.class)) {
+                    if (columnType.endsWith(" NULL")) {
+                        sb.delete(sb.length() - 5, sb.length());
+                    }
+                    sb.append(" NOT NULL");
+                }
+
+                if (column.isAnnotationPresent(Unique.class)) {
+                    sb.append(" UNIQUE");
+                }
+                alterCommands.add(sb.toString());
+            }
+        }
+
+        for (String command : alterCommands) {
+            Log.i(TAG, command);
+            sqLiteDatabase.execSQL(command);
+        }
     }
 
     private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
