@@ -2,8 +2,11 @@ package com.orm.util;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
 import android.util.Log;
 
 import com.orm.SugarRecord;
