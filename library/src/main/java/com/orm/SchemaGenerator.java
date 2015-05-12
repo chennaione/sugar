@@ -29,7 +29,6 @@ import static com.orm.util.ReflectionUtil.getDomainClasses;
 
 public class SchemaGenerator {
 
-    private static final String TAG = SchemaGenerator.class.getName();
     private Context context;
 
     public SchemaGenerator(Context context) {
@@ -53,18 +52,22 @@ public class SchemaGenerator {
             if (c.moveToFirst() && c.getInt(0) == 0) {
                 createTable(domain, sqLiteDatabase);
             } else {
-                Cursor resultsQuery = sqLiteDatabase.query(tableName, null, null, null, null, null, null);
-                //Check if columns match vs the one on the domain class
-                ArrayList<String> columnNames = new ArrayList<>();
-                for (int i = 0; i < resultsQuery.getColumnCount(); i++) {
-                    String columnName = resultsQuery.getColumnName(i);
-                    columnNames.add(columnName);
-                }
-                resultsQuery.close();
-                addColumns(domain, columnNames, sqLiteDatabase);
+                addColumns(domain, sqLiteDatabase);
             }
         }
         executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion);
+    }
+
+    private ArrayList<String> getColumnNames(SQLiteDatabase sqLiteDatabase, String tableName) {
+        Cursor resultsQuery = sqLiteDatabase.query(tableName, null, null, null, null, null, null);
+        //Check if columns match vs the one on the domain class
+        ArrayList<String> columnNames = new ArrayList<>();
+        for (int i = 0; i < resultsQuery.getColumnCount(); i++) {
+            String columnName = resultsQuery.getColumnName(i);
+            columnNames.add(columnName);
+        }
+        resultsQuery.close();
+        return columnNames;
     }
 
 
@@ -119,11 +122,13 @@ public class SchemaGenerator {
         Log.i("Sugar", "Script executed");
     }
 
-    private void addColumns(Class<?> table, ArrayList<String> presentColumns, SQLiteDatabase sqLiteDatabase) {
+    private void addColumns(Class<?> table, SQLiteDatabase sqLiteDatabase) {
 
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
+        ArrayList<String> presentColumns = getColumnNames(sqLiteDatabase, tableName);
         ArrayList<String> alterCommands = new ArrayList<>();
+
         for (Field column : fields) {
             String columnName = NamingHelper.toSQLName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
@@ -151,7 +156,7 @@ public class SchemaGenerator {
         }
 
         for (String command : alterCommands) {
-            Log.i(TAG, command);
+            Log.i("Sugar", command);
             sqLiteDatabase.execSQL(command);
         }
     }
