@@ -23,7 +23,7 @@ public class ManifestHelper {
     /**
      * The default name for the database unless specified in the AndroidManifest.
      */
-    public final static String DATABASE_DEFAULT_NAME = "Sugar.db";
+    public final static String DATABASE_DEFAULT_NAME = "internal.db";
 
     /**
      * Grabs the database version from the manifest.
@@ -82,7 +82,12 @@ public class ManifestHelper {
      * @return true if the debug flag is enabled
      */
     public static boolean getDebugEnabled(Context context) {
-        return getMetaDataBoolean(context, METADATA_QUERY_LOG);
+        Boolean queryLog=getMetaDataBoolean(context, METADATA_QUERY_LOG);
+        if (queryLog==null)
+        {
+            queryLog=true;
+        }
+        return queryLog;
     }
 
     private static String getMetaDataString(Context context, String name) {
