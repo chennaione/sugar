@@ -20,7 +20,7 @@ android {
 
 dependencies {
     compile project (':library')
-    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:support-v4:21.0.3'
     testCompile 'org.robolectric:robolectric:2.4'
     testCompile 'junit:junit:4.12'
 }
