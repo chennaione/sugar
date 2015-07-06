@@ -17,6 +17,16 @@ public class Select<T> implements Iterable {
     private String limit;
     private String offset;
     private List<Object> args = new ArrayList<Object>();
+    private static final String SPACE = " ";
+    private static final String WHERE = "WHERE ";
+    private static final String ORDER_BY = "ORDER BY ";
+    private static final String LIMIT = "LIMIT ";
+    private static final String OFFSET = "OFFSET ";
+    private static final String SELECT_FROM = "SELECT * FROM ";
+    private static final String LEFT_PARENTHESIS = "(";
+    private static final String RIGHT_PARENTHESIS = ")";
+    private static final String SINGLE_QUOTE = "'";
+
 
     public Select(Class<T> record) {
         this.record = record;
@@ -54,39 +64,41 @@ public class Select<T> implements Iterable {
     }
 
     private void mergeConditions(Condition[] conditions, Condition.Type type) {
-        StringBuilder toAppend = new StringBuilder("");
+        StringBuilder toAppend = new StringBuilder();
         for (Condition condition : conditions) {
             if (toAppend.length() != 0) {
-                toAppend.append(" ").append(type.name()).append(" ");
+                toAppend.append(SPACE).append(type.name()).append(SPACE);
             }
 
             if (Condition.Check.LIKE.equals(condition.getCheck()) ||
                     Condition.Check.NOT_LIKE.equals(condition.getCheck())) {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol())
-                    .append("'")
-                    .append(condition.getValue().toString())
-                    .append("'");
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol())
+                        .append(SINGLE_QUOTE)
+                        .append(condition.getValue().toString())
+                        .append(SINGLE_QUOTE);
             } else if (Condition.Check.IS_NULL.equals(condition.getCheck()) ||
                     Condition.Check.IS_NOT_NULL.equals(condition.getCheck())) {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol());
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol());
             } else {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol())
-                    .append("? ");
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol())
+                        .append("? ");
                 args.add(condition.getValue());
             }
         }
-        
-        if (!"".equals(whereClause)) {
-            whereClause += " " + type.name() + " ";
+
+
+        if (!whereClause.isEmpty()) {
+            whereClause += SPACE + type.name() + SPACE;
         }
 
-        whereClause += "(" + toAppend + ")";
+
+        whereClause += LEFT_PARENTHESIS + toAppend + RIGHT_PARENTHESIS;
     }
 
     public Select<T> whereOr(Condition... args) {
@@ -117,12 +129,12 @@ public class Select<T> implements Iterable {
 
         return SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, limit);
     }
-    
+
     public long count() {
         if (arguments == null) {
             arguments = convertArgs(args);
         }
-    	
+
         return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
     }
 
@@ -134,31 +146,31 @@ public class Select<T> implements Iterable {
         List<T> list = SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, "1");
         return list.size() > 0 ? list.get(0) : null;
     }
-    
+
     String toSql() {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM ").append(NamingHelper.toSQLName(this.record)).append(" ");
+        sql.append(SELECT_FROM).append(NamingHelper.toSQLName(this.record)).append(SPACE);
 
-        if (whereClause != null) {
-            sql.append("WHERE ").append(whereClause).append(" ");
+        if (!whereClause.isEmpty()) {
+            sql.append(WHERE).append(whereClause).append(SPACE);
         }
 
-        if (orderBy != null) {
-            sql.append("ORDER BY ").append(orderBy).append(" ");
+        if (!orderBy.isEmpty()) {
+            sql.append(ORDER_BY).append(orderBy).append(SPACE);
         }
 
-        if (limit != null) {
-            sql.append("LIMIT ").append(limit).append(" ");
+        if (!limit.isEmpty()) {
+            sql.append(LIMIT).append(limit).append(SPACE);
         }
 
-        if (offset != null) {
-            sql.append("OFFSET ").append(offset).append(" ");
+        if (!offset.isEmpty()) {
+            sql.append(OFFSET).append(offset).append(SPACE);
         }
 
         return sql.toString();
     }
 
-    String getWhereCond() {
+    String getWhereClause() {
         return whereClause;
     }
 
@@ -170,7 +182,7 @@ public class Select<T> implements Iterable {
         String[] argsArray = new String[argsList.size()];
 
         for (int i = 0; i < argsList.size(); i++) {
-             argsArray[i] = argsList.get(i).toString();
+            argsArray[i] = argsList.get(i).toString();
         }
 
         return argsArray;
