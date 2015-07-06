@@ -20,14 +20,14 @@ android {
 
 dependencies {
     compile project (':library')
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:22.2.0'
     testCompile 'org.robolectric:robolectric:2.4'
     testCompile 'junit:junit:4.12'
 }
 
 robolectric {
     // Configure includes / excludes
-    include '**/*Test.class'
+    include '**/*Tests.class'
     exclude '**/espresso/**/*.class'
 
     // Configure max heap size of the test JVM
