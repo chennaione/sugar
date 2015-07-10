@@ -373,7 +373,7 @@ public class SugarRecord {
         this.id = id;
     }
 
-    static class CursorIterator<E> implements Iterator<E> {
+    public static class CursorIterator<E> implements Iterator<E> {
         Class<E> type;
         Cursor cursor;
 
@@ -417,6 +417,19 @@ public class SugarRecord {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+        
+        @Override
+        public E getItemAtPosition(int position) {
+            if(cursor.moveToPosition(position)) {
+                return this.next();
+            } else {
+                return null;
+            }
+        }
+        
+        public Cursor getCursor() {
+            return cursor;
+        }
     }
-
+    
 }
