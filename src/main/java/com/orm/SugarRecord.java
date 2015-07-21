@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
@@ -246,15 +247,32 @@ public class SugarRecord {
         return save(getSugarContext().getSugarDb().getDB(), object);
     }
 
+    static void saveJoinTable(SQLiteDatabase db, List<ContentValues> relationshipList, String joinTableName) {
+
+        for(ContentValues values: relationshipList) {
+
+            //If record already exists then ignore
+            long id = db.insertWithOnConflict(joinTableName, null, values,
+                    SQLiteDatabase.CONFLICT_IGNORE);
+
+            Log.i("Sugar", "Inserted Join table record for " + joinTableName + ".");
+
+        }
+    }
+
     static long save(SQLiteDatabase db, Object object) {
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+            List<ContentValues> relationshipList = ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             if (column.getName().equals("id")) {
                 idField = column;
+            }
+
+            if(relationshipList != null && !relationshipList.isEmpty()) {
+                saveJoinTable(db, relationshipList, column.getAnnotation(Relationship.class).joinTable());
             }
         }
 

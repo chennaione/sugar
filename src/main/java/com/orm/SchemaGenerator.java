@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.orm.dsl.Column;
-import com.orm.dsl.ManyToMany;
+import com.orm.dsl.Relationship;
 import com.orm.dsl.ManyToOne;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.OneToOne;
@@ -154,15 +154,18 @@ public class SchemaGenerator {
                     }
                 }
 
-                if(column.isAnnotationPresent(OneToOne.class)) {
+                /*if(column.isAnnotationPresent(OneToOne.class)) {
                     OneToOne oneToOne =  column.getAnnotation(OneToOne.class);
                     sb.append(", ").append(oneToOne.name()).append(" INTEGER");
                 } else if(column.isAnnotationPresent(ManyToOne.class)) {
                     ManyToOne manyToOne =  column.getAnnotation(ManyToOne.class);
                     sb.append(", ").append(manyToOne.name()).append(" INTEGER");
-                } else if(column.isAnnotationPresent(ManyToMany.class)) {
-                    ManyToMany manyToMany =  column.getAnnotation(ManyToMany.class);
-                    createJoinTable(manyToMany, sqLiteDatabase);
+                } else */
+
+                //Create join table for all relationships. This will prevent issues with migrations (yes, unnecessary joins will be slower)
+                if(column.isAnnotationPresent(Relationship.class)) {
+                    Relationship relationship =  column.getAnnotation(Relationship.class);
+                    createJoinTable(relationship, sqLiteDatabase);
                 }
             }
         }
@@ -179,18 +182,18 @@ public class SchemaGenerator {
         }
     }
 
-    private void createJoinTable(ManyToMany manyToMany, SQLiteDatabase sqLiteDatabase) {
+    private void createJoinTable(Relationship relationship, SQLiteDatabase sqLiteDatabase) {
 
-        if(manyToMany.joinTable() == null) {
+        if(relationship.joinTable() == null) {
             return;
         }
 
         Log.i("Sugar", "Create join table");
         StringBuilder sb = new StringBuilder("CREATE TABLE ");
-        sb.append(manyToMany.joinTable()).append(" ( ")
-                .append(manyToMany.columnOneName()).append(" INTEGER NOT NULL,")
-                .append(manyToMany.columnTwoName()).append(" INTEGER NOT NULL,")
-                .append(" PRIMARY KEY(").append(manyToMany.columnOneName()).append(", ").append(manyToMany.columnTwoName()).append(" )")
+        sb.append(relationship.joinTable()).append(" ( ")
+                .append(relationship.columnOneName()).append(" INTEGER NOT NULL,")
+                .append(relationship.columnTwoName()).append(" INTEGER NOT NULL,")
+                .append(" PRIMARY KEY(").append(relationship.columnOneName()).append(", ").append(relationship.columnTwoName()).append(" )")
         .append(" );");
 
         if (!"".equals(sb.toString())) {

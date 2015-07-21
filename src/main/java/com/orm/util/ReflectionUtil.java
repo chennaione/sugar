@@ -8,23 +8,23 @@ import android.util.Log;
 
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+import com.orm.dsl.Relationship;
+import com.orm.dsl.ManyToOne;
+import com.orm.dsl.OneToMany;
+import com.orm.dsl.OneToOne;
 import com.orm.dsl.Table;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Collection;
 
 import dalvik.system.DexFile;
 
@@ -60,8 +60,11 @@ public class ReflectionUtil {
         return fields;
     }
 
-    public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
+    public static List<ContentValues> addFieldValueToColumn(ContentValues values, Field column, Object object,
                                              Map<Object, Long> entitiesMap) {
+
+        List<ContentValues> relationshipList = null;
+
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
@@ -129,6 +132,32 @@ public class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
+                } else if(column.isAnnotationPresent(Relationship.class)) {
+                    Relationship relationship = column.getAnnotation(Relationship.class);
+
+                    relationshipList = new ArrayList<ContentValues>();
+
+                    if(java.util.Collection.class.isAssignableFrom(columnValue.getClass())) {
+                        for(Object children: (Collection)columnValue) {
+                            //They should be
+                            if(SugarRecord.isSugarEntity(children.getClass())) {
+                                ContentValues contentValues = new ContentValues(2);
+                                contentValues.put(relationship.columnOneName(), ((SugarRecord) children).getId());
+                                contentValues.put(relationship.columnTwoName(), ((SugarRecord) object).getId());
+
+                                relationshipList.add(contentValues);
+                            } else {
+                              break;
+                            }
+                        }
+                    } else if(SugarRecord.isSugarEntity(columnValue.getClass())) {
+                        ContentValues contentValues = new ContentValues(2);
+                        contentValues.put(relationship.columnOneName(), ((SugarRecord) columnValue).getId());
+                        contentValues.put(relationship.columnTwoName(), ((SugarRecord) object).getId());
+
+                        relationshipList.add(contentValues);
+                    }
+
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
@@ -143,6 +172,8 @@ public class ReflectionUtil {
         } catch (IllegalAccessException e) {
             Log.e("Sugar", e.getMessage());
         }
+
+        return relationshipList;
     }
 
     public static void setFieldValueFromCursor(Cursor cursor, Field field, Object object) {
