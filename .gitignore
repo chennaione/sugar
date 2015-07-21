@@ -1,0 +1,45 @@
+.DS_Store
+
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse project files
+.classpath
+.project
+
+*.a
+*.dylib
+*.log
+*.o
+*.pot
+*.pyc
+*.pydevproject
+*.so
+*.suo
+*.xcworkspace
+*_ReSharper*
+
+.DS_Store
+._.DS_Store
+
+project.properties
+
+.settings
+build/
+.gradle/
+.idea
+*.iml

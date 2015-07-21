@@ -1,0 +1,32 @@
+apply plugin: 'com.android.library'
+apply from: '../maven_push.gradle'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 21
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.google.guava:guava:18.0'
+    testCompile 'junit:junit:4.12'
+}
+
+task libraryJar(type: Jar) {
+    dependsOn assembleRelease
+    from android.sourceSets.main.java.srcDirs,
+         ['build/intermediates/classes/release/'] // Add the release classes into the jar
+    baseName 'sugar'
+}
+
