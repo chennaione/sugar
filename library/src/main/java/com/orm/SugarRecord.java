@@ -8,12 +8,14 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
 
 import java.lang.String;
+import java.lang.StringBuffer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,6 +186,49 @@ public class SugarRecord {
         getSugarContext().getSugarDb().getDB().execSQL(query, arguments);
     }
 
+    public static <T> List<T> findByInnerJoin(Class<T> type, String joinTable, String objectIdName, String where, String groupBy, String orderBy, String limit) {
+        SugarDb db = getSugarContext().getSugarDb();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        T entity;
+        List<T> toRet = new ArrayList<T>();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM ").append(NamingHelper.toSQLName(type))
+                .append(" a INNER JOIN ").append(joinTable).append(" b ON a.ID")
+                .append("=b.").append(objectIdName);
+        appendClause(sb, " WHERE ", where);
+        appendClause(sb, " GROUP BY ", groupBy);
+        //appendClause(sb, " HAVING ", having);
+        appendClause(sb, " ORDER BY ", orderBy);
+        appendClause(sb, " LIMIT ", limit);
+
+        Log.v("SUGAR", "Join table sql: " + sb.toString());
+
+        Cursor c = sqLiteDatabase.rawQuery(sb.toString(), new String[0]);
+
+//        Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+//                groupBy, null, orderBy, limit);
+        try {
+            while (c.moveToNext()) {
+                entity = type.getDeclaredConstructor().newInstance();
+                inflate(c, entity, getSugarContext().getEntitiesMap());
+                toRet.add(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            c.close();
+        }
+        return toRet;
+    }
+
+    private static void appendClause(StringBuilder s, String name, String clause) {
+        if (!TextUtils.isEmpty(clause)) {
+            s.append(name);
+            s.append(clause);
+        }
+    }
+
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
@@ -246,15 +291,33 @@ public class SugarRecord {
         return save(getSugarContext().getSugarDb().getDB(), object);
     }
 
+    static void saveJoinTable(SQLiteDatabase db, List<ContentValues> relationshipList, String joinTableName) {
+
+        for(ContentValues values: relationshipList) {
+
+            //If record already exists then ignore
+            long id = db.insertWithOnConflict(joinTableName, null, values,
+                    SQLiteDatabase.CONFLICT_IGNORE);
+
+            Log.i("Sugar", "Inserted Join table record for " + joinTableName + ".");
+
+        }
+    }
+
     static long save(SQLiteDatabase db, Object object) {
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+            List<SugarRecord> children = new ArrayList<SugarRecord>();
+            List<ContentValues> relationshipList = ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             if (column.getName().equals("id")) {
                 idField = column;
+            }
+
+            if(relationshipList != null && !relationshipList.isEmpty()) {
+                saveJoinTable(db, relationshipList, column.getAnnotation(Relationship.class).joinTable());
             }
         }
 
@@ -417,8 +480,7 @@ public class SugarRecord {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-        
-        @Override
+
         public E getItemAtPosition(int position) {
             if(cursor.moveToPosition(position)) {
                 return this.next();

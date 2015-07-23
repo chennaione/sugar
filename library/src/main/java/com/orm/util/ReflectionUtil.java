@@ -8,23 +8,24 @@ import android.util.Log;
 
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+import com.orm.dsl.Relationship;
+import com.orm.dsl.ManyToOne;
+import com.orm.dsl.OneToMany;
+import com.orm.dsl.OneToOne;
 import com.orm.dsl.Table;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.Exception;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Collection;
 
 import dalvik.system.DexFile;
 
@@ -60,8 +61,11 @@ public class ReflectionUtil {
         return fields;
     }
 
-    public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
+    public static List<ContentValues> addFieldValueToColumn(ContentValues values, Field column, Object object,
                                              Map<Object, Long> entitiesMap) {
+
+        List<ContentValues> relationshipList = null;
+
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
@@ -129,6 +133,75 @@ public class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
+                } else if(column.isAnnotationPresent(Relationship.class)) {
+                    Relationship relationship = column.getAnnotation(Relationship.class);
+
+                    relationshipList = new ArrayList<ContentValues>();
+
+                    if(Collection.class.isAssignableFrom(columnType)) {
+
+                        //Explicitly invoke getter instead of grabbing value from field to be safe that we don't omit getter logic
+                        //Try get{fieldName}
+                        try {
+                            Method getter = object.getClass().getMethod("get" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                            columnValue = getter.invoke(object, null);
+
+                            //Try is{fieldName}
+                        } catch (Exception e) {
+                            try {
+                                Method getter = object.getClass().getMethod("is" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                                columnValue = getter.invoke(object, null);
+                                //No getter available. Get from field
+                            } catch (Exception e1) {
+                                //DO NOTHING: columnValue already = columnValue
+                            }
+                        }
+
+                        if(columnValue != null) {
+                            for (Object child : (Collection) columnValue) {
+                                //They should be
+                                if (SugarRecord.isSugarEntity(child.getClass())) {
+                                    ContentValues contentValues = new ContentValues(2);
+                                    contentValues.put(relationship.objectIdName(), ((SugarRecord) object).getId());
+                                    contentValues.put(relationship.refObjectIdName(), ((SugarRecord) child).getId());
+
+                                    relationshipList.add(contentValues);
+                                    ((SugarRecord) child).save();
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    } else if(columnValue != null && SugarRecord.isSugarEntity(columnValue.getClass())) {
+
+
+                        //Explicitly invoke getter instead of grabbing value from field to be safe that we don't omit getter logic
+                        //Try get{fieldName}
+                        try {
+                            Method getter = object.getClass().getMethod("get" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                            columnValue = getter.invoke(object, null);
+
+                            //Try is{fieldName}
+                        } catch (Exception e) {
+                            try {
+                                Method getter = object.getClass().getMethod("is" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                                columnValue = getter.invoke(object, null);
+                                //No getter available. Get from field
+                            } catch (Exception e1) {
+                                //DO NOTHING: columnValue already = columnValue
+                            }
+                        }
+
+                        if(columnValue != null) {
+                            ContentValues contentValues = new ContentValues(2);
+                            contentValues.put(relationship.objectIdName(), ((SugarRecord) columnValue).getId());
+                            contentValues.put(relationship.refObjectIdName(), ((SugarRecord) object).getId());
+
+                            relationshipList.add(contentValues);
+                            ((SugarRecord) columnValue).save();
+                        }
+                    }
+
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
@@ -143,6 +216,8 @@ public class ReflectionUtil {
         } catch (IllegalAccessException e) {
             Log.e("Sugar", e.getMessage());
         }
+
+        return relationshipList;
     }
 
     public static void setFieldValueFromCursor(Cursor cursor, Field field, Object object) {

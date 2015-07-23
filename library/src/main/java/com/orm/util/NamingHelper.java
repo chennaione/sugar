@@ -56,10 +56,10 @@ public class NamingHelper {
     /**
      * Maps a Java Field object to the database's column name.
      *
-     * @param field  the {@link java.lang.reflect.Field} that will be mapped
+     * @param field  the {@link Field} that will be mapped
      * @return the name of the given Field as represented in the database. If the Field is annotated
      *         with {@link com.orm.dsl.Column} then the {@link com.orm.dsl.Column#name()} will be
-     *         returned. Else, the Field's {@link java.lang.reflect.Field#getName()} will be
+     *         returned. Else, the Field's {@link Field#getName()} will be
      *         converted from CamelCase to UNDER_SCORE notation
      */
     public static String toSQLName(Field field) {
@@ -74,7 +74,7 @@ public class NamingHelper {
     /**
      * Maps a Java Class to the name of the class.
      *
-     * @param table  the generic {@link java.lang.Class<T>} that defines a database table
+     * @param table  the generic {@link Class<T>} that defines a database table
      * @return if the given class is annotated with {@link com.orm.dsl.Table} then the value for
      *         {@link com.orm.dsl.Table#name()} will be returned. Else, the class' simple name will 
      *         be converted from CamelCase to UNDER_SCORE notation

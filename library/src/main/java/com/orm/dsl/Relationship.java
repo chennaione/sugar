@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 public @interface Relationship {
 
     String joinTable();
-    String columnOneName();
-    String columnTwoName();
+    String objectIdName();
+    String refObjectIdName();
 
 }
