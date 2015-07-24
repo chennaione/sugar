@@ -8,9 +8,7 @@ import android.util.Log;
 
 import com.orm.dsl.Column;
 import com.orm.dsl.Relationship;
-import com.orm.dsl.ManyToOne;
 import com.orm.dsl.NotNull;
-import com.orm.dsl.OneToOne;
 import com.orm.dsl.Unique;
 import com.orm.util.NamingHelper;
 import com.orm.util.NumberComparator;
@@ -153,14 +151,6 @@ public class SchemaGenerator {
                         sb.append(" UNIQUE");
                     }
                 }
-
-                /*if(column.isAnnotationPresent(OneToOne.class)) {
-                    OneToOne oneToOne =  column.getAnnotation(OneToOne.class);
-                    sb.append(", ").append(oneToOne.name()).append(" INTEGER");
-                } else if(column.isAnnotationPresent(ManyToOne.class)) {
-                    ManyToOne manyToOne =  column.getAnnotation(ManyToOne.class);
-                    sb.append(", ").append(manyToOne.name()).append(" INTEGER");
-                } else */
 
                 //Create join table for all relationships. This will prevent issues with migrations (yes, unnecessary joins will be slower)
                 if(column.isAnnotationPresent(Relationship.class)) {

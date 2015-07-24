@@ -9,14 +9,12 @@ import android.util.Log;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Relationship;
-import com.orm.dsl.ManyToOne;
-import com.orm.dsl.OneToMany;
-import com.orm.dsl.OneToOne;
 import com.orm.dsl.Table;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.Exception;
+import java.lang.Object;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -144,13 +142,13 @@ public class ReflectionUtil {
                         //Try get{fieldName}
                         try {
                             Method getter = object.getClass().getMethod("get" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
-                            columnValue = getter.invoke(object, null);
+                            columnValue = getter.invoke(object, (Object[]) null);
 
                             //Try is{fieldName}
                         } catch (Exception e) {
                             try {
                                 Method getter = object.getClass().getMethod("is" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
-                                columnValue = getter.invoke(object, null);
+                                columnValue = getter.invoke(object, (Object[]) null);
                                 //No getter available. Get from field
                             } catch (Exception e1) {
                                 //DO NOTHING: columnValue already = columnValue
@@ -179,13 +177,13 @@ public class ReflectionUtil {
                         //Try get{fieldName}
                         try {
                             Method getter = object.getClass().getMethod("get" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
-                            columnValue = getter.invoke(object, null);
+                            columnValue = getter.invoke(object, (Object[]) null);
 
                             //Try is{fieldName}
                         } catch (Exception e) {
                             try {
                                 Method getter = object.getClass().getMethod("is" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
-                                columnValue = getter.invoke(object, null);
+                                columnValue = getter.invoke(object, (Object[]) null);
                                 //No getter available. Get from field
                             } catch (Exception e1) {
                                 //DO NOTHING: columnValue already = columnValue

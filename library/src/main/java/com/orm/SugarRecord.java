@@ -186,7 +186,11 @@ public class SugarRecord {
         getSugarContext().getSugarDb().getDB().execSQL(query, arguments);
     }
 
-    public static <T> List<T> findByInnerJoin(Class<T> type, String joinTable, String objectIdName, String where, String groupBy, String orderBy, String limit) {
+    public static <T> List<T> findByRelationship(Class<T> type, Relationship relationship, String where, String groupBy, String orderBy, String limit) {
+        return findByRelationship(type, relationship.joinTable(), relationship.refObjectIdName(), where, groupBy, orderBy, limit);
+    }
+
+    public static <T> List<T> findByRelationship(Class<T> type, String joinTable, String objectIdName, String where, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
