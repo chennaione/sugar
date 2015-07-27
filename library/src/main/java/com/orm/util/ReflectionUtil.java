@@ -268,7 +268,7 @@ public class ReflectionUtil {
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable e) {
             Log.e("Sugar", e.getMessage());
         }
 
