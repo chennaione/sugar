@@ -8,22 +8,30 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+
 import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
 
+import java.lang.Object;
+import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuffer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -53,7 +61,7 @@ public class SugarRecord {
             sqLiteDatabase.beginTransaction();
             sqLiteDatabase.setLockingEnabled(false);
             for (T object: objects) {
-                save(object);
+                save(getSugarContext().getSugarDb().getDB(), object);
             }
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -292,10 +300,26 @@ public class SugarRecord {
     }
 
     public static long save(Object object) {
+
+        Set<SugarRecord> recordsToSave = new HashSet<SugarRecord>();
+        ListMultimap<String, ContentValues> joinTables = ArrayListMultimap.create();
+        ReflectionUtil.getRecordsToSave(object, recordsToSave, joinTables);
+
+        if(recordsToSave != null && !recordsToSave.isEmpty()) {
+            saveInTx(recordsToSave);
+
+            if(joinTables != null) {
+                for(String tableName: joinTables.keySet()) {
+                    saveJoinTableList(getSugarContext().getSugarDb().getDB(), joinTables.get(tableName), tableName);
+                }
+            }
+        }
+
+
         return save(getSugarContext().getSugarDb().getDB(), object);
     }
 
-    static void saveJoinTable(SQLiteDatabase db, List<ContentValues> relationshipList, String joinTableName) {
+    static void saveJoinTableList(SQLiteDatabase db, List<ContentValues> relationshipList, String joinTableName) {
 
         for(ContentValues values: relationshipList) {
 
@@ -308,21 +332,30 @@ public class SugarRecord {
         }
     }
 
+    static void saveJoinTable(SQLiteDatabase db, ContentValues values, String joinTableName) {
+
+        //If record already exists then ignore
+        long id = db.insertWithOnConflict(joinTableName, null, values,
+                SQLiteDatabase.CONFLICT_IGNORE);
+
+        Log.i("Sugar", "Inserted Join table record for " + joinTableName + ".");
+
+    }
+
+
     static long save(SQLiteDatabase db, Object object) {
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
+
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
             List<SugarRecord> children = new ArrayList<SugarRecord>();
-            List<ContentValues> relationshipList = ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             if (column.getName().equals("id")) {
                 idField = column;
             }
 
-            if(relationshipList != null && !relationshipList.isEmpty()) {
-                saveJoinTable(db, relationshipList, column.getAnnotation(Relationship.class).joinTable());
-            }
         }
 
         boolean isSugarEntity = isSugarEntity(object.getClass());
@@ -424,6 +457,21 @@ public class SugarRecord {
     }
 
     public long save() {
+
+        Set<SugarRecord> recordsToSave = new HashSet<SugarRecord>();
+        ListMultimap<String, ContentValues> joinTables = ArrayListMultimap.create();
+        ReflectionUtil.getRecordsToSave(this, recordsToSave, joinTables);
+
+        if(recordsToSave != null && !recordsToSave.isEmpty()) {
+            saveInTx(recordsToSave);
+
+            if(joinTables != null) {
+                for(String tableName: joinTables.keySet()) {
+                    saveJoinTableList(getSugarContext().getSugarDb().getDB(), joinTables.get(tableName), tableName);
+                }
+            }
+        }
+
         return save(getSugarContext().getSugarDb().getDB(), this);
     }
 
@@ -495,6 +543,22 @@ public class SugarRecord {
         
         public Cursor getCursor() {
             return cursor;
+        }
+    }
+
+    @Override
+    /**
+     * Objects are equal if their IDs are equal and their class type is equal
+     */
+    public boolean equals(Object object) {
+        if(object == null) {
+            return false;
+        }
+
+        if(object.getClass().equals(this.getClass()) && ((SugarRecord) object).getId().equals(this.getId())) {
+            return true;
+        } else {
+            return false;
         }
     }
     

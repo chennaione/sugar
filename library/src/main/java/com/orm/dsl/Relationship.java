@@ -17,5 +17,6 @@ public @interface Relationship {
     String joinTable();
     String objectIdName();
     String refObjectIdName();
+    boolean cascade() default true;
 
 }
