@@ -41,6 +41,14 @@ public class SchemaGenerator {
         }
     }
 
+    public void clearDb(SQLiteDatabase sqLiteDatabase) {
+        List<Class> domainClasses = getDomainClasses(context);
+        for (Class domain : domainClasses) {
+            clearTable(domain, sqLiteDatabase);
+        }
+        sqLiteDatabase.rawQuery("", new String[0]);
+    }
+
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         List<Class> domainClasses = getDomainClasses(context);
         String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
@@ -102,6 +110,44 @@ public class SchemaGenerator {
         }
 
         Log.i("Sugar", "Script executed");
+    }
+
+    private void clearTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
+        Log.i("Sugar", "Clear table");
+        List<Field> fields = ReflectionUtil.getTableFields(table);
+        String tableName = NamingHelper.toSQLName(table);
+        StringBuilder sb = new StringBuilder("DELETE FROM ");
+        sb.append(tableName).append("; VACUUM;");
+
+        for (Field column : fields) {
+            //Create join table for all relationships. This will prevent issues with migrations (yes, unnecessary joins will be slower)
+            if(column.isAnnotationPresent(Relationship.class)) {
+                Relationship relationship =  column.getAnnotation(Relationship.class);
+                clearJoinTable(relationship, sqLiteDatabase);
+            }
+        }
+
+        if (!"".equals(sb.toString())) {
+            try {
+                sqLiteDatabase.execSQL(sb.toString());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void clearJoinTable(Relationship relationship, SQLiteDatabase sqLiteDatabase) {
+        Log.i("Sugar", "Clearing Join table");
+        StringBuilder sb = new StringBuilder("DELETE FROM ");
+        sb.append(relationship.joinTable()).append("; VACUUM;");
+
+        if (!"".equals(sb.toString())) {
+            try {
+                sqLiteDatabase.execSQL(sb.toString());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
