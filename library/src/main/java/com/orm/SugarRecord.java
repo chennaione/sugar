@@ -17,6 +17,7 @@ import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
 
+import java.lang.IllegalStateException;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
@@ -218,8 +219,6 @@ public class SugarRecord {
 
         Cursor c = sqLiteDatabase.rawQuery(sb.toString(), new String[0]);
 
-//        Cursor c = sqLiteDatabase.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
-//                groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
@@ -239,6 +238,19 @@ public class SugarRecord {
             s.append(name);
             s.append(clause);
         }
+    }
+
+    public static <T> T findUnique(Class<T> type, String whereClause, String[] whereArgs) {
+        List<T> list = find(type, whereClause, whereArgs, null, null, null);
+        if(list == null || list.isEmpty()) {
+            return null;
+        }
+
+        if(list.size() > 1) {
+            throw new IllegalStateException("Find unique was called but database contained more than one matching result.");
+        }
+
+        return list.get(0);
     }
 
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
