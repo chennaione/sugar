@@ -78,6 +78,9 @@ public class ReflectionUtil {
 
                     if (columnValue != null) {
                         for (Object child : (Collection) columnValue) {
+
+                            if(child == null) continue;
+
                             //They should be
                             if (SugarRecord.isSugarEntity(child.getClass())) {
                                 boolean success = recordsToSave.add((SugarRecord) child);
