@@ -18,5 +18,6 @@ public @interface Relationship {
     String objectIdName();
     String refObjectIdName();
     boolean cascade() default true;
+    String joinColumnName() default "id";
 
 }

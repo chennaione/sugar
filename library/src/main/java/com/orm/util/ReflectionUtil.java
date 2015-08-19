@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.orm.SugarRecord;
+import com.orm.dsl.Id;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
@@ -186,8 +187,9 @@ public class ReflectionUtil {
 
             if (columnType.isAnnotationPresent(Table.class)) {
                 Field field = null;
+                Table table = columnType.getAnnotation(Table.class);
                 try {
-                    field = columnType.getDeclaredField("id");
+                    field = columnType.getDeclaredField(table.primaryKeyField());
                     field.setAccessible(true);
                     values.put(columnName,
                             (field != null)
@@ -342,7 +344,7 @@ public class ReflectionUtil {
                 return;
             }
 
-            if (colName.equalsIgnoreCase("id")) {
+            if (colName.equalsIgnoreCase("id") || field.isAnnotationPresent(Id.class)) {
                 long cid = cursor.getLong(columnIndex);
                 field.set(object, Long.valueOf(cid));
             } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
@@ -420,6 +422,7 @@ public class ReflectionUtil {
         }
     }
 
+    /*
     public static void setFieldValueForId(Object object, Long value) {
         try {
             Field field = getDeepField("id", object.getClass());
@@ -430,7 +433,7 @@ public class ReflectionUtil {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public static List<Class> getDomainClasses(Context context) {
         List<Class> domainClasses = new ArrayList<Class>();

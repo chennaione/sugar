@@ -11,6 +11,7 @@ import android.util.Log;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
+import com.orm.dsl.Id;
 import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
@@ -196,10 +197,14 @@ public class SugarRecord {
     }
 
     public static <T> List<T> findByRelationship(Class<T> type, Relationship relationship, String where, String groupBy, String orderBy, String limit) {
-        return findByRelationship(type, relationship.joinTable(), relationship.refObjectIdName(), where, groupBy, orderBy, limit);
+        return findByRelationship(type, relationship.joinTable(), relationship.refObjectIdName(), relationship.joinColumnName(), where, groupBy, orderBy, limit);
     }
 
     public static <T> List<T> findByRelationship(Class<T> type, String joinTable, String objectIdName, String where, String groupBy, String orderBy, String limit) {
+        return findByRelationship(type, joinTable, objectIdName, "ID", where, groupBy, orderBy, limit);
+    }
+
+    public static <T> List<T> findByRelationship(Class<T> type, String joinTable, String objectIdName, String joinColumnName, String where, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         T entity;
@@ -207,7 +212,8 @@ public class SugarRecord {
 
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT * FROM ").append(NamingHelper.toSQLName(type))
-                .append(" a INNER JOIN ").append(joinTable).append(" b ON a.ID")
+                .append(" a INNER JOIN ").append(joinTable).append(" b ON a.")
+                .append(joinColumnName)
                 .append("=b.").append(objectIdName);
         appendClause(sb, " WHERE ", where);
         appendClause(sb, " GROUP BY ", groupBy);
@@ -361,18 +367,46 @@ public class SugarRecord {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
+        boolean isIdAnnotationPresent = false;
         for (Field column : columns) {
             List<SugarRecord> children = new ArrayList<SugarRecord>();
-            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
-            if (column.getName().equals("id")) {
+            if(column.isAnnotationPresent(Id.class)) {
+
+                if(isIdAnnotationPresent) {
+                    throw new IllegalStateException("Multiple Id annotations present on " + object.getClass().getSimpleName() + ". Only one field can have this annotation.");
+                }
+
                 idField = column;
+                isIdAnnotationPresent = true;
+            }
+
+            //Check for null to make sure we don't squash a declared annotated ID field
+            else if (column.getName().equals("id") && idField == null) {
+                idField = column;
+            }
+
+            if(!column.getName().equals("id")) {
+                ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             }
 
         }
 
+        ReflectionUtil.addFieldValueToColumn(values, idField, object, entitiesMap);
+
         boolean isSugarEntity = isSugarEntity(object.getClass());
-        if (isSugarEntity && entitiesMap.containsKey(object)) {
+        if (isSugarEntity && entitiesMap.containsKey(object) && !isIdAnnotationPresent) {
                 values.put("id", entitiesMap.get(object));
+        } else if(isSugarEntity && isIdAnnotationPresent && idField != null) {
+            idField.setAccessible(true);
+            try {
+                Object id = idField.get(object);
+                if(id != null && (Long.class.equals(id.getClass()) || long.class.equals(id.getClass()))) {
+                    values.put("id", (Long) id);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
         }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
@@ -441,7 +475,10 @@ public class SugarRecord {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
             try {
-                Field field = type.getDeclaredField("id");
+
+                Table table = type.getAnnotation(Table.class);
+
+                Field field = type.getDeclaredField(table.primaryKeyField());
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
