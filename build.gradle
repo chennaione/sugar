@@ -31,7 +31,7 @@ subprojects { proj ->
     apply plugin: 'jacoco'
 
     jacoco {
-        version "0.7.1.201405082137"
+        version "0.7.1.201508030944"
     }
 
     task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
@@ -42,9 +42,9 @@ subprojects { proj ->
             html.enabled = true
         }
         classDirectories = fileTree(
-            dir: 'build/intermediates/classes/debug',
-            excludes: ['**/R*.class',
-                       '**/BuildConfig*'])
+                dir: 'build/intermediates/classes/debug',
+                excludes: ['**/R*.class',
+                           '**/BuildConfig*'])
         sourceDirectories = files('src/main/java')
         executionData = files('build/jacoco/testDebug.exec')
         doFirst {

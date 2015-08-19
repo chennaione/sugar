@@ -37,6 +37,10 @@ public class SugarContext {
         instance.doTerminate();
     }
 
+    public void clearDb() {
+        instance.getSugarDb().clearDb();
+    }
+
     /*
      * Per issue #106 on Github, this method won't be called in
      * any real Android device. This method is used purely in

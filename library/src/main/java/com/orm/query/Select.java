@@ -135,7 +135,7 @@ public class Select<T> implements Iterable {
         return list.size() > 0 ? list.get(0) : null;
     }
     
-    String toSql() {
+    public String toSql() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM ").append(NamingHelper.toSQLName(this.record)).append(" ");
 
@@ -158,11 +158,11 @@ public class Select<T> implements Iterable {
         return sql.toString();
     }
 
-    String getWhereCond() {
+    public String getWhereCond() {
         return whereClause;
     }
 
-    String[] getArgs() {
+    public String[] getArgs() {
         return convertArgs(args);
     }
 

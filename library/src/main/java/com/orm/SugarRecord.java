@@ -8,20 +8,32 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+
+import com.orm.dsl.Id;
+import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
 
+import java.lang.IllegalStateException;
+import java.lang.Object;
+import java.lang.Override;
 import java.lang.String;
+import java.lang.StringBuffer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -51,7 +63,7 @@ public class SugarRecord {
             sqLiteDatabase.beginTransaction();
             sqLiteDatabase.setLockingEnabled(false);
             for (T object: objects) {
-                save(object);
+                save(getSugarContext().getSugarDb().getDB(), object);
             }
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -184,6 +196,69 @@ public class SugarRecord {
         getSugarContext().getSugarDb().getDB().execSQL(query, arguments);
     }
 
+    public static <T> List<T> findByRelationship(Class<T> type, Relationship relationship, String where, String groupBy, String orderBy, String limit) {
+        return findByRelationship(type, relationship.joinTable(), relationship.refObjectIdName(), relationship.joinColumnName(), where, groupBy, orderBy, limit);
+    }
+
+    public static <T> List<T> findByRelationship(Class<T> type, String joinTable, String objectIdName, String where, String groupBy, String orderBy, String limit) {
+        return findByRelationship(type, joinTable, objectIdName, "ID", where, groupBy, orderBy, limit);
+    }
+
+    public static <T> List<T> findByRelationship(Class<T> type, String joinTable, String objectIdName, String joinColumnName, String where, String groupBy, String orderBy, String limit) {
+        SugarDb db = getSugarContext().getSugarDb();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        T entity;
+        List<T> toRet = new ArrayList<T>();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM ").append(NamingHelper.toSQLName(type))
+                .append(" a INNER JOIN ").append(joinTable).append(" b ON a.")
+                .append(joinColumnName)
+                .append("=b.").append(objectIdName);
+        appendClause(sb, " WHERE ", where);
+        appendClause(sb, " GROUP BY ", groupBy);
+        //appendClause(sb, " HAVING ", having);
+        appendClause(sb, " ORDER BY ", orderBy);
+        appendClause(sb, " LIMIT ", limit);
+
+        Log.v("SUGAR", "Join table sql: " + sb.toString());
+
+        Cursor c = sqLiteDatabase.rawQuery(sb.toString(), new String[0]);
+
+        try {
+            while (c.moveToNext()) {
+                entity = type.getDeclaredConstructor().newInstance();
+                inflate(c, entity, getSugarContext().getEntitiesMap());
+                toRet.add(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            c.close();
+        }
+        return toRet;
+    }
+
+    private static void appendClause(StringBuilder s, String name, String clause) {
+        if (!TextUtils.isEmpty(clause)) {
+            s.append(name);
+            s.append(clause);
+        }
+    }
+
+    public static <T> T findUnique(Class<T> type, String whereClause, String[] whereArgs) {
+        List<T> list = find(type, whereClause, whereArgs, null, null, null);
+        if(list == null || list.isEmpty()) {
+            return null;
+        }
+
+        if(list.size() > 1) {
+            throw new IllegalStateException("Find unique was called but database contained more than one matching result.");
+        }
+
+        return list.get(0);
+    }
+
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
         SugarDb db = getSugarContext().getSugarDb();
         SQLiteDatabase sqLiteDatabase = db.getDB();
@@ -243,24 +318,95 @@ public class SugarRecord {
     }
 
     public static long save(Object object) {
-        return save(getSugarContext().getSugarDb().getDB(), object);
-    }
 
-    static long save(SQLiteDatabase db, Object object) {
-        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
-        List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
-        ContentValues values = new ContentValues(columns.size());
-        Field idField = null;
-        for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
-            if (column.getName().equals("id")) {
-                idField = column;
+        Set<SugarRecord> recordsToSave = new HashSet<SugarRecord>();
+        ListMultimap<String, ContentValues> joinTables = ArrayListMultimap.create();
+        ReflectionUtil.getRecordsToSave(object, recordsToSave, joinTables);
+
+        if(recordsToSave != null && !recordsToSave.isEmpty()) {
+            saveInTx(recordsToSave);
+
+            if(joinTables != null) {
+                for(String tableName: joinTables.keySet()) {
+                    saveJoinTableList(getSugarContext().getSugarDb().getDB(), joinTables.get(tableName), tableName);
+                }
             }
         }
 
+
+        return save(getSugarContext().getSugarDb().getDB(), object);
+    }
+
+    static void saveJoinTableList(SQLiteDatabase db, List<ContentValues> relationshipList, String joinTableName) {
+
+        for(ContentValues values: relationshipList) {
+
+            //If record already exists then ignore
+            long id = db.insertWithOnConflict(joinTableName, null, values,
+                    SQLiteDatabase.CONFLICT_IGNORE);
+
+            Log.i("Sugar", "Inserted Join table record for " + joinTableName + ".");
+
+        }
+    }
+
+    static void saveJoinTable(SQLiteDatabase db, ContentValues values, String joinTableName) {
+
+        //If record already exists then ignore
+        long id = db.insertWithOnConflict(joinTableName, null, values,
+                SQLiteDatabase.CONFLICT_IGNORE);
+
+        Log.i("Sugar", "Inserted Join table record for " + joinTableName + ".");
+
+    }
+
+
+    static long save(SQLiteDatabase db, Object object) {
+        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
+
+        List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
+        ContentValues values = new ContentValues(columns.size());
+        Field idField = null;
+        boolean isIdAnnotationPresent = false;
+        for (Field column : columns) {
+            List<SugarRecord> children = new ArrayList<SugarRecord>();
+            if(column.isAnnotationPresent(Id.class)) {
+
+                if(isIdAnnotationPresent) {
+                    throw new IllegalStateException("Multiple Id annotations present on " + object.getClass().getSimpleName() + ". Only one field can have this annotation.");
+                }
+
+                idField = column;
+                isIdAnnotationPresent = true;
+            }
+
+            //Check for null to make sure we don't squash a declared annotated ID field
+            else if (column.getName().equals("id") && idField == null) {
+                idField = column;
+            }
+
+            if(!column.getName().equals("id")) {
+                ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+            }
+
+        }
+
+        ReflectionUtil.addFieldValueToColumn(values, idField, object, entitiesMap);
+
         boolean isSugarEntity = isSugarEntity(object.getClass());
-        if (isSugarEntity && entitiesMap.containsKey(object)) {
+        if (isSugarEntity && entitiesMap.containsKey(object) && !isIdAnnotationPresent) {
                 values.put("id", entitiesMap.get(object));
+        } else if(isSugarEntity && isIdAnnotationPresent && idField != null) {
+            idField.setAccessible(true);
+            try {
+                Object id = idField.get(object);
+                if(id != null && (Long.class.equals(id.getClass()) || long.class.equals(id.getClass()))) {
+                    values.put("id", (Long) id);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
         }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
@@ -329,7 +475,10 @@ public class SugarRecord {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
             try {
-                Field field = type.getDeclaredField("id");
+
+                Table table = type.getAnnotation(Table.class);
+
+                Field field = type.getDeclaredField(table.primaryKeyField());
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
@@ -357,6 +506,21 @@ public class SugarRecord {
     }
 
     public long save() {
+
+        Set<SugarRecord> recordsToSave = new HashSet<SugarRecord>();
+        ListMultimap<String, ContentValues> joinTables = ArrayListMultimap.create();
+        ReflectionUtil.getRecordsToSave(this, recordsToSave, joinTables);
+
+        if(recordsToSave != null && !recordsToSave.isEmpty()) {
+            saveInTx(recordsToSave);
+
+            if(joinTables != null) {
+                for(String tableName: joinTables.keySet()) {
+                    saveJoinTableList(getSugarContext().getSugarDb().getDB(), joinTables.get(tableName), tableName);
+                }
+            }
+        }
+
         return save(getSugarContext().getSugarDb().getDB(), this);
     }
 
@@ -373,7 +537,7 @@ public class SugarRecord {
         this.id = id;
     }
 
-    static class CursorIterator<E> implements Iterator<E> {
+    public static class CursorIterator<E> implements Iterator<E> {
         Class<E> type;
         Cursor cursor;
 
@@ -417,6 +581,34 @@ public class SugarRecord {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+
+        public E getItemAtPosition(int position) {
+            if(cursor.moveToPosition(position)) {
+                return this.next();
+            } else {
+                return null;
+            }
+        }
+        
+        public Cursor getCursor() {
+            return cursor;
+        }
     }
 
+    @Override
+    /**
+     * Objects are equal if their IDs are equal and their class type is equal
+     */
+    public boolean equals(Object object) {
+        if(object == null) {
+            return false;
+        }
+
+        if(object.getClass().equals(this.getClass()) && ((SugarRecord) object).getId().equals(this.getId())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 }

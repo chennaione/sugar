@@ -28,7 +28,7 @@ public class ManifestHelper {
     /**
      * Grabs the database version from the manifest.
      *
-     * @param context  the {@link android.content.Context} of the Android application
+     * @param context  the {@link Context} of the Android application
      * @return the database version as specified by the {@link #METADATA_VERSION} version or 1 of
      *         not present
      */
@@ -45,7 +45,7 @@ public class ManifestHelper {
     /**
      * Grabs the domain name of the model classes from the manifest. 
      *
-     * @param context  the {@link android.content.Context} of the Android application
+     * @param context  the {@link Context} of the Android application
      * @return the package String that Sugar uses to search for model classes
      */
     public static String getDomainPackageName(Context context){
@@ -61,7 +61,7 @@ public class ManifestHelper {
     /**
      * Grabs the name of the database file specified in the manifest.
      *
-     * @param context  the {@link android.content.Context} of the Android application
+     * @param context  the {@link Context} of the Android application
      * @return the value for the {@value #METADATA_DATABASE} meta data in the AndroidManifest or
      *         {@link #DATABASE_DEFAULT_NAME} if not present
      */
@@ -78,7 +78,7 @@ public class ManifestHelper {
     /**
      * Grabs the debug flag from the manifest.
      *
-     * @param context  the {@link android.content.Context} of the Android application
+     * @param context  the {@link Context} of the Android application
      * @return true if the debug flag is enabled
      */
     public static boolean getDebugEnabled(Context context) {

@@ -4,33 +4,147 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.orm.SugarRecord;
+import com.orm.dsl.Id;
 import com.orm.dsl.Ignore;
+import com.orm.dsl.Relationship;
 import com.orm.dsl.Table;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.Exception;
+import java.lang.Object;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 
 import dalvik.system.DexFile;
 
 public class ReflectionUtil {
 
+    public static Set<SugarRecord> getRecordsToSave(Object object, Set<SugarRecord> recordsToSave, ListMultimap<String, ContentValues> joinTables) {
+        Class table = object.getClass();
+
+        Log.d("Sugar", "Fetching properties");
+        List<Field> typeFields = new ArrayList<Field>();
+
+        getAllFields(typeFields, table);
+
+        for (Field field : typeFields) {
+            if(field.isAnnotationPresent(Relationship.class) && ((Relationship) field.getAnnotation(Relationship.class)).cascade()) {
+
+                field.setAccessible(true);
+                Class<?> columnType = field.getType();
+                Object columnValue = null;
+
+                try {
+                    columnValue = field.get(object);
+                } catch(IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                Relationship relationship = field.getAnnotation(Relationship.class);
+
+                if (Collection.class.isAssignableFrom(columnType)) {
+
+                    //Explicitly invoke getter instead of grabbing value from field to be safe that we don't omit getter logic
+                    //Try get{fieldName}
+                    try {
+                        Method getter = table.getMethod("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
+                        columnValue = getter.invoke(object, (Object[]) null);
+
+                        //Try is{fieldName}
+                    } catch (Exception e) {
+                        try {
+                            Method getter = table.getMethod("is" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
+                            columnValue = getter.invoke(object, (Object[]) null);
+                            //No getter available. Get from field
+                        } catch (Exception e1) {
+                            //DO NOTHING: columnValue already = columnValue
+                        }
+                    }
+
+                    if (columnValue != null) {
+                        for (Object child : (Collection) columnValue) {
+
+                            if(child == null) continue;
+
+                            //They should be
+                            if (SugarRecord.isSugarEntity(child.getClass())) {
+                                boolean success = recordsToSave.add((SugarRecord) child);
+
+                                //If not then it means it is a bidirectional relationship and we don't want it showing up twice
+                                if(success) {
+
+                                    ContentValues contentValues = new ContentValues(2);
+                                    contentValues.put(relationship.objectIdName(), ((SugarRecord) object).getId());
+                                    contentValues.put(relationship.refObjectIdName(), ((SugarRecord) child).getId());
+
+                                    joinTables.put(relationship.joinTable(), contentValues);
+
+                                    ReflectionUtil.getRecordsToSave(child, recordsToSave, joinTables);
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                } else if(columnValue != null && SugarRecord.isSugarEntity(columnValue.getClass())) {
+
+
+                    //Explicitly invoke getter instead of grabbing value from field to be safe that we don't omit getter logic
+                    //Try get{fieldName}
+                    try {
+                        Method getter = object.getClass().getMethod("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
+                        columnValue = getter.invoke(object, (Object[]) null);
+
+                        //Try is{fieldName}
+                    } catch (Exception e) {
+                        try {
+                            Method getter = object.getClass().getMethod("is" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
+                            columnValue = getter.invoke(object, (Object[]) null);
+                            //No getter available. Get from field
+                        } catch (Exception e1) {
+                            //DO NOTHING: columnValue already = columnValue
+                        }
+                    }
+
+                    if(columnValue != null) {
+                        boolean success = recordsToSave.add((SugarRecord) columnValue);
+
+                        //If not then it means it is a bidirectional relationship and we don't want it showing up twice
+                        if(success) {
+
+                            ContentValues contentValues = new ContentValues(2);
+                            contentValues.put(relationship.objectIdName(), ((SugarRecord) object).getId());
+                            contentValues.put(relationship.refObjectIdName(), ((SugarRecord) columnValue).getId());
+
+                            joinTables.put(relationship.joinTable(), contentValues);
+                            ReflectionUtil.getRecordsToSave(columnValue, recordsToSave, joinTables);
+                        }
+                    }
+                }
+            }
+        }
+
+        return recordsToSave;
+    }
+
     public static List<Field> getTableFields(Class table) {
+
         List<Field> fieldList = SugarConfig.getFields(table);
         if (fieldList != null) return fieldList;
 
@@ -60,8 +174,11 @@ public class ReflectionUtil {
         return fields;
     }
 
-    public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
+    public static List<ContentValues> addFieldValueToColumn(ContentValues values, Field column, Object object,
                                              Map<Object, Long> entitiesMap) {
+
+        List<ContentValues> relationshipList = null;
+
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
@@ -70,8 +187,9 @@ public class ReflectionUtil {
 
             if (columnType.isAnnotationPresent(Table.class)) {
                 Field field = null;
+                Table table = columnType.getAnnotation(Table.class);
                 try {
-                    field = columnType.getDeclaredField("id");
+                    field = columnType.getDeclaredField(table.primaryKeyField());
                     field.setAccessible(true);
                     values.put(columnName,
                             (field != null)
@@ -129,6 +247,73 @@ public class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
+                } else if(column.isAnnotationPresent(Relationship.class)) {
+                    Relationship relationship = column.getAnnotation(Relationship.class);
+
+                    relationshipList = new ArrayList<ContentValues>();
+
+                    if(Collection.class.isAssignableFrom(columnType)) {
+
+                        //Explicitly invoke getter instead of grabbing value from field to be safe that we don't omit getter logic
+                        //Try get{fieldName}
+                        try {
+                            Method getter = object.getClass().getMethod("get" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                            columnValue = getter.invoke(object, (Object[]) null);
+
+                            //Try is{fieldName}
+                        } catch (Exception e) {
+                            try {
+                                Method getter = object.getClass().getMethod("is" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                                columnValue = getter.invoke(object, (Object[]) null);
+                                //No getter available. Get from field
+                            } catch (Exception e1) {
+                                //DO NOTHING: columnValue already = columnValue
+                            }
+                        }
+
+                        if(columnValue != null) {
+                            for (Object child : (Collection) columnValue) {
+                                //They should be
+                                if (SugarRecord.isSugarEntity(child.getClass())) {
+                                    ContentValues contentValues = new ContentValues(2);
+                                    contentValues.put(relationship.objectIdName(), ((SugarRecord) object).getId());
+                                    contentValues.put(relationship.refObjectIdName(), ((SugarRecord) child).getId());
+
+                                    relationshipList.add(contentValues);
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    } else if(columnValue != null && SugarRecord.isSugarEntity(columnValue.getClass())) {
+
+
+                        //Explicitly invoke getter instead of grabbing value from field to be safe that we don't omit getter logic
+                        //Try get{fieldName}
+                        try {
+                            Method getter = object.getClass().getMethod("get" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                            columnValue = getter.invoke(object, (Object[]) null);
+
+                            //Try is{fieldName}
+                        } catch (Exception e) {
+                            try {
+                                Method getter = object.getClass().getMethod("is" + column.getName().substring(0, 1).toUpperCase() + column.getName().substring(1));
+                                columnValue = getter.invoke(object, (Object[]) null);
+                                //No getter available. Get from field
+                            } catch (Exception e1) {
+                                //DO NOTHING: columnValue already = columnValue
+                            }
+                        }
+
+                        if(columnValue != null) {
+                            ContentValues contentValues = new ContentValues(2);
+                            contentValues.put(relationship.objectIdName(), ((SugarRecord) columnValue).getId());
+                            contentValues.put(relationship.refObjectIdName(), ((SugarRecord) object).getId());
+
+                            relationshipList.add(contentValues);
+                        }
+                    }
+
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
@@ -143,6 +328,8 @@ public class ReflectionUtil {
         } catch (IllegalAccessException e) {
             Log.e("Sugar", e.getMessage());
         }
+
+        return relationshipList;
     }
 
     public static void setFieldValueFromCursor(Cursor cursor, Field field, Object object) {
@@ -157,7 +344,7 @@ public class ReflectionUtil {
                 return;
             }
 
-            if (colName.equalsIgnoreCase("id")) {
+            if (colName.equalsIgnoreCase("id") || field.isAnnotationPresent(Id.class)) {
                 long cid = cursor.getLong(columnIndex);
                 field.set(object, Long.valueOf(cid));
             } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
@@ -235,6 +422,7 @@ public class ReflectionUtil {
         }
     }
 
+    /*
     public static void setFieldValueForId(Object object, Long value) {
         try {
             Field field = getDeepField("id", object.getClass());
@@ -245,7 +433,7 @@ public class ReflectionUtil {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public static List<Class> getDomainClasses(Context context) {
         List<Class> domainClasses = new ArrayList<Class>();

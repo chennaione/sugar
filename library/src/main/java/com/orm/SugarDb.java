@@ -39,4 +39,8 @@ public class SugarDb extends SQLiteOpenHelper {
         return this.sqLiteDatabase;
     }
 
+    public void clearDb() {
+        schemaGenerator.clearDb(sqLiteDatabase);
+    }
+
 }
