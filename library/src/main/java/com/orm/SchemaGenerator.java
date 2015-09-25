@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -151,6 +152,24 @@ public class SchemaGenerator {
                     }
                 }
             }
+        }
+
+        if (table.isAnnotationPresent(Unique.class)) {
+            String constraint = table.getAnnotation(Unique.class).value();
+
+            sb.append(", UNIQUE(");
+
+            String[] constraintFields = constraint.split(",");
+            for(int i = 0; i < constraintFields.length; i++) {
+                String columnName = NamingHelper.toSQLNameDefault(constraintFields[i]);
+                sb.append(columnName);
+
+                if(i < (constraintFields.length -1)) {
+                    sb.append(",");
+                }
+            }
+
+            sb.append(") ON CONFLICT REPLACE");
         }
 
         sb.append(" ) ");
