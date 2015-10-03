@@ -1,6 +1,7 @@
 package com.orm.entity;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.common.collect.Lists;
 import com.orm.util.ReflectionUtil;
@@ -31,7 +32,7 @@ public class EntityListenerManager {
     public void notify(Object entity, Class listenerType) {
         List<EntityListenerMeta> entityListenerMetas = entityListenerMetaMap.get(entity.getClass());
 
-        if (entityListenerMetas != null && entityListenerMetas.isEmpty()) {
+        if (entityListenerMetas != null && !entityListenerMetas.isEmpty()) {
             for (EntityListenerMeta meta : entityListenerMetas) {
                 notify(entity, listenerType, meta);
             }
@@ -90,6 +91,8 @@ public class EntityListenerManager {
         List<EntityListenerMeta> metaList = Lists.newArrayList();
 
         for (Class listenerClass : listenerClasses) {
+            Log.i("Sugar", "Found EntityListener for domain class '" + domainClass + "': " + listenerClass);
+
             EntityListenerMeta meta = processListenerClass(domainClass, listenerClass);
             if (meta != null) {
                 metaList.add(meta);
