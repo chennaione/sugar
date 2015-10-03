@@ -55,9 +55,9 @@ public class EntityListenerManager {
         try {
             method.invoke(obj, entity);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.w("Sugar", "Cannot invoke method '" + method.getName() + "' with entity '" + entity.getClass() + "'");
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            Log.w("Sugar", "Cannot invoke method '" + method.getName() + "' with entity '" + entity.getClass() + "'");
         }
     }
 
