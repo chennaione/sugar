@@ -3,6 +3,7 @@ package com.orm;
 import android.content.Context;
 
 import com.google.common.collect.MapMaker;
+import com.orm.entity.EntityListenerManager;
 
 import java.util.concurrent.ConcurrentMap;
 
@@ -12,13 +13,15 @@ public class SugarContext {
     private SugarDb sugarDb;
     private Context context;
     private ConcurrentMap<Object, Long> entitiesMap;
+    private EntityListenerManager entitylistenerManager;
 
     private SugarContext(Context context) {
         this.context = context;
         this.sugarDb = new SugarDb(context);
         this.entitiesMap = new MapMaker().weakKeys().makeMap();
+        this.entitylistenerManager = new EntityListenerManager(context);
     }
-    
+
     public static SugarContext getSugarContext() {
         if (instance == null) {
             throw new NullPointerException("SugarContext has not been initialized properly. Call SugarContext.init(Context) in your Application.onCreate() method and SugarContext.terminate() in your Application.onTerminate() method.");
@@ -55,5 +58,9 @@ public class SugarContext {
 
     ConcurrentMap<Object, Long> getEntitiesMap() {
         return entitiesMap;
+    }
+
+    public EntityListenerManager getEntitylistenerManager() {
+        return entitylistenerManager;
     }
 }

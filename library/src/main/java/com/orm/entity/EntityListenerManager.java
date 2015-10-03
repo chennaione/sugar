@@ -1,0 +1,129 @@
+package com.orm.entity;
+
+import android.content.Context;
+
+import com.google.common.collect.Lists;
+import com.orm.util.ReflectionUtil;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityListeners;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+
+public class EntityListenerManager {
+
+    private Map<Class, List<EntityListenerMeta>> entityListenerMetaMap;
+
+    private Context context;
+
+    public EntityListenerManager(Context context) {
+        this.context = context;
+        load();
+    }
+
+    public void notify(Object entity, Class listenerType) {
+        List<EntityListenerMeta> entityListenerMetas = entityListenerMetaMap.get(entity.getClass());
+
+        if (entityListenerMetas != null && entityListenerMetas.isEmpty()) {
+            for (EntityListenerMeta meta : entityListenerMetas) {
+                notify(entity, listenerType, meta);
+            }
+        }
+    }
+
+    private void notify(Object entity, Class listenerType, EntityListenerMeta meta) {
+        if (listenerType == PrePersist.class && meta.getPrePersist() != null) {
+            execute(meta.getListener(), meta.getPrePersist(), entity);
+        } else if (listenerType == PreRemove.class && meta.getPreRemove() != null) {
+            execute(meta.getListener(), meta.getPreRemove(), entity);
+        } else if (listenerType == PostPersist.class && meta.getPostPersist() != null) {
+            execute(meta.getListener(), meta.getPostPersist(), entity);
+        } else if (listenerType == PostRemove.class && meta.getPostRemove() != null) {
+            execute(meta.getListener(), meta.getPostRemove(), entity);
+        }
+    }
+
+    private void execute(Object obj, Method method, Object entity) {
+        try {
+            method.invoke(obj, entity);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void load() {
+        entityListenerMetaMap = new HashMap<>();
+
+        List<Class> domainClasses = ReflectionUtil.getDomainClasses(context);
+
+        for (Class domainClass : domainClasses) {
+            processDomainClass(domainClass);
+        }
+    }
+
+    private void processDomainClass(Class domainClass) {
+        EntityListeners annotation = (EntityListeners) domainClass.getAnnotation(EntityListeners.class);
+
+        if (annotation != null) {
+            Class[] listenerClasses = annotation.value();
+
+            if (listenerClasses != null && listenerClasses.length > 0) {
+                List<EntityListenerMeta> metaList = processListenerClasses(domainClass, listenerClasses);
+
+                if (metaList != null && !metaList.isEmpty()) {
+                    entityListenerMetaMap.put(domainClass, metaList);
+                }
+            }
+        }
+    }
+
+    private List<EntityListenerMeta> processListenerClasses(Class domainClass, Class[] listenerClasses) {
+        List<EntityListenerMeta> metaList = Lists.newArrayList();
+
+        for (Class listenerClass : listenerClasses) {
+            EntityListenerMeta meta = processListenerClass(domainClass, listenerClass);
+            if (meta != null) {
+                metaList.add(meta);
+            }
+        }
+
+        return metaList;
+    }
+
+    private EntityListenerMeta processListenerClass(Class domainClass, Class listenerClass) {
+        try {
+            EntityListenerMeta meta = new EntityListenerMeta(domainClass, listenerClass);
+            meta.setPrePersist(findMethod(listenerClass, PrePersist.class));
+            meta.setPreRemove(findMethod(listenerClass, PreRemove.class));
+            meta.setPostPersist(findMethod(listenerClass, PostPersist.class));
+            meta.setPostRemove(findMethod(listenerClass, PostRemove.class));
+
+            return meta;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private Method findMethod(Class source, Class annotation) {
+        for (Method method : source.getMethods()) {
+            if (method.getAnnotation(annotation) != null) {
+                return method;
+            }
+        }
+
+        return null;
+    }
+}

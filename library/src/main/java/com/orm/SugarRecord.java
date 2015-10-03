@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import javax.persistence.PostPersist;
+import javax.persistence.PrePersist;
+
 import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
@@ -93,7 +96,7 @@ public class SugarRecord {
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
-    
+
     public static <T> List<T> listAll(Class<T> type, String orderBy) {
         return find(type, null, null, null, orderBy, null);
     }
@@ -263,6 +266,8 @@ public class SugarRecord {
                 values.put("id", entitiesMap.get(object));
         }
 
+        getSugarContext().getEntitylistenerManager().notify(object, PrePersist.class);
+
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
                 SQLiteDatabase.CONFLICT_REPLACE);
 
@@ -280,6 +285,8 @@ public class SugarRecord {
         } else if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ((SugarRecord) object).setId(id);
         }
+
+        getSugarContext().getEntitylistenerManager().notify(object, PostPersist.class);
 
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
@@ -324,7 +331,7 @@ public class SugarRecord {
             return false;
         }
     }
-    
+
     public static boolean delete(Object object) {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
