@@ -112,9 +112,9 @@ public class EntityListenerManager {
 
             return meta;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.e("Sugar", "Unable to instantiate EntityListener of class: " + listenerClass, e);
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            Log.e("Sugar", "Unable to instantiate EntityListener of class: " + listenerClass, e);
         }
 
         return null;
