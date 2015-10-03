@@ -103,7 +103,7 @@ public class EntityListenerManager {
 
     private EntityListenerMeta processListenerClass(Class domainClass, Class listenerClass) {
         try {
-            EntityListenerMeta meta = new EntityListenerMeta(domainClass, listenerClass);
+            EntityListenerMeta meta = new EntityListenerMeta(context, domainClass, listenerClass);
             meta.setPrePersist(findMethod(listenerClass, PrePersist.class));
             meta.setPreRemove(findMethod(listenerClass, PreRemove.class));
             meta.setPostPersist(findMethod(listenerClass, PostPersist.class));
@@ -113,6 +113,10 @@ public class EntityListenerManager {
         } catch (IllegalAccessException e) {
             Log.e("Sugar", "Unable to instantiate EntityListener of class: " + listenerClass, e);
         } catch (InstantiationException e) {
+            Log.e("Sugar", "Unable to instantiate EntityListener of class: " + listenerClass, e);
+        } catch (NoSuchMethodException e) {
+            Log.e("Sugar", "Unable to instantiate EntityListener of class: " + listenerClass, e);
+        } catch (InvocationTargetException e) {
             Log.e("Sugar", "Unable to instantiate EntityListener of class: " + listenerClass, e);
         }
 

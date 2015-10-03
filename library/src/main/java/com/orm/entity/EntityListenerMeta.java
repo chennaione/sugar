@@ -1,5 +1,8 @@
 package com.orm.entity;
 
+import android.content.Context;
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class EntityListenerMeta {
@@ -13,9 +16,9 @@ public class EntityListenerMeta {
     private Method postPersist;
     private Method postRemove;
 
-    public EntityListenerMeta(Class entityClass, Class listenerClass) throws IllegalAccessException, InstantiationException {
+    public EntityListenerMeta(Context context, Class entityClass, Class listenerClass) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         this.entityClass = entityClass;
-        this.listener = listenerClass.newInstance();
+        this.listener = listenerClass.getConstructor(Context.class).newInstance(context);
     }
 
     public Class getEntityClass() {
