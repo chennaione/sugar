@@ -24,7 +24,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
 import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -323,8 +325,12 @@ public class SugarRecord {
         Long id = getId();
         Class<?> type = getClass();
         if (id != null && id > 0L) {
+            getSugarContext().getEntitylistenerManager().notify(this, PreRemove.class);
+
             SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
             Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
+
+            getSugarContext().getEntitylistenerManager().notify(this, PostRemove.class);
             return db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
         } else {
             Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
@@ -340,8 +346,12 @@ public class SugarRecord {
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
+                    getSugarContext().getEntitylistenerManager().notify(object, PreRemove.class);
                     SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
+
                     boolean deleted = db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
+
+                    getSugarContext().getEntitylistenerManager().notify(object, PostRemove.class);
                     Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
                     return deleted;
                 } else {
