@@ -23,10 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
+import com.orm.entity.annotation.PostPersist;
+import com.orm.entity.annotation.PostRemove;
+import com.orm.entity.annotation.PrePersist;
+import com.orm.entity.annotation.PreRemove;
 
 import static com.orm.SugarContext.getSugarContext;
 

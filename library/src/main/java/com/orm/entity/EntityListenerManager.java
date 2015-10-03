@@ -4,6 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.common.collect.Lists;
+import com.orm.entity.annotation.EntityListeners;
+import com.orm.entity.annotation.PostPersist;
+import com.orm.entity.annotation.PostRemove;
+import com.orm.entity.annotation.PrePersist;
+import com.orm.entity.annotation.PreRemove;
 import com.orm.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,12 +16,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.EntityListeners;
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
 
 public class EntityListenerManager {
 
