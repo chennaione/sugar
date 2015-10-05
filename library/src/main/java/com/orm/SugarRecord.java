@@ -252,6 +252,8 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
+        getSugarContext().getEntitylistenerManager().notify(object, PrePersist.class);
+
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
@@ -267,8 +269,6 @@ public class SugarRecord {
         if (isSugarEntity && entitiesMap.containsKey(object)) {
                 values.put("id", entitiesMap.get(object));
         }
-
-        getSugarContext().getEntitylistenerManager().notify(object, PrePersist.class);
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
                 SQLiteDatabase.CONFLICT_REPLACE);
