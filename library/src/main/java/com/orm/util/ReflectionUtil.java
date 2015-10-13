@@ -289,15 +289,11 @@ public class ReflectionUtil {
 
     private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
         String packageName = ManifestHelper.getDomainPackageName(context);
-        String path = getSourcePath(context);
         List<String> classNames = new ArrayList<String>();
-        DexFile dexfile = null;
         try {
-            dexfile = new DexFile(path);
-            Enumeration<String> dexEntries = dexfile.entries();
-            while (dexEntries.hasMoreElements()) {
-                String className = dexEntries.nextElement();
-                if (className.startsWith(packageName)) classNames.add(className);
+            List<String> allClasses = MultiDexHelper.getAllClasses(context);
+            for (String classString : allClasses) {
+                if (classString.startsWith(packageName)) classNames.add(classString);
             }
         } catch (NullPointerException e) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -316,7 +312,7 @@ public class ReflectionUtil {
                 }
             }
         } finally {
-            if (null != dexfile) dexfile.close();
+//            if (null != dexfile) dexfile.close();
         }
         return classNames;
     }
