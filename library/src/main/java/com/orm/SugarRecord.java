@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.orm.entity.annotation.PostPersist;
+import com.orm.entity.annotation.PostRemove;
+import com.orm.entity.annotation.PrePersist;
+import com.orm.entity.annotation.PreRemove;
+
 import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
@@ -93,7 +98,7 @@ public class SugarRecord {
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
-    
+
     public static <T> List<T> listAll(Class<T> type, String orderBy) {
         return find(type, null, null, null, orderBy, null);
     }
@@ -247,6 +252,8 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
+        getSugarContext().getEntitylistenerManager().notify(object, PrePersist.class);
+
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
@@ -280,6 +287,8 @@ public class SugarRecord {
         } else if (SugarRecord.class.isAssignableFrom(object.getClass())) {
             ((SugarRecord) object).setId(id);
         }
+
+        getSugarContext().getEntitylistenerManager().notify(object, PostPersist.class);
 
         Log.i("Sugar", object.getClass().getSimpleName() + " saved : " + id);
 
@@ -316,15 +325,19 @@ public class SugarRecord {
         Long id = getId();
         Class<?> type = getClass();
         if (id != null && id > 0L) {
+            getSugarContext().getEntitylistenerManager().notify(this, PreRemove.class);
+
             SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
             Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
+
+            getSugarContext().getEntitylistenerManager().notify(this, PostRemove.class);
             return db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
         } else {
             Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
             return false;
         }
     }
-    
+
     public static boolean delete(Object object) {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
@@ -333,8 +346,12 @@ public class SugarRecord {
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
+                    getSugarContext().getEntitylistenerManager().notify(object, PreRemove.class);
                     SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
+
                     boolean deleted = db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
+
+                    getSugarContext().getEntitylistenerManager().notify(object, PostRemove.class);
                     Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
                     return deleted;
                 } else {
