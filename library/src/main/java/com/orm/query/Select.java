@@ -167,7 +167,7 @@ public class Select<T> implements Iterable {
         return sql.toString();
     }
 
-    String getWhereClause() {
+    String getWhereCond() {
         return whereClause;
     }
 
