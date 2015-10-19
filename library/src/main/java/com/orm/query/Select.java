@@ -1,5 +1,7 @@
 package com.orm.query;
 
+import android.database.sqlite.SQLiteQueryBuilder;
+
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -136,26 +138,8 @@ public class Select<T> implements Iterable {
     }
     
     String toSql() {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM ").append(NamingHelper.toSQLName(this.record)).append(" ");
-
-        if (whereClause != null) {
-            sql.append("WHERE ").append(whereClause).append(" ");
-        }
-
-        if (orderBy != null) {
-            sql.append("ORDER BY ").append(orderBy).append(" ");
-        }
-
-        if (limit != null) {
-            sql.append("LIMIT ").append(limit).append(" ");
-        }
-
-        if (offset != null) {
-            sql.append("OFFSET ").append(offset).append(" ");
-        }
-
-        return sql.toString();
+        return SQLiteQueryBuilder.buildQueryString(
+                true, NamingHelper.toSQLName(this.record), arguments, whereClause, groupBy, null, orderBy, limit);
     }
 
     String getWhereCond() {
