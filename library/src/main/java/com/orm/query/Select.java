@@ -24,6 +24,7 @@ public class Select<T> implements Iterable {
     private static final String SELECT_FROM="SELECT * FROM ";
     private static final String WHERE="WHERE ";
     private static final String ORDER_BY ="ORDER BY ";
+    private static final String GROUP_BY ="GROUP BY ";
     private static final String LIMIT ="LIMIT ";
     private static final String OFFSET ="OFFSET ";
 
@@ -159,6 +160,10 @@ public class Select<T> implements Iterable {
 
         if (!orderBy.isEmpty()) {
             sql.append(ORDER_BY).append(orderBy).append(SPACE);
+        }
+
+        if (!groupBy.isEmpty()) {
+            sql.append(GROUP_BY).append(groupBy).append(SPACE);
         }
 
         if (!limit.isEmpty()) {

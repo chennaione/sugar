@@ -38,13 +38,13 @@ public class SelectTest {
     @Test
     public void toSqlAllClauses(){
         String toSql = Select.from(TestRecord.class)
-                .where("test")
-                .groupBy("test")
-                .orderBy("test")
-                .limit("test")
-                .offset("test")
+                .where("foo")
+                .orderBy("doe")
+                .groupBy("john")
+                .limit("5")
+                .offset("10")
                 .toSql();
-        assertEquals("SELECT * FROM TEST_RECORD WHERE test ORDER BY test GROUP BY test LIMIT test OFFSET test ", toSql);
+        assertEquals("SELECT * FROM TEST_RECORD WHERE foo ORDER BY doe GROUP BY john LIMIT 5 OFFSET 10 ", toSql);
     }
 
     @Test
@@ -57,10 +57,10 @@ public class SelectTest {
     @Test
     public void toSqlWhereLimitClauses(){
         String toSql = Select.from(TestRecord.class)
-                .where("test")
-                .limit("test")
+                .where("foo")
+                .limit("10")
                 .toSql();
-        assertEquals("SELECT * FROM TEST_RECORD WHERE test LIMIT test ", toSql);
+        assertEquals("SELECT * FROM TEST_RECORD WHERE foo LIMIT 10 ", toSql);
     }
 
 
