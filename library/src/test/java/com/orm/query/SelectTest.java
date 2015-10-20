@@ -35,6 +35,34 @@ public class SelectTest {
         assertEquals("2", where.getArgs()[1]);
     }
 
+    @Test
+    public void toSqlAllClauses(){
+        String toSql = Select.from(TestRecord.class)
+                .where("test")
+                .groupBy("test")
+                .orderBy("test")
+                .limit("test")
+                .offset("test")
+                .toSql();
+        assertEquals("SELECT * FROM TEST_RECORD WHERE test ORDER BY test GROUP BY test LIMIT test OFFSET test ", toSql);
+    }
+
+    @Test
+    public void toSqlNoClauses(){
+        String toSql = Select.from(TestRecord.class)
+                .toSql();
+        assertEquals("SELECT * FROM TEST_RECORD ", toSql);
+    }
+
+    @Test
+    public void toSqlWhereLimitClauses(){
+        String toSql = Select.from(TestRecord.class)
+                .where("test")
+                .limit("test")
+                .toSql();
+        assertEquals("SELECT * FROM TEST_RECORD WHERE test LIMIT test ", toSql);
+    }
+
 
     @Test
     public void testWhereOr(){

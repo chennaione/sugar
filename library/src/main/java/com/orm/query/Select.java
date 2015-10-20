@@ -1,5 +1,7 @@
 package com.orm.query;
 
+import android.database.sqlite.SQLiteQueryBuilder;
+
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -12,10 +14,10 @@ public class Select<T> implements Iterable {
     private Class<T> record;
     private String[] arguments;
     private String whereClause = "";
-    private String orderBy;
-    private String groupBy;
-    private String limit;
-    private String offset;
+    private String orderBy = "";
+    private String groupBy = "";
+    private String limit = "";
+    private String offset = "";
     private List<Object> args = new ArrayList<Object>();
 
     public Select(Class<T> record) {
@@ -41,6 +43,11 @@ public class Select<T> implements Iterable {
         return this;
     }
 
+    public Select<T> offset(String offset) {
+        this.offset = offset;
+        return this;
+    }
+
     public Select<T> where(String whereClause) {
         this.whereClause = whereClause;
         return this;
@@ -63,25 +70,25 @@ public class Select<T> implements Iterable {
             if (Condition.Check.LIKE.equals(condition.getCheck()) ||
                     Condition.Check.NOT_LIKE.equals(condition.getCheck())) {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol())
-                    .append("'")
-                    .append(condition.getValue().toString())
-                    .append("'");
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol())
+                        .append("'")
+                        .append(condition.getValue().toString())
+                        .append("'");
             } else if (Condition.Check.IS_NULL.equals(condition.getCheck()) ||
                     Condition.Check.IS_NOT_NULL.equals(condition.getCheck())) {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol());
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol());
             } else {
                 toAppend
-                    .append(condition.getProperty())
-                    .append(condition.getCheckSymbol())
-                    .append("? ");
+                        .append(condition.getProperty())
+                        .append(condition.getCheckSymbol())
+                        .append("? ");
                 args.add(condition.getValue());
             }
         }
-        
+
         if (!"".equals(whereClause)) {
             whereClause += " " + type.name() + " ";
         }
@@ -117,12 +124,12 @@ public class Select<T> implements Iterable {
 
         return SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, limit);
     }
-    
+
     public long count() {
         if (arguments == null) {
             arguments = convertArgs(args);
         }
-    	
+
         return SugarRecord.count(record, whereClause, arguments, groupBy, orderBy, limit);
     }
 
@@ -134,24 +141,28 @@ public class Select<T> implements Iterable {
         List<T> list = SugarRecord.find(record, whereClause, arguments, groupBy, orderBy, "1");
         return list.size() > 0 ? list.get(0) : null;
     }
-    
+
     String toSql() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM ").append(NamingHelper.toSQLName(this.record)).append(" ");
 
-        if (whereClause != null) {
+        if (!whereClause.isEmpty()) {
             sql.append("WHERE ").append(whereClause).append(" ");
         }
 
-        if (orderBy != null) {
+        if (!orderBy.isEmpty()) {
             sql.append("ORDER BY ").append(orderBy).append(" ");
         }
 
-        if (limit != null) {
+        if (!groupBy.isEmpty()) {
+            sql.append("GROUP BY ").append(groupBy).append(" ");
+        }
+
+        if (!limit.isEmpty()) {
             sql.append("LIMIT ").append(limit).append(" ");
         }
 
-        if (offset != null) {
+        if (!offset.isEmpty()) {
             sql.append("OFFSET ").append(offset).append(" ");
         }
 
@@ -170,7 +181,7 @@ public class Select<T> implements Iterable {
         String[] argsArray = new String[argsList.size()];
 
         for (int i = 0; i < argsList.size(); i++) {
-             argsArray[i] = argsList.get(i).toString();
+            argsArray[i] = argsList.get(i).toString();
         }
 
         return argsArray;
