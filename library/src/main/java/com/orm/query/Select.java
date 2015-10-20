@@ -1,7 +1,5 @@
 package com.orm.query;
 
-import android.database.sqlite.SQLiteQueryBuilder;
-
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -70,21 +68,21 @@ public class Select<T> implements Iterable {
             if (Condition.Check.LIKE.equals(condition.getCheck()) ||
                     Condition.Check.NOT_LIKE.equals(condition.getCheck())) {
                 toAppend
-                        .append(condition.getProperty())
-                        .append(condition.getCheckSymbol())
-                        .append("'")
-                        .append(condition.getValue().toString())
-                        .append("'");
+                    .append(condition.getProperty())
+                    .append(condition.getCheckSymbol())
+                    .append("'")
+                    .append(condition.getValue().toString())
+                    .append("'");
             } else if (Condition.Check.IS_NULL.equals(condition.getCheck()) ||
                     Condition.Check.IS_NOT_NULL.equals(condition.getCheck())) {
                 toAppend
-                        .append(condition.getProperty())
-                        .append(condition.getCheckSymbol());
+                    .append(condition.getProperty())
+                    .append(condition.getCheckSymbol());
             } else {
                 toAppend
-                        .append(condition.getProperty())
-                        .append(condition.getCheckSymbol())
-                        .append("? ");
+                    .append(condition.getProperty())
+                    .append(condition.getCheckSymbol())
+                    .append("? ");
                 args.add(condition.getValue());
             }
         }
@@ -181,7 +179,7 @@ public class Select<T> implements Iterable {
         String[] argsArray = new String[argsList.size()];
 
         for (int i = 0; i < argsList.size(); i++) {
-            argsArray[i] = argsList.get(i).toString();
+             argsArray[i] = argsList.get(i).toString();
         }
 
         return argsArray;
