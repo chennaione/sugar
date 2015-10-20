@@ -12,10 +12,10 @@ public class Select<T> implements Iterable {
     private Class<T> record;
     private String[] arguments;
     private String whereClause = "";
-    private String orderBy;
-    private String groupBy;
-    private String limit;
-    private String offset;
+    private String orderBy = "";
+    private String groupBy = "";
+    private String limit = "";
+    private String offset = "";
     private List<Object> args = new ArrayList<Object>();
     private static final String SPACE =" ";
     private static final String SINGLE_QUOTE ="'";
@@ -47,6 +47,11 @@ public class Select<T> implements Iterable {
 
     public Select<T> limit(String limit) {
         this.limit = limit;
+        return this;
+    }
+
+    public Select<T> offset(String offset) {
+        this.offset = offset;
         return this;
     }
 
