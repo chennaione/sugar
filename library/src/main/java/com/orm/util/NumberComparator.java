@@ -13,34 +13,10 @@ public class NumberComparator implements Comparator<Object> {
     }
 
     private int compareRight(String a, String b) {
-        int bias = 0;
-        int ia = 0;
-        int ib = 0;
-        while (true) {
-            char ca = charAt(a, ia);
-            char cb = charAt(b, ib);
-
-            if ((!Character.isDigit(ca)) && (!Character.isDigit(cb))) {
-                return bias;
-            }
-            if (!Character.isDigit(ca)) {
-                return -1;
-            }
-            if (!Character.isDigit(cb)) {
-                return 1;
-            }
-            if (ca < cb) {
-                if (bias == 0) {
-                    bias = -1;
-                }
-            } else if (ca > cb) {
-                if (bias == 0)
-                    bias = 1;
-            } else if ((ca == 0) && (cb == 0))
-                return bias;
-            ia++;
-            ib++;
-        }
+       int result = a.compareTo(b);
+        if(result < 0) return -1;
+        else if(result > 0) return 1;
+        else return 0;
     }
 
     public int compare(Object o1, Object o2) {
