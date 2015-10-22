@@ -19,58 +19,46 @@ public class NumberComparator implements Comparator<Object> {
         else return 0;
     }
 
-    public int compare(Object o1, Object o2) {
-        String a = o1.toString();
-        String b = o2.toString();
+    public int compare(Object object1, Object object2) {
+        String a = object1.toString();
+        String b = object2.toString();
 
-        int ia = 0;
-        int ib = 0;
-        int nza = 0;
-        int nzb = 0;
+        int indexA = 0, indexB = 0;
+
         while (true) {
-            nza = nzb = 0;
+           int nza = 0, nzb = 0;
 
-            char ca = charAt(a, ia);
-            char cb = charAt(b, ib);
+            char charA = charAt(a, indexA);
+            char charB = charAt(b, indexB);
 
-            while ((Character.isSpaceChar(ca)) || (ca == '0')) {
-                if (ca == '0') {
-                    nza++;
-                } else {
-                    nza = 0;
-                }
-
-                ca = charAt(a, ++ia);
+            while ((Character.isSpaceChar(charA)) || (charA == '0')) {
+                nza = (charA == 0) ? nza+1 : 0;
+                charA = charAt(a, ++indexA);
             }
 
-            while ((Character.isSpaceChar(cb)) || (cb == '0')) {
-                if (cb == '0') {
-                    nzb++;
-                } else {
-                    nzb = 0;
-                }
-
-                cb = charAt(b, ++ib);
+            while ((Character.isSpaceChar(charB)) || (charB == '0')) {
+                nzb = (charB == 0) ? nzb+1 : 0;
+                charB = charAt(b, ++indexB);
             }
             int result;
-            if ((Character.isDigit(ca)) && (Character.isDigit(cb)) &&
-                    ((result = compareRight(a.substring(ia), b.substring(ib))) != 0)) {
+            if ((Character.isDigit(charA)) && (Character.isDigit(charB)) &&
+                    ((result = compareRight(a.substring(indexA), b.substring(indexB))) != 0)) {
                 return result;
             }
 
-            if ((ca == 0) && (cb == 0)) {
+            if ((charA == 0) && (charB == 0)) {
                 return nza - nzb;
             }
 
-            if (ca < cb) {
+            if (charA < charB) {
                 return -1;
             }
-            if (ca > cb) {
+            if (charA > charB) {
                 return 1;
             }
 
-            ia++;
-            ib++;
+            indexA++;
+            indexB++;
         }
     }
 
