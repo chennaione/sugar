@@ -68,7 +68,7 @@ public class SchemaGenerator {
         boolean isSuccess = false;
 
         try {
-            List<String> files = Arrays.asList(context.getAssets().list("sugar_upgrades"));
+            List<String> files = Arrays.asList(this.context.getAssets().list("sugar_upgrades"));
             Collections.sort(files, new NumberComparator());
             for (String file : files) {
                 Log.i(SUGAR, "filename : " + file);
@@ -94,7 +94,7 @@ public class SchemaGenerator {
 
     private void executeScript(SQLiteDatabase db, String file) {
         try {
-            InputStream is = context.getAssets().open("sugar_upgrades/" + file);
+            InputStream is = this.context.getAssets().open("sugar_upgrades/" + file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -109,10 +109,10 @@ public class SchemaGenerator {
     }
 
     private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
-        Log.i(SUGAR, "Create table");
+        Log.i(SUGAR, "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
-        StringBuilder sb = new StringBuilder("CREATE TABLE ");
+        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
