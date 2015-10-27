@@ -308,10 +308,10 @@ public class ReflectionUtil {
     private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
         List<String> paths = getSourcePaths(context);
         List<String> classNames = new ArrayList<>();
+        DexFile dexfile = null;
         try {
             for (int i = 0; i <paths.size(); i++){
                 String path = paths.get(i);
-                DexFile dexfile = null;
                 if (path.endsWith(EXTRACTED_SUFFIX)) {
                     //NOT use new DexFile(path) here, because it will throw "permission error in /data/dalvik-cache"
                     dexfile = DexFile.loadDex(path, path + ".tmp", 0);
