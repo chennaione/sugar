@@ -119,7 +119,7 @@ public class SchemaGenerator {
             String columnName = NamingHelper.toSQLName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
-            if (!columnType.isEmpty()) {
+            if (columnType != null) {
                 if (columnName.equalsIgnoreCase("Id")) {
                     continue;
                 }
