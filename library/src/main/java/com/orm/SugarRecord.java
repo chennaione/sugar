@@ -14,6 +14,7 @@ import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
 
 import java.lang.String;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,7 +168,9 @@ public class SugarRecord {
 
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor().newInstance();
+                Constructor<T> constructor = type.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                entity = constructor.newInstance();
                 inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
@@ -193,7 +196,9 @@ public class SugarRecord {
                 groupBy, null, orderBy, limit);
         try {
             while (c.moveToNext()) {
-                entity = type.getDeclaredConstructor().newInstance();
+                Constructor<T> constructor = type.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                entity = constructor.newInstance();
                 inflate(c, entity, getSugarContext().getEntitiesMap());
                 toRet.add(entity);
             }
@@ -399,7 +404,9 @@ public class SugarRecord {
             }
 
             try {
-                entity = type.getDeclaredConstructor().newInstance();
+                Constructor<E> constructor = type.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                entity = constructor.newInstance();
                 inflate(cursor, entity, getSugarContext().getEntitiesMap());
             } catch (Exception e) {
                 e.printStackTrace();
