@@ -27,7 +27,7 @@ dependencies {
 
 robolectric {
     // Configure includes / excludes
-    include '**/*Test.class'
+    include '**/*Tests.class'
     exclude '**/espresso/**/*.class'
 
     // Configure max heap size of the test JVM

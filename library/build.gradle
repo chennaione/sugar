@@ -1,8 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-
-group 'com.github.satyan'
-version '1.3.1'
+apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion 21
@@ -33,20 +30,3 @@ task libraryJar(type: Jar) {
     baseName 'sugar'
 }
 
-publishing {
-    publications {
-        artifactJar(MavenPublication) {
-            artifact libraryJar
-            artifactId 'sugar'
-            groupId project.group
-        }
-        artifactAar(MavenPublication) {
-            artifact bundleRelease
-            artifactId 'sugar'
-            groupId project.group
-        }
-    }
-    repositories {
-        mavenCentral()
-    }
-}

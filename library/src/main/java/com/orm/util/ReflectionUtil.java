@@ -338,6 +338,8 @@ public class ReflectionUtil {
                     classNames.addAll(fileNames);
                 }
             }
+        } finally {
+            if (null != dexfile) dexfile.close();
         }
         return classNames;
     }

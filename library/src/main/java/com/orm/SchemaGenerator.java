@@ -104,10 +104,10 @@ public class SchemaGenerator {
     }
 
     private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
-        Log.i("Sugar", "Create table");
+        Log.i("Sugar", "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
-        StringBuilder sb = new StringBuilder("CREATE TABLE ");
+        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
