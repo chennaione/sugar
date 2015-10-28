@@ -306,11 +306,12 @@ public class ReflectionUtil {
     }
 
     private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+        String packageName = ManifestHelper.getDomainPackageName(context);
         List<String> paths = getSourcePaths(context);
         List<String> classNames = new ArrayList<>();
         DexFile dexfile = null;
         try {
-            for (int i = 0; i <paths.size(); i++){
+            for (int i = 0; i < paths.size(); i++) {
                 String path = paths.get(i);
                 if (path.endsWith(EXTRACTED_SUFFIX)) {
                     //NOT use new DexFile(path) here, because it will throw "permission error in /data/dalvik-cache"
@@ -321,7 +322,10 @@ public class ReflectionUtil {
 
                 Enumeration<String> dexEntries = dexfile.entries();
                 while (dexEntries.hasMoreElements()) {
-                    classNames.add(dexEntries.nextElement());
+                    String className = dexEntries.nextElement();
+                    if (className.startsWith(packageName)) {
+                        classNames.add(className);
+                    }
                 }
             }
         } catch (NullPointerException e) {
@@ -335,12 +339,18 @@ public class ReflectionUtil {
                     for (File filePath : classDirectory.listFiles()) {
                         populateFiles(filePath, fileNames, "");
                     }
-                    classNames.addAll(fileNames);
+
+                    for (String className : fileNames) {
+                        if (className.startsWith(packageName)) {
+                            classNames.add(className);
+                        }
+                    }
                 }
             }
         } finally {
             if (null != dexfile) dexfile.close();
         }
+
         return classNames;
     }
 
@@ -372,6 +382,7 @@ public class ReflectionUtil {
 
         return sourcePaths;
     }
+
     private static void populateFiles(File path, List<String> fileNames, String parent) {
         if (path.isDirectory()) {
             for (File newPath : path.listFiles()) {
