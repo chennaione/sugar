@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -93,6 +94,18 @@ public class SimpleExtendedModelTests {
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
         assertTrue(SugarRecord.delete(model));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteAndSaveTest() throws Exception {
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        long oldId = model.save();
+        model.delete();
+        long newId = model.save();
+
+        assertNotEquals(oldId, -1L);
+        assertNotEquals(newId, -1L);
+        assertNotEquals(oldId, newId);
     }
 
     @Test

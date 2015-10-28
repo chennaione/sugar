@@ -318,7 +318,9 @@ public class SugarRecord {
         if (id != null && id > 0L) {
             SQLiteDatabase db = getSugarContext().getSugarDb().getDB();
             Log.i("Sugar", type.getSimpleName() + " deleted : " + id);
-            return db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
+            boolean deleted = db.delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
+            if (deleted) setId(null);
+            return deleted;
         } else {
             Log.i("Sugar", "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
             return false;
