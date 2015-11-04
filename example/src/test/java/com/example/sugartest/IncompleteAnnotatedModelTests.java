@@ -14,7 +14,7 @@ import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertFalse;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk=18)
+@Config(sdk=18)
 public class IncompleteAnnotatedModelTests {
     @Test(expected=SQLiteException.class)
     public void saveNoIdFieldTest() {

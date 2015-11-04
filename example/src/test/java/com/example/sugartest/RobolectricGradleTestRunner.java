@@ -3,9 +3,9 @@ package com.example.sugartest;
 import com.example.ClientApp;
 
 import org.junit.runners.model.InitializationError;
-import org.robolectric.AndroidManifest;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.manifest.AndroidManifest;
 import org.robolectric.res.Fs;
 
 public class RobolectricGradleTestRunner extends RobolectricTestRunner {
@@ -18,6 +18,7 @@ public class RobolectricGradleTestRunner extends RobolectricTestRunner {
         String manifestPath = myAppPath + "../../../../src/main/AndroidManifest.xml";
         String resPath = myAppPath + "../../../../src/main/res";
         String assetPath = myAppPath + "../../../../src/main/assets";
-        return createAppManifest(Fs.fileFromPath(manifestPath), Fs.fileFromPath(resPath), Fs.fileFromPath(assetPath));
+        String packageName = "com.example";
+        return createAppManifest(Fs.fileFromPath(manifestPath), Fs.fileFromPath(resPath), Fs.fileFromPath(assetPath), packageName);
     }
 }
