@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk=18)
+@Config(sdk=18)
 public class SimpleExtendedModelTests {
     @Test
     public void emptyDatabaseTest() throws Exception {

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk = 18)
+@Config(sdk = 18)
 public class EnumFieldTests {
     @Test
     public void nullDefaultEnumExtendedTest() {

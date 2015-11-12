@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk=18)
+@Config(sdk=18)
 public class NestedAnnotatedTests {
     @Test
     public void emptyDatabaseTest() throws Exception {

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk=18)
+@Config(sdk=18)
 public class ByteArrayFieldTests {
     @Test
     public void nullByteArrayExtendedTest() {
