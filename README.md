@@ -21,7 +21,7 @@ There are four ways to install Sugar:
 This is the preferred way. Simply add:
 
 ```groovy
-compile 'com.github.satyan:sugar:1.3.1'
+compile 'com.github.satyan:sugar:1.4.0'
 ```
 
 to your project dependencies and run `gradle build` or `gradle assemble`.
@@ -34,7 +34,7 @@ Declare the dependency in Maven:
 <dependency>
     <groupId>com.github.satyan</groupId>
     <artifactId>sugar</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
 </dependency>
 ```
 
@@ -53,39 +53,3 @@ After installing, check out how to set up your first database and models [here](
 ## Contributing
 
 Please fork this repository and contribute back using [pull requests](https://github.com/satyan/sugar/pulls). Features can be requested using [issues](https://github.com/satyan/sugar/issues). All code, comments, and critiques are greatly appreciated.
-
-## Changelog
-
-#### v1.3 [[jar](https://github.com/satyan/sugar/releases/download/v1.3/sugar-1.3.jar)]
-
-- Transaction Support
-- Bulk Insert of records 
-- Encrypted datastore (branch : sugar-cipher using sqlcipher)
-- Removed Constructor with context parameter. Needs default constructor now.
-- Enhancements to QueryBuilder
-- Bug fixes and other improvements.
-
-#### v1.2 [[jar](https://github.com/satyan/sugar/releases/download/v1.2/sugar-1.2.jar)]
-
-- package restriction for domain classes.
-- metadata caching
-- QueryBuilder v1
-- Database Migrations
-- Provision for Raw queries
-- Better and more organized api guide and usage instructions.
-
-#### v1.1 [[jar](https://github.com/satyan/sugar/releases/download/v1.1/sugar-1.1.jar)]
-
-- Static api doesn't take context anymore. Hence
-
-```java
-Book.findById(context, Book.class, 1);
-```
-
-becomes
-
-```java
-Book.findById(Book.class, 1);
-```
-
-- Some cleanup in the code.
