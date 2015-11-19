@@ -1,6 +1,11 @@
 # Sugar Releases
 
 ## [Unreleased]
+### Added
+* [#155](https://github.com/satyan/sugar/issues/155) @benohalloran adding Cursors for Cursor Adapters [Pull 312](https://github.com/satyan/sugar/pull/312)
+
+
+## v1.4
 
 ## v1.4 Beta [[jar](https://github.com/satyan/sugar/releases/download/v1.4_beta/sugar-1.4_beta.jar)]
 ### Added
