@@ -1,14 +1,13 @@
 apply plugin: 'com.android.application'
-apply plugin: 'org.robolectric'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.example"
         minSdkVersion 9
-        targetSdkVersion 21
+        targetSdkVersion 23
     }
 
     buildTypes {
@@ -20,27 +19,27 @@ android {
 
 dependencies {
     compile project (':library')
-    compile 'com.android.support:support-v4:21.0.3'
-    testCompile 'org.robolectric:robolectric:2.4'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    testCompile 'org.robolectric:robolectric:3.0'
     testCompile 'junit:junit:4.12'
 }
 
-robolectric {
-    // Configure includes / excludes
-    include '**/*Tests.class'
-    exclude '**/espresso/**/*.class'
-
-    // Configure max heap size of the test JVM
-    maxHeapSize = '2048m'
-
-    // Configure the test JVM arguments - Does not apply to Java 8
-    jvmArgs '-XX:MaxPermSize=512m', '-XX:-UseSplitVerifier'
-
-    // configure whether failing tests should fail the build
-    ignoreFailures true
-
-    // use afterTest to listen to the test execution results
-    afterTest { descriptor, result ->
-        println "Executing test for ${descriptor.name} with result: ${result.resultType}"
-    }
-}
+//robolectric {
+//    // Configure includes / excludes
+//    include '**/*Tests.class'
+//    exclude '**/espresso/**/*.class'
+//
+//    // Configure max heap size of the test JVM
+//    maxHeapSize = '2048m'
+//
+//    // Configure the test JVM arguments - Does not apply to Java 8
+//    jvmArgs '-XX:MaxPermSize=512m', '-XX:-UseSplitVerifier'
+//
+//    // configure whether failing tests should fail the build
+//    ignoreFailures true
+//
+//    // use afterTest to listen to the test execution results
+//    afterTest { descriptor, result ->
+//        println "Executing test for ${descriptor.name} with result: ${result.resultType}"
+//    }
+//}

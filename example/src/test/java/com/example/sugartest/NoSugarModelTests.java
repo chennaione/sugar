@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk=18)
+@Config(sdk=18)
 public class NoSugarModelTests {
     @Test
     public void deleteTest() throws Exception {

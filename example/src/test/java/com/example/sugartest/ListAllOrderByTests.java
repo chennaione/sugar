@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(emulateSdk=18)
+@Config(sdk=18)
 public class ListAllOrderByTests {
     @Test
     public void listAllOrderByEmptyTest() {

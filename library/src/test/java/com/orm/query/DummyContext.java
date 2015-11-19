@@ -378,18 +378,28 @@ public class DummyContext extends Context {
     }
 
     @Override
+    public String getSystemServiceName(Class<?> serviceClass) {
+        return null;
+    }
+
+    @Override
     public int checkPermission(String s, int i, int i1) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return PackageManager.PERMISSION_GRANTED;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public int checkCallingPermission(String s) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return PackageManager.PERMISSION_GRANTED;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public int checkCallingOrSelfPermission(String s) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return PackageManager.PERMISSION_GRANTED;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int checkSelfPermission(String permission) {
+        return PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
