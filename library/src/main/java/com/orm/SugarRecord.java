@@ -10,10 +10,10 @@ import android.util.Log;
 
 import com.orm.dsl.Table;
 import com.orm.util.NamingHelper;
-import com.orm.util.ReflectionUtil;
 import com.orm.util.QueryBuilder;
+import com.orm.util.ReflectionUtil;
+import com.orm.util.SugarCursor;
 
-import java.lang.String;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +40,12 @@ public class SugarRecord {
 
     public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
         return getSugarDataBase().delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+    }
+
+    public static <T> Cursor getCursor(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
+        Cursor raw = getSugarDataBase().query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+                groupBy, null, orderBy, limit);
+        return new SugarCursor(raw);
     }
 
     @SuppressWarnings("deprecation")
