@@ -21,7 +21,7 @@ There are four ways to install Sugar:
 This is the preferred way. Simply add:
 
 ```groovy
-compile 'com.github.satyan:sugar:1.4.0'
+compile 'com.github.satyan:sugar:1.4'
 ```
 
 to your project dependencies and run `gradle build` or `gradle assemble`.
