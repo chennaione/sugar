@@ -9,6 +9,7 @@
 * [#423](https://github.com/satyan/sugar/pull/423) @sibeliusseraphini moving changelog of README.md to CHANGELOG.md
 
 ### Fixed
+* [#434](https://github.com/satyan/sugar/pull/434) @bendaniel10 fix multi-dex
 * [#410](https://github.com/satyan/sugar/pull/410) [#408](https://github.com/satyan/sugar/pull/408) @RoyMontoya simplify code
 * [#327](https://github.com/satyan/sugar/pull/327) @tracytheron support multi-dex
 * [#373](https://github.com/satyan/sugar/pull/373) @salimkamboh use existing tables
