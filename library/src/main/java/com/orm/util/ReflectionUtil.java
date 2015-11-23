@@ -2,11 +2,8 @@ package com.orm.util;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.Build;
 import android.util.Log;
 
 import com.orm.SugarRecord;
@@ -20,6 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Ref;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +30,8 @@ import java.util.Map;
 import dalvik.system.DexFile;
 
 public class ReflectionUtil {
+
+    private static final String TAG = ReflectionUtil.class.getSimpleName();
 
     public static List<Field> getTableFields(Class table) {
         List<Field> fieldList = SugarConfig.getFields(table);
@@ -254,6 +254,7 @@ public class ReflectionUtil {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
             for (String className : getAllClasses(context)) {
+                Log.d(TAG, className);
                 Class domainClass = getDomainClass(className, context);
                 if (domainClass != null) domainClasses.add(domainClass);
             }
@@ -289,89 +290,37 @@ public class ReflectionUtil {
         }
     }
 
-    private static final String EXTRACTED_NAME_EXT = ".classes";
-    private static final String EXTRACTED_SUFFIX = ".zip";
-
-    private static final String SECONDARY_FOLDER_NAME = "code_cache" + File.separator +
-            "secondary-dexes";
-
-    private static final String PREFS_FILE = "multidex.version";
-    private static final String KEY_DEX_NUMBER = "dex.number";
-
-    private static SharedPreferences getMultiDexPreferences(Context context) {
-        return context.getSharedPreferences(PREFS_FILE,
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
-                        ? Context.MODE_PRIVATE
-                        : Context.MODE_PRIVATE | Context.MODE_MULTI_PROCESS);
-    }
 
     private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
-        List<String> paths = getSourcePaths(context);
-        List<String> classNames = new ArrayList<>();
-        DexFile dexfile = null;
+        String packageName = ManifestHelper.getDomainPackageName(context);
+        List<String> classNames = new ArrayList<String>();
         try {
-            for (int i = 0; i <paths.size(); i++){
-                String path = paths.get(i);
-                if (path.endsWith(EXTRACTED_SUFFIX)) {
-                    //NOT use new DexFile(path) here, because it will throw "permission error in /data/dalvik-cache"
-                    dexfile = DexFile.loadDex(path, path + ".tmp", 0);
-                } else {
-                    dexfile = new DexFile(path);
-                }
-
-                Enumeration<String> dexEntries = dexfile.entries();
-                while (dexEntries.hasMoreElements()) {
-                    classNames.add(dexEntries.nextElement());
-                }
+            List<String> allClasses = MultiDexHelper.getAllClasses(context);
+            for (String classString : allClasses) {
+                if (classString.startsWith(packageName)) classNames.add(classString);
             }
         } catch (NullPointerException e) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Enumeration<URL> urls = classLoader.getResources("");
-            List<String> fileNames = new ArrayList<String>();
             while (urls.hasMoreElements()) {
+                List<String> fileNames = new ArrayList<String>();
                 String classDirectoryName = urls.nextElement().getFile();
                 if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
                     File classDirectory = new File(classDirectoryName);
                     for (File filePath : classDirectory.listFiles()) {
                         populateFiles(filePath, fileNames, "");
                     }
-                    classNames.addAll(fileNames);
+                    for (String fileName : fileNames) {
+                        if (fileName.startsWith(packageName)) classNames.add(fileName);
+                    }
                 }
             }
         } finally {
-            if (null != dexfile) dexfile.close();
+//            if (null != dexfile) dexfile.close();
         }
         return classNames;
     }
 
-    public static List<String> getSourcePaths(Context context) throws PackageManager.NameNotFoundException, IOException {
-        ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
-        File sourceApk = new File(applicationInfo.sourceDir);
-        File dexDir = new File(applicationInfo.dataDir, SECONDARY_FOLDER_NAME);
-
-        List<String> sourcePaths = new ArrayList<String>();
-        //default apk path
-        sourcePaths.add(applicationInfo.sourceDir);
-
-        String extractedFilePrefix = sourceApk.getName() + EXTRACTED_NAME_EXT;
-
-        //get the dex number
-        int totalDexNumber = getMultiDexPreferences(context).getInt(KEY_DEX_NUMBER, 1);
-
-        //get other dexes
-        for (int i = 2; i <= totalDexNumber; i++) {
-            String fileName = extractedFilePrefix + i + EXTRACTED_SUFFIX;
-            File extractedFile = new File(dexDir, fileName);
-            if (extractedFile.isFile()) {
-                sourcePaths.add(extractedFile.getAbsolutePath());
-            } else {
-                throw new IOException("Missing extracted secondary dex file '" +
-                        extractedFile.getPath() + "'");
-            }
-        }
-
-        return sourcePaths;
-    }
     private static void populateFiles(File path, List<String> fileNames, String parent) {
         if (path.isDirectory()) {
             for (File newPath : path.listFiles()) {
