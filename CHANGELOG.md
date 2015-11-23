@@ -3,7 +3,15 @@
 ## [Unreleased]
 ### Added
 * [#155](https://github.com/satyan/sugar/issues/155) @benohalloran adding Cursors for Cursor Adapters [Pull 312](https://github.com/satyan/sugar/pull/312)
+* [#430](https://github.com/satyan/sugar/pull/430) @sibeliusseraphini update to roboelectric 3.0 and target android-32
 
+### Changed
+* [#423](https://github.com/satyan/sugar/pull/423) @sibeliusseraphini moving changelog of README.md to CHANGELOG.md
+
+### Fixed
+* [#410](https://github.com/satyan/sugar/pull/410) [#408](https://github.com/satyan/sugar/pull/408) @RoyMontoya simplify code
+* [#327](https://github.com/satyan/sugar/pull/327) @tracytheron support multi-dex
+* [#373](https://github.com/satyan/sugar/pull/373) @salimkamboh use existing tables
 
 ## v1.4
 ### Added
