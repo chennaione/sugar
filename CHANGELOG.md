@@ -6,6 +6,7 @@
 * [#430](https://github.com/satyan/sugar/pull/430) @sibeliusseraphini update to roboelectric 3.0 and target android-32
 
 ### Changed
+* [#437](https://github.com/satyan/sugar/pull/437) @dnalves removing guava dependency, using synchronized WeakHashMap instead
 * [#423](https://github.com/satyan/sugar/pull/423) @sibeliusseraphini moving changelog of README.md to CHANGELOG.md
 
 ### Fixed
