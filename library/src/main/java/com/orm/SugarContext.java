@@ -2,21 +2,21 @@ package com.orm;
 
 import android.content.Context;
 
-import com.google.common.collect.MapMaker;
-
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class SugarContext {
 
     private static SugarContext instance = null;
     private SugarDb sugarDb;
     private Context context;
-    private ConcurrentMap<Object, Long> entitiesMap;
+    private Map<Object, Long> entitiesMap;
 
     private SugarContext(Context context) {
         this.context = context;
         this.sugarDb = new SugarDb(context);
-        this.entitiesMap = new MapMaker().weakKeys().makeMap();
+        this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }
     
     public static SugarContext getSugarContext() {
@@ -53,7 +53,7 @@ public class SugarContext {
         return sugarDb;
     }
 
-    ConcurrentMap<Object, Long> getEntitiesMap() {
+    Map<Object, Long> getEntitiesMap() {
         return entitiesMap;
     }
 }
