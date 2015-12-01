@@ -13,7 +13,8 @@ android:
     - sys-img-armeabi-v7a-android-23
 
 script:
-  - ./gradlew clean testDebug connectedCheck coveralls
+  - ./gradlew clean build connectedCheck coveralls
+
 
 notifications:
   email: false
