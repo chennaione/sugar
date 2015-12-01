@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.orm.dsl.Table;
+import com.orm.dsl.Unique;
 import com.orm.util.NamingHelper;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;
@@ -61,6 +62,29 @@ public class SugarRecord {
             sqLiteDatabase.setLockingEnabled(false);
             for (T object: objects) {
                 save(object);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.i(SUGAR, "Error in saving in transaction " + e.getMessage());
+        } finally {
+            sqLiteDatabase.endTransaction();
+            sqLiteDatabase.setLockingEnabled(true);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T> void updateInTx(T... objects) {
+        updateInTx(Arrays.asList(objects));
+    }
+
+    @SuppressWarnings("deprecation")
+    public static <T> void updateInTx(Collection<T> objects) {
+        SQLiteDatabase sqLiteDatabase = getSugarDataBase();
+        try {
+            sqLiteDatabase.beginTransaction();
+            sqLiteDatabase.setLockingEnabled(false);
+            for (T object: objects) {
+                update(object);
             }
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
@@ -276,6 +300,47 @@ public class SugarRecord {
         return id;
     }
 
+    public static long update(Object object) {
+        return update(getSugarDataBase(), object);
+    }
+
+    static long update(SQLiteDatabase db, Object object) {
+        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
+        List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
+        ContentValues values = new ContentValues(columns.size());
+        Field idField = null;
+
+        StringBuilder whereClause = new StringBuilder();
+        List<String> whereArgs = new ArrayList<>();
+
+        for (Field column : columns) {
+            if(column.isAnnotationPresent(Unique.class)) {
+                try {
+                    column.setAccessible(true);
+                    String columnName = NamingHelper.toSQLName(column);
+                    Object columnValue = column.get(object);
+
+                    whereClause.append(columnName).append(" = ?");
+                    whereArgs.add(String.valueOf(columnValue));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (!column.getName().equals("id")) {
+                    ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                }
+            }
+        }
+
+        String[] whereArgsArray = whereArgs.toArray(new String[whereArgs.size()]);
+        // Get SugarRecord based on Unique values
+        long id = db.update(NamingHelper.toSQLName(object.getClass()), values, whereClause.toString(), whereArgsArray);
+
+        return id;
+    }
+
+
+
     public static boolean isSugarEntity(Class<?> objectClass) {
         return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
@@ -346,6 +411,10 @@ public class SugarRecord {
 
     public long save() {
         return save(getSugarDataBase(), this);
+    }
+
+    public long update() {
+        return update(getSugarDataBase(), this);
     }
 
     @SuppressWarnings("unchecked")
