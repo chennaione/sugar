@@ -334,9 +334,13 @@ public class SugarRecord {
 
         String[] whereArgsArray = whereArgs.toArray(new String[whereArgs.size()]);
         // Get SugarRecord based on Unique values
-        long id = db.update(NamingHelper.toSQLName(object.getClass()), values, whereClause.toString(), whereArgsArray);
+        long rowsEffected = db.update(NamingHelper.toSQLName(object.getClass()), values, whereClause.toString(), whereArgsArray);
 
-        return id;
+        if (rowsEffected == 0) {
+            return save(db, object);
+        } else {
+            return rowsEffected;
+        }
     }
 
 
