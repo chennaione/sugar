@@ -413,6 +413,10 @@ public class SugarRecord {
         return save(getSugarDataBase(), this);
     }
 
+    public long update() {
+        return update(getSugarDataBase(), this);
+    }
+
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
         inflate(cursor, this, getSugarContext().getEntitiesMap());
