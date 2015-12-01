@@ -1,5 +1,8 @@
 language: android
 
+jdk:
+ - oraclejdk8
+
 android:
   components:
     - platform-tools
@@ -10,8 +13,14 @@ android:
     - sys-img-armeabi-v7a-android-23
 
 script:
-  - gradle clean build connectedCheck coveralls
+  - ./gradlew clean testDebug connectedCheck coveralls
+
+notifications:
+  email: false
+
+sudo: false
 
 cache:
   directories:
+    - $HOME/.gradle
     - $HOME/.m2
