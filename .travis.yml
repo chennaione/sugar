@@ -1,10 +1,16 @@
 language: android
 
+jdk:
+ - oraclejdk8
+
 android:
   components:
-    - sys-img-armeabi-v7a-android-23
-    - build-tools-23.0.2
+    - platform-tools
+    - tools
     - android-23
+    - build-tools-23.0.2
+    - extra-android-m2repository
+    - sys-img-armeabi-v7a-android-23
 
 script:
   - gradle clean build connectedCheck coveralls
