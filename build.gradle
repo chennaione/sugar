@@ -33,12 +33,16 @@ subprojects { proj ->
         version "0.7.1.201405082137"
     }
 
-    task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
+    task jacocoTestReport(type: JacocoReport) {
+        dependsOn = subprojects.test
         group = "Reporting"
         description = "Generate Jacoco coverage reports after running tests."
         reports {
             xml.enabled = true
             html.enabled = true
+        }
+        onlyIf = {
+            true
         }
         classDirectories = fileTree(
             dir: 'build/intermediates/classes/debug',
