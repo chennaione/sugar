@@ -108,7 +108,7 @@ public class SchemaGenerator {
         Log.i(SUGAR, "Script executed");
     }
 
-    private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
+    protected String createTableSQL(Class<?> table) {
         Log.i(SUGAR, "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
@@ -161,9 +161,15 @@ public class SchemaGenerator {
         sb.append(" ) ");
         Log.i(SUGAR, "Creating table " + tableName);
 
-        if (!sb.toString().isEmpty()) {
+        return sb.toString();
+    }
+
+    private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
+        String createSQL = createTableSQL(table);
+
+        if (!createSQL.isEmpty()) {
             try {
-                sqLiteDatabase.execSQL(sb.toString());
+                sqLiteDatabase.execSQL(createSQL);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
