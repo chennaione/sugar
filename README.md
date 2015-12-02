@@ -1,5 +1,7 @@
 # Sugar ORM [![Build Status](https://travis-ci.org/satyan/sugar.svg?branch=master)](https://travis-ci.org/satyan/sugar) [![Coverage Status](https://coveralls.io/repos/satyan/sugar/badge.svg?branch=master)](https://coveralls.io/r/satyan/sugar?branch=master)
 
+[![Join the chat at https://gitter.im/satyan/sugar](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/satyan/sugar?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Insanely easy way to work with Android databases.
 
 Official documentation can be found [here](http://satyan.github.io/sugar). The example application is provided in the **example** folder in the source.
