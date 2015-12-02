@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* [#389](https://github.com/satyan/sugar/pull/389) @alfmatos MultiUnique DSL to handle MultiColumn Unique Table constraint
 * @sibeliusseraphini update, updateInTx methods based on Unique values of SugarRecord
 * [#155](https://github.com/satyan/sugar/issues/155) @benohalloran adding Cursors for Cursor Adapters [Pull 312](https://github.com/satyan/sugar/pull/312)
 * [#430](https://github.com/satyan/sugar/pull/430) @sibeliusseraphini update to roboelectric 3.0 and target android-32

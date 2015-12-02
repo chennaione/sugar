@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.orm.dsl.Column;
+import com.orm.dsl.MultiUnique;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.Unique;
 import com.orm.util.NamingHelper;
@@ -18,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -156,6 +158,24 @@ public class SchemaGenerator {
                     }
                 }
             }
+        }
+
+        if (table.isAnnotationPresent(MultiUnique.class)) {
+            String constraint = table.getAnnotation(MultiUnique.class).value();
+
+            sb.append(", UNIQUE(");
+
+            String[] constraintFields = constraint.split(",");
+            for(int i = 0; i < constraintFields.length; i++) {
+                String columnName = NamingHelper.toSQLNameDefault(constraintFields[i]);
+                sb.append(columnName);
+
+                if(i < (constraintFields.length -1)) {
+                    sb.append(",");
+                }
+            }
+
+            sb.append(") ON CONFLICT REPLACE");
         }
 
         sb.append(" ) ");

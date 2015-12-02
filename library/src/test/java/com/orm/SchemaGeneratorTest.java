@@ -3,6 +3,7 @@ package com.orm;
 import com.orm.dsl.Table;
 import com.orm.models.EmptyModel;
 import com.orm.models.IntUniqueModel;
+import com.orm.models.MultiColumnUniqueModel;
 import com.orm.models.StringFieldAnnotatedModel;
 import com.orm.models.StringFieldExtendedModel;
 import com.orm.models.StringFieldExtendedModelAnnotatedColumn;
@@ -59,6 +60,18 @@ public class SchemaGeneratorTest {
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(IntUniqueModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "VALUE INTEGER UNIQUE ) ",
+                createSQL);
+    }
+
+    @Test
+    public void testMultiColumnUniqueTableCreation() {
+        SchemaGenerator schemaGenerator = new SchemaGenerator(new DummyContext());
+        String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
+        assertEquals(
+                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(MultiColumnUniqueModel.class) +
+                        " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
+                        "A INTEGER, B INTEGER, " +
+                        "UNIQUE(A, B) ON CONFLICT REPLACE ) ",
                 createSQL);
     }
 }
