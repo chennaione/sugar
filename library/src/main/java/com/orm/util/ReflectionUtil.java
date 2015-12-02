@@ -31,8 +31,6 @@ import dalvik.system.DexFile;
 
 public class ReflectionUtil {
 
-    private static final String TAG = ReflectionUtil.class.getSimpleName();
-
     public static List<Field> getTableFields(Class table) {
         List<Field> fieldList = SugarConfig.getFields(table);
         if (fieldList != null) return fieldList;
@@ -254,7 +252,6 @@ public class ReflectionUtil {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
             for (String className : getAllClasses(context)) {
-                Log.d(TAG, className);
                 Class domainClass = getDomainClass(className, context);
                 if (domainClass != null) domainClasses.add(domainClass);
             }
@@ -318,6 +315,7 @@ public class ReflectionUtil {
         } finally {
 //            if (null != dexfile) dexfile.close();
         }
+
         return classNames;
     }
 
