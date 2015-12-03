@@ -8,10 +8,9 @@ android:
     - build-tools-23.0.2
     - android-23
     - extra-android-m2repository
-    - extra-google-m2repository
 
 script:
-  - gradle clean build connectedCheck coveralls --info
+  - gradle clean build connectedCheck coveralls --stacktrace
 
 cache:
   directories:
