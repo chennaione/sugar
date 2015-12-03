@@ -1,5 +1,6 @@
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'java'
 
 buildscript {
     repositories {
@@ -14,7 +15,11 @@ buildscript {
 def isReleaseBuild() {
     return version.contains("SNAPSHOT") == false
 }
-
+test{
+    testLogging{
+        events "passed", "skipped", "standardOut"
+    }
+}
 allprojects {
     version = VERSION_NAME
     group = GROUP
@@ -92,3 +97,4 @@ tasks.coveralls {
     dependsOn jacocoRootReport
     onlyIf { System.env.'CI' }
 }
+apply plugin: 'java'

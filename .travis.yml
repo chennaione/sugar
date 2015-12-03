@@ -4,10 +4,9 @@ jdk: oracle
 android:
   components:
     - sys-img-armeabi-v7a-android-23
-    - tool
+    - tools
     - build-tools-23.0.2
     - android-23
-    - platform-tool
     - extra-android-m2repository
     - extra-google-m2repository
 
