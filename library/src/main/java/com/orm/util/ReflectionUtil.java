@@ -154,6 +154,12 @@ public class ReflectionUtil {
 
             int columnIndex = cursor.getColumnIndex(colName);
 
+            //TODO auto upgrade to add new columns
+            if (columnIndex < 0) {
+                Log.e("SUGAR", "Invalid colName, you should upgrade database");
+                return;
+            }
+
             if (cursor.isNull(columnIndex)) {
                 return;
             }
