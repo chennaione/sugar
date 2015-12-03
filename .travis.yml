@@ -26,6 +26,8 @@ before_script:
 script:
   - gradle clean build connectedCheck coveralls
 
+sudo: false
+
 cache:
   directories:
     - $HOME/.m2
