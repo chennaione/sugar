@@ -17,7 +17,7 @@ def isReleaseBuild() {
 }
 test{
     testLogging{
-        events "passed", "skipped", "standardOut"
+        exceptionFormat = 'full'
     }
 }
 allprojects {
