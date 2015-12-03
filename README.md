@@ -2,7 +2,7 @@
 
 Insanely easy way to work with Android databases.
 
-Official documentation can be found [here](http://satyan.github.io/sugar). The example application is provided in the **example** folder in the source.
+Official documentation can be found [here](http://satyan.github.io/sugar) **Outdated** - Check some examples below. The example application is provided in the **example** folder in the source.
 
 ## Features
 
@@ -46,9 +46,43 @@ Download the source code and import it as a library project in Eclipse. The proj
 
 Visit the [releases](https://github.com/satyan/sugar/releases) page to download jars directly. You can drop them into your `libs` folder and configure the Java build path to include the library. See this [tutorial](http://www.vogella.com/tutorials/AndroidLibraryProjects/article.html) for an excellent guide on how to do this.
 
+
+### How to use master version
+First, download sugar repository
+```
+git clone git@github.com:satyan/sugar.git
+```
+
+include this in your **settings.gradle**
+```
+include ':app' // your module app
+include ':sugar'
+
+def getLocalProperty(prop) {
+	Properties properties = new Properties()
+	properties.load(new File(rootDir.absolutePath + '/local.properties').newDataInputStream())
+	return properties.getProperty(prop, '')
+}
+
+project(':sugar').projectDir = new File(getLocalProperty('sugar.dir'))
+
+```
+
+include this in your **local.properties**
+```
+sugar.dir=/path/to/sugar/library
+```
+
+add sugar project to the dependencies of your main project (build.gradle)
+```
+dependencies {
+    compile project(':sugar')
+}
+```
+
 ===================
 
-After installing, check out how to set up your first database and models [here](http://satyan.github.io/sugar/getting-started.html).
+After installing, check out how to set up your first database and models [here](http://satyan.github.io/sugar/getting-started.html) **Outdated**. Check examples of 1.4 and master below: 
 
 ## Examples
 ### SugarRecord
@@ -122,6 +156,8 @@ books.add(new Book("isbn456", "Title here 2", "3nd edition"))
 books.add(new Book("isbn789", "Title here 3", "4nd edition"))
 SugarRecord.saveInTx(books);
 ```
+
+## [CHANGELOG](https://github.com/satyan/sugar/blob/master/CHANGELOG.md)
 
 ## Contributing
 
