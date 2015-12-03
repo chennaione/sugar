@@ -13,7 +13,7 @@ android:
     - extra-android-m2repository
 
 script:
-  - ./gradlew clean build connectedCheck coveralls --debug
+  - ./gradlew clean build connectedCheck coveralls
 
 cache:
   directories:
