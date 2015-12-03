@@ -11,7 +11,7 @@ android:
     - extra-google-m2repository
 
 script:
-  - gradle clean build connectedCheck coveralls
+  - gradle clean build connectedCheck coveralls --info
 
 cache:
   directories:
