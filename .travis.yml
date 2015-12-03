@@ -9,7 +9,7 @@ android:
     - android-23
 
 script:
-  - gradle clean build connectedCheck coveralls --stacktrace --debug
+  - gradle clean build connectedCheck coveralls --stacktrace --info
 
 cache:
   directories:
