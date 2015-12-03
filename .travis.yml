@@ -1,15 +1,19 @@
 language: android
 jdk: oracle
 
+env:
+  global:
+    - TERM=dumb
 android:
   components:
     - sys-img-armeabi-v7a-android-23
     - tools
     - build-tools-23.0.2
     - android-23
+    - extra-android-m2repository
 
 script:
-  - gradle clean build connectedCheck coveralls --stacktrace --info
+  - gradle clean build connectedCheck coveralls --debug
 
 cache:
   directories:
