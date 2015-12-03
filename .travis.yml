@@ -10,7 +10,7 @@ android:
     - extra-android-m2repository
 
 script:
-  - gradle clean build connectedCheck coveralls --stacktrace
+  - gradle clean build connectedCheck coveralls --stacktrace --debug
 
 cache:
   directories:
