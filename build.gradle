@@ -33,7 +33,7 @@ subprojects { proj ->
         version "0.7.1.201405082137"
     }
 
-    task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
+    task jacocoTestReport(type: JacocoReport) {
         group = "Reporting"
         description = "Generate Jacoco coverage reports after running tests."
         reports {
