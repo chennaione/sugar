@@ -50,7 +50,7 @@ subprojects { proj ->
             excludes: ['**/R*.class',
                        '**/BuildConfig*'])
         sourceDirectories = files('src/main/java')
-        executionData = files('build/jacoco/testDebug.exec')
+        executionData = files('build/jacoco/testDebugUnitTest.exec')
         doFirst {
             files('build/intermediates/classes/debug').getFiles().each { file ->
                 if (file.name.contains('$$')) {
@@ -97,4 +97,3 @@ tasks.coveralls {
     dependsOn jacocoRootReport
     onlyIf { System.env.'CI' }
 }
-apply plugin: 'java'
