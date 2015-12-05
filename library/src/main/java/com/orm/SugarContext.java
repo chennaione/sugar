@@ -10,11 +10,9 @@ public class SugarContext {
 
     private static SugarContext instance = null;
     private SugarDb sugarDb;
-    private Context context;
     private Map<Object, Long> entitiesMap;
 
     private SugarContext(Context context) {
-        this.context = context;
         this.sugarDb = new SugarDb(context);
         this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }

@@ -10,6 +10,7 @@ import com.orm.dsl.Column;
 import com.orm.dsl.MultiUnique;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.Unique;
+import com.orm.util.MigrationFileParser;
 import com.orm.util.NamingHelper;
 import com.orm.util.NumberComparator;
 import com.orm.util.QueryBuilder;
@@ -98,11 +99,17 @@ public class SchemaGenerator {
         try {
             InputStream is = this.context.getAssets().open("sugar_upgrades/" + file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                Log.i("Sugar script", line);
-                db.execSQL(line);
+                sb.append(line);
             }
+            MigrationFileParser migrationFileParser = new MigrationFileParser(sb.toString());
+            for(String statement: migrationFileParser.getStatements()){
+                Log.i("Sugar script", statement);
+                db.execSQL(statement);
+            }
+
         } catch (IOException e) {
             Log.e(SUGAR, e.getMessage());
         }
