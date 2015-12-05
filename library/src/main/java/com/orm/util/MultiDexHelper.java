@@ -85,7 +85,7 @@ public class MultiDexHelper {
         List<String> classNames = new ArrayList<String>();
         for (String path : getSourcePaths(context)) {
             try {
-                DexFile dexfile = null;
+                DexFile dexfile;
                 if (path.endsWith(EXTRACTED_SUFFIX)) {
                     //NOT use new DexFile(path), because it will throw "permission error in /data/dalvik-cache"
                     dexfile = DexFile.loadDex(path, path + ".tmp", 0);

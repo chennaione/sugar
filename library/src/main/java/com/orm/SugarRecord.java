@@ -308,7 +308,6 @@ public class SugarRecord {
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
-        Field idField = null;
 
         StringBuilder whereClause = new StringBuilder();
         List<String> whereArgs = new ArrayList<>();
