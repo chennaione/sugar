@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class SugarConfig {
 
-    static Map<Class<?>, List<Field>> fields = new HashMap<Class<?>, List<Field>>();
+    static Map<Class<?>, List<Field>> fields = new HashMap<>();
 
     public static void setFields(Class<?> clazz, List<Field> fieldz) {
          fields.put(clazz, fieldz);

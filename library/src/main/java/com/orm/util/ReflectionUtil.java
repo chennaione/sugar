@@ -33,11 +33,11 @@ public class ReflectionUtil {
         if (fieldList != null) return fieldList;
 
         Log.d("Sugar", "Fetching properties");
-        List<Field> typeFields = new ArrayList<Field>();
+        List<Field> typeFields = new ArrayList<>();
 
         getAllFields(typeFields, table);
 
-        List<Field> toStore = new ArrayList<Field>();
+        List<Field> toStore = new ArrayList<>();
         for (Field field : typeFields) {
             if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
                 toStore.add(field);
@@ -72,8 +72,7 @@ public class ReflectionUtil {
                     field = columnType.getDeclaredField("id");
                     field.setAccessible(true);
                     values.put(columnName,
-                            (field != null)
-                                    ? String.valueOf(field.get(columnValue)) : "0");
+                            String.valueOf(field.get(columnValue)));
                 } catch (NoSuchFieldException e) {
                     if (entitiesMap.containsKey(columnValue)) {
                         values.put(columnName, entitiesMap.get(columnValue));

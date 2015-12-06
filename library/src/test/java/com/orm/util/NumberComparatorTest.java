@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by nursultan on 12/6/15.
+ * Created by Nursultan Turdaliev on 12/6/15.
  */
 public class NumberComparatorTest {
 
