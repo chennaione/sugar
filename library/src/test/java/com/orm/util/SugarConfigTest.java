@@ -23,7 +23,10 @@ public class SugarConfigTest {
         ReflectionUtil.getTableFields(TestRecord.class);
 
         assertTrue("SugarConfig: testing existing key on SugarConfig", SugarConfig.fields.containsKey(TestRecord.class));
-        assertFalse("SugarConfig: testing non existent key ",SugarConfig.fields.containsKey(Field.class));
+        assertFalse("SugarConfig: testing non existent key ", SugarConfig.fields.containsKey(Field.class));
+
+        SugarConfig.clearCache();
+        assertNull("SugarConfig: testing non existent key", SugarConfig.getFields(TestRecord.class));
 
     }
 
