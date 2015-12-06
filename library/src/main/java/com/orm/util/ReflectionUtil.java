@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Ref;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,8 +25,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-
-import dalvik.system.DexFile;
 
 public class ReflectionUtil {
 
@@ -70,7 +67,7 @@ public class ReflectionUtil {
             Object columnValue = column.get(object);
 
             if (columnType.isAnnotationPresent(Table.class)) {
-                Field field = null;
+                Field field;
                 try {
                     field = columnType.getDeclaredField("id");
                     field.setAccessible(true);

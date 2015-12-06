@@ -1,14 +1,9 @@
 package com.orm.util;
 
-import android.text.TextUtils;
-
 import com.orm.dsl.Column;
 import com.orm.dsl.Table;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class NamingHelper {
 

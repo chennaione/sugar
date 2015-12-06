@@ -49,8 +49,8 @@ public class NumberComparator implements Comparator<Object> {
 
         int ia = 0;
         int ib = 0;
-        int nza = 0;
-        int nzb = 0;
+        int nza;
+        int nzb;
         while (true) {
             nza = nzb = 0;
 
