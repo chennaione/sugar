@@ -24,7 +24,7 @@ public class SugarTransactionHelper {
         }
     }
 
-    public static interface Callback {
+    public interface Callback {
         void manipulateInTransaction();
     }
 }
