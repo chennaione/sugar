@@ -124,7 +124,9 @@ public class SchemaGenerator {
             MigrationFileParser migrationFileParser = new MigrationFileParser(sb.toString());
             for(String statement: migrationFileParser.getStatements()){
                 Log.i("Sugar script", statement);
-                db.execSQL(statement);
+                if (!statement.isEmpty()) {
+                    db.execSQL(statement);
+                }
             }
 
         } catch (IOException e) {
