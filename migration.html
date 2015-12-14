@@ -55,6 +55,9 @@ android:name="com.orm.SugarApp">
             <li>
               <p class="lead">Note that Sugar will automatically create tables for new entities, so your migration script only needs to cater for alterations to existing tables.</p>
             </li>
+              <li>
+                  <p class="lead">Sugar will also automatically create fields for existing tables when you add new fields to your Sugar models</p>
+              </li>
           </ul>
         </section>
 
@@ -63,6 +66,7 @@ android:name="com.orm.SugarApp">
             <h1>2. Upgrade Script sample.</h1>
           </div>
           <p class="lead">This is a normal sql script file. You can add all your alter and insert/update queries, one line at a time. Each line is terminated by a <code>;</code> (semicolon).</p>
+
 
           <div class="bs-docs-example">
             2.sql

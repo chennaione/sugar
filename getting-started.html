@@ -32,7 +32,7 @@ title: Getting Started
 
 
 {% highlight xml %}
-compile 'com.github.satyan:sugar:1.3'
+compile 'com.github.satyan:sugar:1.4'
 {% endhighlight %}
         
           
@@ -108,7 +108,7 @@ android:name="com.orm.SugarApp">
 
           <div class="bs-docs-example">
 {% highlight java %}
-public class Book extends SugarRecord<Book> {
+public class Book extends SugarRecord {
   String title;
   String edition;
 
@@ -122,6 +122,29 @@ public class Book extends SugarRecord<Book> {
 }
 {% endhighlight %}
           </div>
+
+          <p class="lead">Or you can use annotations<code>@Table</code>, but then you should define a <code>private Long id</code> field</p>
+          <div class="bs-docs-example">
+{% highlight java %}
+@Table
+public class Book {
+  private Long id;
+
+  public Book(){
+  }
+
+  public Book(String title, String edition){
+     this.title = title;
+     this.edition = edition;
+  }
+
+  public Long getId() {
+      return id;
+  }
+}
+{% endhighlight %}
+          </div>
+
         </section>
 
         <section id="usage">
@@ -133,7 +156,7 @@ public class Book extends SugarRecord<Book> {
             Save Entity:
 
 {% highlight java %}
-Book book = new Book(ctx, "Title here", "2nd edition")
+Book book = new Book("Title here", "2nd edition")
 book.save();
 {% endhighlight %}
 

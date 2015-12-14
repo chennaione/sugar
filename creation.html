@@ -29,11 +29,34 @@ title: Creation
           <p class="lead">To create a persistent entity, just extend it with <code>SugarRecord</code>.</p>
           <div class="bs-docs-example">
 {% highlight java %}
-public class Book extends SugarRecord<Book> {
-  String name;
+public class Book extends SugarRecord {
+    String name;
+    // You must provide an empty constructor
+    public Book() {}
 }
 {% endhighlight %}
           </div>
+            <p class="lead">Or you can use annotations<code>@Table</code>, but then you should define a <code>private Long id</code> field</p>
+            <div class="bs-docs-example">
+{% highlight java %}
+@Table
+public class Book {
+    private Long id;
+
+    public Book(){
+    }
+
+    public Book(String title, String edition){
+        this.title = title;
+        this.edition = edition;
+    }
+
+    public Long getId() {
+        return id;
+    }
+}
+{% endhighlight %}
+            </div>
           <p>This class would automatically map to a table named <code>book</code>.
         </section>
 
@@ -45,7 +68,7 @@ public class Book extends SugarRecord<Book> {
 
           <div class="bs-docs-example">
 {% highlight java %}
-public class Book extends SugarRecord<Book> {
+public class Book extends SugarRecord {
   String name;
   String ISBN;
   String title;
@@ -61,7 +84,7 @@ public class Book extends SugarRecord<Book> {
 
           <div class="bs-docs-example">
 {% highlight java %}
-public class Book extends SugarRecord<Book> {
+public class Book extends SugarRecord {
   @Ignore
   String name;
 
@@ -78,8 +101,15 @@ public class Book extends SugarRecord<Book> {
           <p class="lead">Lets bring another entity into picture.</p>
           <div class="bs-docs-example">
 {% highlight java %}
-public class Author extends SugarRecord<Author> {
+public class Author extends SugarRecord {
   String name;
+
+  public Author() {}
+
+  // Get all books of this author
+  List<Book> getBooks() {
+      return Book.find(Book.class, "author = ?", new String{getId()})
+  }
 }
 {% endhighlight %}
           </div>
@@ -88,7 +118,7 @@ public class Author extends SugarRecord<Author> {
 
           <div class="bs-docs-example">
 {% highlight java %}
-public class Book extends SugarRecord<Book> {
+public class Book extends SugarRecord {
   String name;
   String ISBN;
   String title;
@@ -99,7 +129,19 @@ public class Book extends SugarRecord<Book> {
 }
 {% endhighlight %}
           </div>
-          <p class="lead">This would store a column named <code>author</code> in the book table. This would help with one-to-one and one-to-many relationships.</p>
+          <p class="lead">This would store a column named <code>author</code> in the book table. This would help with one-to-many relationships.</p>
+            <ul>
+                <li>
+                    <p class="lead">You should save <code>Author</code> before saving <code>Book</code>.</p>
+                </li>
+                <li>
+                    <p class="lead">We will try to improve how we handle one-to-many relationships</p>
+                </li>
+                <li>
+                    <p class="lead">One-to-one relationship doesn't work yet</p>
+                </li>
+            </ul>
+
         </section>
 
         <section id="what">
