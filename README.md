@@ -4,7 +4,7 @@
 
 Insanely easy way to work with Android databases.
 
-Official documentation can be found [here](http://satyan.github.io/sugar) **Outdated** - Check some examples below. The example application is provided in the **example** folder in the source.
+Official documentation can be found [here](http://satyan.github.io/sugar) - Check some examples below. The example application is provided in the **example** folder in the source.
 
 ## Features
 
