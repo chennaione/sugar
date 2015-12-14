@@ -273,7 +273,8 @@ public class ReflectionUtil {
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
         } catch (Throwable e) {
-            Log.e("Sugar", e.getMessage());
+            String error = (e.getMessage() == null) ? "getDomainClass " + className + " error" : e.getMessage();
+            Log.e("Sugar", error);
         }
 
         if ((discoveredClass != null) &&
