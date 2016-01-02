@@ -306,7 +306,8 @@ public class ReflectionUtil {
             while (urls.hasMoreElements()) {
                 List<String> fileNames = new ArrayList<String>();
                 String classDirectoryName = urls.nextElement().getFile();
-                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
+                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")
+                        || classDirectoryName.contains("retrolambda")) {
                     File classDirectory = new File(classDirectoryName);
                     for (File filePath : classDirectory.listFiles()) {
                         populateFiles(filePath, fileNames, "");
