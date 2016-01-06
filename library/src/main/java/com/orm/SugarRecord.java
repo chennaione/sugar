@@ -310,17 +310,36 @@ public class SugarRecord {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
-        for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
-            if (column.getName().equals("id")) {
-                idField = column;
+
+        boolean isSugarEntity = isSugarEntity(object.getClass());
+
+        if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
+            for(Field column : columns){
+                ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+
+                if(!column.isAnnotationPresent(Ignore.class)){
+                    if(column.isAnnotationPresent(PrimaryKey.class)){
+                        idField = column;
+                    }
+                }
+            }
+
+            if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put(NamingHelper.toSQLName(idField), entitiesMap.get(object));
+            }
+        }else{
+            for(Field column : columns){
+                ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                if(column.getName().equals("id")){
+                    idField = column;
+                }
+            }
+
+            if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put("id", entitiesMap.get(object));
             }
         }
 
-        boolean isSugarEntity = isSugarEntity(object.getClass());
-        if (isSugarEntity && entitiesMap.containsKey(object)) {
-                values.put("id", entitiesMap.get(object));
-        }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
                 SQLiteDatabase.CONFLICT_REPLACE);
