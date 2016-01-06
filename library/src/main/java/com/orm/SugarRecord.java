@@ -451,6 +451,8 @@ public class SugarRecord {
         }
     }
 
+    //FIXME I don't know how make this method using PrimaryKey notation without the 'Object'. Suggestions?
+    @Deprecated
     public boolean delete() {
         Long id = getId();
         Class<?> type = getClass();
@@ -505,6 +507,7 @@ public class SugarRecord {
     void inflate(Cursor cursor) {
         inflate(cursor, this, getSugarContext().getEntitiesMap());
     }
+
 
     public Long getId() {
         return id;
