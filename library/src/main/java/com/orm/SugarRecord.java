@@ -469,7 +469,11 @@ public class SugarRecord {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
             try {
-                Field field = type.getDeclaredField("id");
+
+                Field field = (object.getClass().isAnnotationPresent(PrimaryKey.class))
+                              ?findPrimaryKeyNotationField(type)
+                              :type.getDeclaredField("id");
+
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
@@ -488,7 +492,27 @@ public class SugarRecord {
                 return false;
             }
         } else if (SugarRecord.class.isAssignableFrom(type)) {
-            return ((SugarRecord) object).delete();
+            if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
+                Field idField = findPrimaryKeyNotationField(type);
+                idField.setAccessible(true);
+                Long id = null;
+                try{
+                    id = idField.getLong(object);
+                }catch(IllegalAccessException e){
+                    Log.i(SUGAR, "Cannot delete object using primaryKey notation " + e.getMessage(),e);
+                    return false;
+                }
+                if (id != null && id > 0L) {
+                    Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
+                    return getSugarDataBase().delete(NamingHelper.toSQLName(type), NamingHelper.toSQLName(idField)+"=?",
+                                                     new String[]{id.toString()}) == 1;
+                } else {
+                    Log.i(SUGAR, "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
+                    return false;
+                }
+            }else{
+                return ((SugarRecord) object).delete();
+            }
         } else {
             Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
             return false;
