@@ -389,8 +389,15 @@ public class SugarRecord {
                     e.printStackTrace();
                 }
             } else {
-                if (!column.getName().equals("id")) {
-                    ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
+                    Field idField = findPrimaryKeyNotationField(object.getClass());
+                    if(!column.getName().equals(NamingHelper.toSQLName(idField))){
+                        ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                    }
+                }else{
+                    if(!column.getName().equals("id")){
+                        ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                    }
                 }
             }
         }
