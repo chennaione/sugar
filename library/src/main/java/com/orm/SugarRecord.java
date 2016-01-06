@@ -178,7 +178,16 @@ public class SugarRecord {
     }
 
     public static <T> List<T> findById(Class<T> type, String[] ids) {
-        String whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        String whereClause;
+
+        if (type.isAnnotationPresent(PrimaryKey.class)) {
+            Field primaryKeyField = findPrimaryKeyNotationField(type);
+            String pk = NamingHelper.toSQLName(primaryKeyField);
+            whereClause = pk+" IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        }else{
+            whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        }
+
         return find(type, whereClause, ids);
     }
 
