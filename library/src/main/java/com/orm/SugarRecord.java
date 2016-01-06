@@ -421,9 +421,19 @@ public class SugarRecord {
 
     private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
-        if (!entitiesMap.containsKey(object)) {
-            entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+
+        if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
+            if (!entitiesMap.containsKey(object)) {
+                Field idField = findPrimaryKeyNotationField(object.getClass());
+                entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex((NamingHelper.toSQLName(idField)))));
+            }
+        }else{
+            if (!entitiesMap.containsKey(object)) {
+                entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+            }
         }
+
+
 
         for (Field field : columns) {
         	field.setAccessible(true);
