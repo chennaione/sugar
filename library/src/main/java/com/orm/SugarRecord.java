@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.orm.dsl.Ignore;
+import com.orm.dsl.NotNull;
+import com.orm.dsl.PrimaryKey;
 import com.orm.dsl.Table;
 import com.orm.dsl.Unique;
 import com.orm.util.NamingHelper;
@@ -16,9 +19,11 @@ import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -131,8 +136,39 @@ public class SugarRecord {
         return find(type, null, null, null, orderBy, null);
     }
 
+    /**
+     * Find field of parameter using @PrimaryKey notation
+     * @return One field of class
+     */
+    private static Field findPrimaryKeyNotationField(@NotNull Class type){
+        Field primaryField = null;
+        Field[] fields = type.getDeclaredFields();
+        for(Field field : fields){
+
+            if(!field.isAnnotationPresent(Ignore.class)
+               && !Modifier.isStatic(field.getModifiers())
+               && !Modifier.isTransient(field.getModifiers())){
+
+                if(field.isAnnotationPresent(PrimaryKey.class)){
+                    primaryField = field;
+                }
+
+            }
+        }
+        return primaryField;
+    }
+
     public static <T> T findById(Class<T> type, Long id) {
-        List<T> list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        List<T> list;
+
+        if (type.isAnnotationPresent(PrimaryKey.class)) {
+            Field primaryKeyField = findPrimaryKeyNotationField(type);
+            String pk = NamingHelper.toSQLName(primaryKeyField);
+            list = find(type, pk + "=?", new String[] {String.valueOf(id)}, null, null, "1");
+        }else{
+            list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        }
+
         if (list.isEmpty()) return null;
         return list.get(0);
     }
