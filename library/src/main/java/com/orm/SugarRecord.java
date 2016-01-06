@@ -532,11 +532,12 @@ public class SugarRecord {
         inflate(cursor, this, getSugarContext().getEntitiesMap());
     }
 
-
+    //FIXME I don't know how make this method using PrimaryKey notation without the 'Object'. Suggestions?
     public Long getId() {
         return id;
     }
 
+    //FIXME I don't know how make this method using PrimaryKey notation without the 'Object'. Suggestions?
     public void setId(Long id) {
         this.id = id;
     }
