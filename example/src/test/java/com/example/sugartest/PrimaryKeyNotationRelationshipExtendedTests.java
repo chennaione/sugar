@@ -103,7 +103,7 @@ public class PrimaryKeyNotationRelationshipExtendedTests{
                 SugarRecord.listAll(PrimaryKeyNotationRelationshipExtendedModel.class);
         assertEquals(100, models.size());
         for (PrimaryKeyNotationRelationshipExtendedModel model : models) {
-            assertEquals(model.getId(), model.getSimple().getId());
+            assertEquals(model.getMyId(), model.getSimple().getId());
         }
     }
 }
