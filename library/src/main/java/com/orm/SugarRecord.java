@@ -23,11 +23,11 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -307,11 +307,10 @@ public class SugarRecord {
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
-        Field idField = null;
-
         boolean isSugarEntity = isSugarEntity(object.getClass());
 
-        if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
+        Field idField = findPrimaryKeyNotationField(object.getClass());
+        if(idField != null){
             for(Field column : columns){
                 ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
 
@@ -474,7 +473,13 @@ public class SugarRecord {
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
-                    boolean deleted = getSugarDataBase().delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
+                    boolean deleted;
+                    if(idField != null){
+                        deleted = getSugarDataBase().delete(NamingHelper.toSQLName(type), NamingHelper.toSQLName(idField) + "=?",
+                                                            new String[] {id.toString()}) == 1;
+                    }else{
+                        deleted = getSugarDataBase().delete(NamingHelper.toSQLName(type), "Id=?", new String[] {id.toString()}) == 1;
+                    }
                     Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
                     return deleted;
                 } else {
@@ -482,10 +487,10 @@ public class SugarRecord {
                     return false;
                 }
             } catch (NoSuchFieldException e) {
-                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
+                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no pk");
                 return false;
             } catch (IllegalAccessException e) {
-                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
+                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access pk");
                 return false;
             }
         } else if (SugarRecord.class.isAssignableFrom(type)) {
