@@ -160,9 +160,8 @@ public class SugarRecord {
 
     public static <T> T findById(Class<T> type, Long id) {
         List<T> list;
-
-        if (type.isAnnotationPresent(PrimaryKey.class)) {
-            Field primaryKeyField = findPrimaryKeyNotationField(type);
+        Field primaryKeyField = findPrimaryKeyNotationField(type);
+        if (primaryKeyField != null) {
             String pk = NamingHelper.toSQLName(primaryKeyField);
             list = find(type, pk + "=?", new String[] {String.valueOf(id)}, null, null, "1");
         }else{
@@ -179,9 +178,8 @@ public class SugarRecord {
 
     public static <T> List<T> findById(Class<T> type, String[] ids) {
         String whereClause;
-
-        if (type.isAnnotationPresent(PrimaryKey.class)) {
-            Field primaryKeyField = findPrimaryKeyNotationField(type);
+        Field primaryKeyField = findPrimaryKeyNotationField(type);
+        if (primaryKeyField != null) {
             String pk = NamingHelper.toSQLName(primaryKeyField);
             whereClause = pk+" IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
         }else{
@@ -389,8 +387,8 @@ public class SugarRecord {
                     e.printStackTrace();
                 }
             } else {
-                if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
-                    Field idField = findPrimaryKeyNotationField(object.getClass());
+                Field idField = findPrimaryKeyNotationField(object.getClass());
+                if(idField != null){
                     if(!column.getName().equals(NamingHelper.toSQLName(idField))){
                         ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
                     }
@@ -422,9 +420,9 @@ public class SugarRecord {
     private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
 
-        if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
+        Field idField = findPrimaryKeyNotationField(object.getClass());
+        if(idField != null){
             if (!entitiesMap.containsKey(object)) {
-                Field idField = findPrimaryKeyNotationField(object.getClass());
                 entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex((NamingHelper.toSQLName(idField)))));
             }
         }else{
@@ -470,9 +468,8 @@ public class SugarRecord {
         if (type.isAnnotationPresent(Table.class)) {
             try {
 
-                Field field = (object.getClass().isAnnotationPresent(PrimaryKey.class))
-                              ?findPrimaryKeyNotationField(type)
-                              :type.getDeclaredField("id");
+                Field idField = findPrimaryKeyNotationField(object.getClass());
+                Field field = (idField != null)?idField:type.getDeclaredField("id");
 
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
@@ -492,8 +489,8 @@ public class SugarRecord {
                 return false;
             }
         } else if (SugarRecord.class.isAssignableFrom(type)) {
-            if(object.getClass().isAnnotationPresent(PrimaryKey.class)){
-                Field idField = findPrimaryKeyNotationField(type);
+            Field idField = findPrimaryKeyNotationField(object.getClass());
+            if(idField != null){
                 idField.setAccessible(true);
                 Long id = null;
                 try{
