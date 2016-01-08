@@ -191,7 +191,7 @@ public class SchemaGenerator {
             }
         }
 
-        sb.append(tableName).append((idField != null)?" ( ID INTEGER PRIMARY KEY AUTOINCREMENT "
+        sb.append(tableName).append((idField == null)?" ( ID INTEGER PRIMARY KEY AUTOINCREMENT "
                                                      :" ( "+NamingHelper.toSQLName(idField)+" INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
