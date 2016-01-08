@@ -9,6 +9,7 @@ import android.util.Log;
 import com.orm.dsl.Column;
 import com.orm.dsl.MultiUnique;
 import com.orm.dsl.NotNull;
+import com.orm.dsl.PrimaryKey;
 import com.orm.dsl.Unique;
 import com.orm.util.MigrationFileParser;
 import com.orm.util.NamingHelper;
@@ -181,15 +182,32 @@ public class SchemaGenerator {
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
+
+        Field idField = null;
+        for (Field column : fields) {
+            if (column.isAnnotationPresent(PrimaryKey.class)) {
+                idField = column;
+                break;
+            }
+        }
+
+        sb.append(tableName).append((idField != null)?" ( ID INTEGER PRIMARY KEY AUTOINCREMENT "
+                                                     :" ( "+NamingHelper.toSQLName(idField)+" INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
             String columnName = NamingHelper.toSQLName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
             if (columnType != null) {
-                if (columnName.equalsIgnoreCase("Id")) {
-                    continue;
+
+                if(idField != null){
+                    if(column.isAnnotationPresent(PrimaryKey.class)){
+                        continue;
+                    }
+                }else{
+                    if (columnName.equalsIgnoreCase("Id")) {
+                        continue;
+                    }
                 }
 
                 if (column.isAnnotationPresent(Column.class)) {
