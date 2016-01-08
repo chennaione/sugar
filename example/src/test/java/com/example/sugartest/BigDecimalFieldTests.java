@@ -3,7 +3,6 @@ package com.example.sugartest;
 
 import com.example.models.BigDecimalFieldAnnotatedModel;
 import com.example.models.BigDecimalFieldExtendedModel;
-import com.example.models.PrimaryKeyNotationBigDecimalFieldAnnotatedModel;
 import com.orm.SugarRecord;
 
 import org.junit.Test;
@@ -12,31 +11,30 @@ import org.robolectric.annotation.Config;
 
 import java.math.BigDecimal;
 
+
 import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk=18)
-public class BigDecimalFieldTests {
+@RunWith (RobolectricGradleTestRunner.class)
+@Config (sdk = 18)
+public class BigDecimalFieldTests{
     @Test
-    public void nullBigDecimalExtendedTest() {
+    public void nullBigDecimalExtendedTest(){
         save(new BigDecimalFieldExtendedModel());
-        BigDecimalFieldExtendedModel model =
-                SugarRecord.findById(BigDecimalFieldExtendedModel.class, 1);
+        BigDecimalFieldExtendedModel model = SugarRecord.findById(BigDecimalFieldExtendedModel.class, 1);
         assertNull(model.getBigDecimal());
     }
 
     @Test
-    public void nullBigDecimalAnnotatedTest() {
+    public void nullBigDecimalAnnotatedTest(){
         save(new BigDecimalFieldAnnotatedModel());
-        BigDecimalFieldAnnotatedModel model =
-                SugarRecord.findById(BigDecimalFieldAnnotatedModel.class, 1);
+        BigDecimalFieldAnnotatedModel model = SugarRecord.findById(BigDecimalFieldAnnotatedModel.class, 1);
         assertNull(model.getBigDecimal());
     }
 
     @Test
-    public void bigDecimalExtendedTest() {
+    public void bigDecimalExtendedTest(){
         BigDecimal decimal = new BigDecimal(1234.5678901234567890123456789);
         save(new BigDecimalFieldExtendedModel(decimal));
         BigDecimalFieldExtendedModel model = SugarRecord.findById(BigDecimalFieldExtendedModel.class, 1);
@@ -44,36 +42,11 @@ public class BigDecimalFieldTests {
     }
 
     @Test
-    public void bigDecimalAnnotatedTest() {
+    public void bigDecimalAnnotatedTest(){
         BigDecimal decimal = new BigDecimal(1234.5678901234567890123456789);
         save(new BigDecimalFieldAnnotatedModel(decimal));
-        BigDecimalFieldAnnotatedModel model =
-                SugarRecord.findById(BigDecimalFieldAnnotatedModel.class, 1);
-        assertEquals(decimal, model.getBigDecimal());
-    }
-    @Test
-    public void primryKeyNotationNullBigDecimalExtendedTest() {
-        save(new PrimaryKeyNotationBigDecimalFieldAnnotatedModel());
-        PrimaryKeyNotationBigDecimalFieldAnnotatedModel model =
-                SugarRecord.findById(PrimaryKeyNotationBigDecimalFieldAnnotatedModel.class, 1);
-        assertNull(model.getBigDecimal());
-    }
-
-    @Test
-    public void primryKeyNotationBigDecimalExtendedTest() {
-        BigDecimal decimal = new BigDecimal(1234.5678901234567890123456789);
-        save(new PrimaryKeyNotationBigDecimalFieldAnnotatedModel(decimal));
-        PrimaryKeyNotationBigDecimalFieldAnnotatedModel model =
-                SugarRecord.findById(PrimaryKeyNotationBigDecimalFieldAnnotatedModel.class, 1);
+        BigDecimalFieldAnnotatedModel model = SugarRecord.findById(BigDecimalFieldAnnotatedModel.class, 1);
         assertEquals(decimal, model.getBigDecimal());
     }
 
-    @Test
-    public void primryKeyNotationBigDecimalAnnotatedTest() {
-        BigDecimal decimal = new BigDecimal(1234.5678901234567890123456789);
-        save(new PrimaryKeyNotationBigDecimalFieldAnnotatedModel(decimal));
-        PrimaryKeyNotationBigDecimalFieldAnnotatedModel model =
-                SugarRecord.findById(PrimaryKeyNotationBigDecimalFieldAnnotatedModel.class, 1);
-        assertEquals(decimal, model.getBigDecimal());
-    }
 }
