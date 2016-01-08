@@ -1,16 +1,17 @@
 package com.example.models;
 
+import com.orm.dsl.PrimaryKey;
 import com.orm.dsl.Table;
 
 @Table
 public class PrimaryKeyNotationBooleanFieldAnnotatedModel{
-    private Boolean objectBoolean;
-    private boolean rawBoolean;
-    private Long id;
+    private             Boolean objectBoolean;
+    private             boolean rawBoolean;
+    @PrimaryKey private Long    myId;
 
-    public PrimaryKeyNotationBooleanFieldAnnotatedModel() {}
+    public PrimaryKeyNotationBooleanFieldAnnotatedModel(){}
 
-    public PrimaryKeyNotationBooleanFieldAnnotatedModel(Boolean objectBoolean) {
+    public PrimaryKeyNotationBooleanFieldAnnotatedModel(Boolean objectBoolean){
         this.objectBoolean = objectBoolean;
     }
 
