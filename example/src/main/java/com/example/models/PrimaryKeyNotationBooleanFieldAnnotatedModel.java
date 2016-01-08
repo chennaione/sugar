@@ -1,18 +1,20 @@
 package com.example.models;
 
-import com.orm.SugarRecord;
+import com.orm.dsl.Table;
 
-public class BooleanFieldExtendedModel extends SugarRecord {
+@Table
+public class PrimaryKeyNotationBooleanFieldAnnotatedModel{
     private Boolean objectBoolean;
     private boolean rawBoolean;
+    private Long id;
 
-    public BooleanFieldExtendedModel() {}
+    public PrimaryKeyNotationBooleanFieldAnnotatedModel() {}
 
-    public BooleanFieldExtendedModel(Boolean objectBoolean) {
+    public PrimaryKeyNotationBooleanFieldAnnotatedModel(Boolean objectBoolean) {
         this.objectBoolean = objectBoolean;
     }
 
-    public BooleanFieldExtendedModel(boolean rawBoolean) {
+    public PrimaryKeyNotationBooleanFieldAnnotatedModel(boolean rawBoolean) {
         this.rawBoolean = rawBoolean;
     }
 
