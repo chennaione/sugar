@@ -64,9 +64,6 @@ public class MultiDexHelper {
             if (extractedFile.isFile()) {
                 sourcePaths.add(extractedFile.getAbsolutePath());
                 //we ignore the verify zip part
-            } else {
-                throw new IOException("Missing extracted secondary dex file '" +
-                        extractedFile.getPath() + "'");
             }
         }
 

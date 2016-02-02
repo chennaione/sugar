@@ -4,7 +4,7 @@
 
 Insanely easy way to work with Android databases.
 
-Official documentation can be found [here](http://satyan.github.io/sugar) **Outdated** - Check some examples below. The example application is provided in the **example** folder in the source.
+Official documentation can be found [here](http://satyan.github.io/sugar) - Check some examples below. The example application is provided in the **example** folder in the source.
 
 ## Features
 
@@ -56,7 +56,7 @@ git clone git@github.com:satyan/sugar.git
 ```
 
 include this in your **settings.gradle**
-```
+```gradle
 include ':app' // your module app
 include ':sugar'
 
@@ -76,7 +76,7 @@ sugar.dir=/path/to/sugar/library
 ```
 
 add sugar project to the dependencies of your main project (build.gradle)
-```
+```gradle
 dependencies {
     compile project(':sugar')
 }
@@ -88,7 +88,7 @@ After installing, check out how to set up your first database and models [here](
 
 ## Examples
 ### SugarRecord
-```
+```java
 public class Book extends SugarRecord {
   @Unique
   String isbn;
@@ -108,24 +108,24 @@ public class Book extends SugarRecord {
 }
 ```
 or
-```
+```java
 @Table
 public class Book { ... }
 ```
 
 ### Save Entity
-```
+```java
 Book book = new Book("isbn123", "Title here", "2nd edition")
 book.save();
 ```
 
 ### Load Entity
-```
+```java
 Book book = Book.findById(Book.class, 1);
 ```
 
 ### Update Entity
-```
+```java
 Book book = Book.findById(Book.class, 1);
 book.title = "updated title here"; // modify the values
 book.edition = "3rd edition";
@@ -133,13 +133,13 @@ book.save(); // updates the previous entry with new values.
 ```
 
 ### Delete Entity
-```
+```java
 Book book = Book.findById(Book.class, 1);
 book.delete();
 ```
 
 ### Update Entity based on Unique values
-```
+```java
 Book book = new Book("isbn123", "Title here", "2nd edition")
 book.save();
 
@@ -151,7 +151,7 @@ book.getId() == sameBook.getId(); // true
 ```
 
 ### Bulk Insert
-```
+```java
 List<Book> books = new ArrayList<>();
 books.add(new Book("isbn123", "Title here", "2nd edition"))
 books.add(new Book("isbn456", "Title here 2", "3nd edition"))

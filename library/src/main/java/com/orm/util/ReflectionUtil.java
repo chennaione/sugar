@@ -271,8 +271,9 @@ public class ReflectionUtil {
         Class<?> discoveredClass = null;
         try {
             discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
-            Log.e("Sugar", e.getMessage());
+        } catch (Throwable e) {
+            String error = (e.getMessage() == null) ? "getDomainClass " + className + " error" : e.getMessage();
+            Log.e("Sugar", error);
         }
 
         if ((discoveredClass != null) &&
@@ -304,7 +305,8 @@ public class ReflectionUtil {
             while (urls.hasMoreElements()) {
                 List<String> fileNames = new ArrayList<String>();
                 String classDirectoryName = urls.nextElement().getFile();
-                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
+                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")
+                        || classDirectoryName.contains("retrolambda")) {
                     File classDirectory = new File(classDirectoryName);
                     for (File filePath : classDirectory.listFiles()) {
                         populateFiles(filePath, fileNames, "");
