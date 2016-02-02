@@ -17,7 +17,7 @@ public class SugarContext {
         this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }
     
-    public static SugarContext getSugarContext() {
+    public static SugarContext getInstance() {
         if (instance == null) {
             throw new NullPointerException("SugarContext has not been initialized properly. Call SugarContext.init(Context) in your Application.onCreate() method and SugarContext.terminate() in your Application.onTerminate() method.");
         }
