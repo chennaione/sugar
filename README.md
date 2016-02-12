@@ -159,6 +159,12 @@ books.add(new Book("isbn789", "Title here 3", "4nd edition"))
 SugarRecord.saveInTx(books);
 ```
 
+### When using ProGuard
+```java
+# Ensures entities remain un-obfuscated so table and columns are named correctly
+-keep class com.yourpackage.yourapp.domainclasspackage.** { *; }
+```
+
 ## [CHANGELOG](https://github.com/satyan/sugar/blob/master/CHANGELOG.md)
 
 ## Contributing
