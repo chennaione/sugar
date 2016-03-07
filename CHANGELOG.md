@@ -1,6 +1,9 @@
 # Sugar Releases
 
 ## [Unreleased]
+
+
+## v1.5
 ### Added
 * [#328](https://github.com/satyan/sugar/pull/328) @jedid auto add new columns during database upgrade, fix [#299](https://github.com/satyan/sugar/issues/299) and [#151](https://github.com/satyan/sugar/issues/151)
 * [#389](https://github.com/satyan/sugar/pull/389) @alfmatos MultiUnique DSL to handle MultiColumn Unique Table constraint
