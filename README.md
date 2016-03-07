@@ -23,7 +23,7 @@ There are four ways to install Sugar:
 This is the preferred way. Simply add:
 
 ```groovy
-compile 'com.github.satyan:sugar:1.4'
+compile 'com.github.satyan:sugar:1.5'
 ```
 
 to your project dependencies and run `gradle build` or `gradle assemble`.
@@ -36,7 +36,7 @@ Declare the dependency in Maven:
 <dependency>
     <groupId>com.github.satyan</groupId>
     <artifactId>sugar</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
 </dependency>
 ```
 
