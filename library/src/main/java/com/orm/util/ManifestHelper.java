@@ -19,6 +19,7 @@ public class ManifestHelper {
      */
     public final static String METADATA_VERSION = "VERSION";
     public final static String METADATA_DOMAIN_PACKAGE_NAME = "DOMAIN_PACKAGE_NAME";
+    public final static String METADATA_SERIALIZER_PACKAGE_NAME = "SERIALIZER_PACKAGE_NAME";
     public final static String METADATA_QUERY_LOG = "QUERY_LOG";
     /**
      * The default name for the database unless specified in the AndroidManifest.
@@ -56,6 +57,22 @@ public class ManifestHelper {
         }
 
         return domainPackageName;
+    }
+
+    /**
+     * Grabs the domain name of the serializer classes from the manifest.
+     *
+     * @param context  the {@link android.content.Context} of the Android application
+     * @return the package String that Sugar uses to search for serializer classes
+     */
+    public static String getSerializerPackageName(Context context) {
+        String serializerPackageName = getMetaDataString(context, METADATA_SERIALIZER_PACKAGE_NAME);
+
+        if (serializerPackageName == null) {
+            serializerPackageName = "";
+        }
+
+        return serializerPackageName;
     }
 
     /**

@@ -9,6 +9,8 @@ import android.util.Log;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Table;
+import com.orm.serializer.EntitySerializer;
+import com.orm.serializer.EntitySerializerManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,12 +63,17 @@ public class ReflectionUtil {
     }
 
     public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
-                                             Map<Object, Long> entitiesMap) {
+                                             Map<Object, Long> entitiesMap, EntitySerializerManager serializerManager) {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
             String columnName = NamingHelper.toSQLName(column);
             Object columnValue = column.get(object);
+            com.orm.serializer.EntitySerializer serializer = serializerManager.get(columnType);
+
+            if (serializer != null) {
+                columnValue = serializer.serialize(columnValue);
+            }
 
             if (columnType.isAnnotationPresent(Table.class)) {
                 Field field = null;
@@ -145,7 +152,8 @@ public class ReflectionUtil {
         }
     }
 
-    public static void setFieldValueFromCursor(Cursor cursor, Field field, Object object) {
+    public static void setFieldValueFromCursor(Cursor cursor, Field field, Object object,
+                                               EntitySerializerManager serializerManager) {
         field.setAccessible(true);
         try {
             Class fieldType = field.getType();
@@ -156,6 +164,8 @@ public class ReflectionUtil {
             if (cursor.isNull(columnIndex)) {
                 return;
             }
+
+            com.orm.serializer.EntitySerializer serializer = serializerManager.get(fieldType);
 
             if (colName.equalsIgnoreCase("id")) {
                 long cid = cursor.getLong(columnIndex);
@@ -211,12 +221,34 @@ public class ReflectionUtil {
                 } catch (Exception e) {
                     Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
                 }
+            } else if (serializer != null) {
+                setFieldFromCursorWithSerializer(cursor, field, object, columnIndex, serializer);
             } else
                 Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
         } catch (IllegalArgumentException e) {
             Log.e("field set error", e.getMessage());
         } catch (IllegalAccessException e) {
             Log.e("field set error", e.getMessage());
+        }
+    }
+
+    private static void setFieldFromCursorWithSerializer(Cursor cursor, Field field, Object object, int columnIndex, EntitySerializer serializer) throws IllegalAccessException {
+        Class serializedType = serializer.getSerializedType();
+
+        if (serializedType.equals(long.class) || serializedType.equals(Long.class)) {
+            field.set(object, serializer.deserialize(cursor.getLong(columnIndex)));
+        } else if (serializedType.equals(int.class) || serializedType.equals(Integer.class)) {
+            field.set(object, serializer.deserialize(cursor.getInt(columnIndex)));
+        } else if (serializedType.equals(double.class) || serializedType.equals(Double.class)) {
+            field.set(object, serializer.deserialize(cursor.getInt(columnIndex)));
+        } else if (serializedType.equals(byte.class) || serializedType.equals(Byte.class)) {
+            field.set(object, serializer.deserialize(cursor.getInt(columnIndex)));
+        } else if (serializedType.equals(boolean.class) || serializedType.equals(Boolean.class)) {
+            field.set(object, serializer.deserialize(cursor.getInt(columnIndex)));
+        } else if (serializedType.equals(short.class) || serializedType.equals(Short.class)) {
+            field.set(object, serializer.deserialize(cursor.getInt(columnIndex)));
+        } else if (serializedType.equals(float.class) || serializedType.equals(Float.class)) {
+            field.set(object, serializer.deserialize(cursor.getInt(columnIndex)));
         }
     }
 
@@ -250,7 +282,7 @@ public class ReflectionUtil {
     public static List<Class> getDomainClasses(Context context) {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
-            for (String className : getAllClasses(context)) {
+            for (String className : getAllDomainClasses(context)) {
                 Class domainClass = getDomainClass(className, context);
                 if (domainClass != null) domainClasses.add(domainClass);
             }
@@ -286,9 +318,40 @@ public class ReflectionUtil {
         }
     }
 
+    public static List<Class<? extends com.orm.serializer.EntitySerializer>> getSerializerClasses(Context context) {
+        List<Class<? extends com.orm.serializer.EntitySerializer>> serializerClasses = new ArrayList<>();
+        try {
+            for (String className : getAllSerializerClasses(context)) {
+                Class serializerClass = getSerializerClass(className, context);
+                if (serializerClass != null) serializerClasses.add(serializerClass);
+            }
+        } catch (PackageManager.NameNotFoundException | IOException e) {
+            Log.e("Sugar", e.getMessage());
+        }
 
-    private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
-        String packageName = ManifestHelper.getDomainPackageName(context);
+        return serializerClasses;
+    }
+
+    private static Class getSerializerClass(String className, Context context) {
+        try {
+            Class<?> discoveredClass = Class.forName(
+                    className, true, context.getClass().getClassLoader());
+
+            if (discoveredClass != null && com.orm.serializer.EntitySerializer.class.isAssignableFrom(discoveredClass)
+                    && !Modifier.isAbstract(discoveredClass.getModifiers())) {
+
+                Log.i("Sugar", "serializer class : " + discoveredClass.getSimpleName());
+                return discoveredClass;
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    private static List<String> getAllClasses(Context context, String packageName) throws PackageManager.NameNotFoundException, IOException {
         String path = getSourcePath(context);
         List<String> classNames = new ArrayList<String>();
         DexFile dexfile = null;
@@ -319,6 +382,14 @@ public class ReflectionUtil {
             if (null != dexfile) dexfile.close();
         }
         return classNames;
+    }
+
+    private static List<String> getAllSerializerClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+        return getAllClasses(context, ManifestHelper.getSerializerPackageName(context));
+    }
+
+    private static List<String> getAllDomainClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
+        return getAllClasses(context, ManifestHelper.getDomainPackageName(context));
     }
 
     private static void populateFiles(File path, List<String> fileNames, String parent) {

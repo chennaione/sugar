@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.common.collect.MapMaker;
 import com.orm.entity.EntityListenerManager;
+import com.orm.serializer.EntitySerializerManager;
 
 import java.util.concurrent.ConcurrentMap;
 
@@ -14,12 +15,14 @@ public class SugarContext {
     private Context context;
     private ConcurrentMap<Object, Long> entitiesMap;
     private EntityListenerManager entitylistenerManager;
+    private EntitySerializerManager entitySerializerManager;
 
     private SugarContext(Context context) {
         this.context = context;
         this.sugarDb = new SugarDb(context);
         this.entitiesMap = new MapMaker().weakKeys().makeMap();
         this.entitylistenerManager = new EntityListenerManager(context);
+        this.entitySerializerManager = new EntitySerializerManager(context);
     }
 
     public static SugarContext getSugarContext() {
@@ -62,5 +65,9 @@ public class SugarContext {
 
     public EntityListenerManager getEntitylistenerManager() {
         return entitylistenerManager;
+    }
+
+    public EntitySerializerManager getEntitySerializerManager() {
+        return entitySerializerManager;
     }
 }
