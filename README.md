@@ -119,6 +119,11 @@ Book book = new Book("isbn123", "Title here", "2nd edition")
 book.save();
 ```
 
+or
+```java
+SugarRecord.save(book); // if using the @Table annotation 
+```
+
 ### Load Entity
 ```java
 Book book = Book.findById(Book.class, 1);
@@ -132,10 +137,16 @@ book.edition = "3rd edition";
 book.save(); // updates the previous entry with new values.
 ```
 
+
 ### Delete Entity
 ```java
 Book book = Book.findById(Book.class, 1);
 book.delete();
+```
+
+or
+```java
+SugarRecord.delete(book); // if using the @Table annotation 
 ```
 
 ### Update Entity based on Unique values
@@ -148,6 +159,11 @@ Book sameBook = new Book("isbn123", "New Title", "5th edition")
 sameBook.update();
 
 book.getId() == sameBook.getId(); // true
+```
+
+or
+```java
+SugarRecord.update(sameBook); // if using the @Table annotation 
 ```
 
 ### Bulk Insert
