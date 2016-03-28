@@ -163,7 +163,7 @@ public class ReflectionUtil {
 
             if (colName.equalsIgnoreCase("id")) {
                 long cid = cursor.getLong(columnIndex);
-                field.set(object, Long.valueOf(cid));
+                field.set(object, cid);
             } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                 field.set(object,
                         cursor.getLong(columnIndex));
@@ -216,7 +216,8 @@ public class ReflectionUtil {
                     Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
                 }
             } else
-                Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
+                Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field "
+                        + field.getName() + "(" + field.getType().getName() + ")");
         } catch (IllegalArgumentException e) {
             Log.e("field set error", e.getMessage());
         } catch (IllegalAccessException e) {
@@ -327,7 +328,7 @@ public class ReflectionUtil {
     private static void populateFiles(File path, List<String> fileNames, String parent) {
         if (path.isDirectory()) {
             for (File newPath : path.listFiles()) {
-                if ("".equals(parent)) {
+                if (parent.isEmpty()) {
                     populateFiles(newPath, fileNames, path.getName());
                 } else {
                     populateFiles(newPath, fileNames, parent + "." + path.getName());
@@ -338,7 +339,7 @@ public class ReflectionUtil {
             String classSuffix = ".class";
             pathName = pathName.endsWith(classSuffix) ?
                     pathName.substring(0, pathName.length() - classSuffix.length()) : pathName;
-            if ("".equals(parent)) {
+            if (parent.isEmpty()) {
                 fileNames.add(pathName);
             } else {
                 fileNames.add(parent + "." + pathName);
