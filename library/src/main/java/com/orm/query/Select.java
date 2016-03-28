@@ -6,6 +6,7 @@ import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class Select<T> implements Iterable {
     private String groupBy = "";
     private String limit = "";
     private String offset = "";
-    private List<Object> args = new ArrayList<Object>();
+    private List<String> args = new ArrayList<String>();
     private static final String SPACE =" ";
     private static final String SINGLE_QUOTE ="'";
     private static final String LEFT_PARENTHESIS="(";
@@ -95,7 +96,7 @@ public class Select<T> implements Iterable {
                     .append(condition.getProperty())
                     .append(condition.getCheckSymbol())
                     .append("? ");
-                args.add(condition.getValue());
+                args.add(condition.getValue().toString());
             }
         }
         
@@ -190,14 +191,8 @@ public class Select<T> implements Iterable {
         return convertArgs(args);
     }
 
-    private String[] convertArgs(List<Object> argsList) {
-        String[] argsArray = new String[argsList.size()];
-
-        for (int i = 0; i < argsList.size(); i++) {
-             argsArray[i] = argsList.get(i).toString();
-        }
-
-        return argsArray;
+    private String[] convertArgs(List<String> argsList) {
+        return argsList.toArray(new String[argsList.size()]);
     }
 
     @Override
