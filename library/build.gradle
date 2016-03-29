@@ -43,7 +43,7 @@ publishing {
 
             groupId 'com.github.satyan'
             artifactId 'sugar'
-            version '1.5.XX6'
+            version '1.5.XX12'
 
             artifact bundleRelease
         }

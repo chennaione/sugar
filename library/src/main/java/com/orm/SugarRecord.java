@@ -5,10 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.orm.dsl.BuildConfig;
 import com.orm.dsl.Table;
 import com.orm.dsl.Unique;
 import com.orm.util.NamingHelper;
@@ -41,7 +41,10 @@ public class SugarRecord {
 	}
 
 	public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
-		return getSugarDataBase().delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+		final int delete = getSugarDataBase()
+				.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+		getSugarContext().notifyChange(type, null, false);
+		return delete;
 	}
 
 	public static <T> Cursor getCursor(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
@@ -54,12 +57,14 @@ public class SugarRecord {
 	public static <T> long insert(Class<T> type, ContentValues values) {
 		long rowID = getSugarDataBase().insertOrThrow(NamingHelper.toSQLName(type), null, values);
 		//Uri result = Uri.withAppendedPath(uri, Long.toString(rowID));
+		getSugarContext().notifyChange(type, rowID, null, false);
 		return rowID;
 	}
 
 	public static <T> int update(Class<T> type, ContentValues values, String whereClause, String[] whereArgs) {
 		int count = getSugarDataBase()
 				.update(NamingHelper.toSQLName(type), values, whereClause, whereArgs);
+		getSugarContext().notifyChange(type, null, false);
 		return count;
 	}
 
@@ -74,12 +79,13 @@ public class SugarRecord {
 		try {
 			sqLiteDatabase.beginTransaction();
 			sqLiteDatabase.setLockingEnabled(false);
+			//notifyType = null;
 			for (T object : objects) {
 				save(object);
 			}
 			sqLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
-			Log.i(SUGAR, "Error in saving in transaction " + e.getMessage());
+			Log.w(SUGAR, "Error in saving in transaction " + e.getMessage(), e);
 		} finally {
 			sqLiteDatabase.endTransaction();
 			sqLiteDatabase.setLockingEnabled(true);
@@ -102,7 +108,7 @@ public class SugarRecord {
 			}
 			sqLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
-			Log.i(SUGAR, "Error in saving in transaction " + e.getMessage());
+			Log.w(SUGAR, "Error in saving in transaction " + e.getMessage(), e);
 		} finally {
 			sqLiteDatabase.endTransaction();
 			sqLiteDatabase.setLockingEnabled(true);
@@ -129,7 +135,7 @@ public class SugarRecord {
 			sqLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
 			deletedRows = 0;
-			Log.i(SUGAR, "Error in deleting in transaction " + e.getMessage());
+			Log.w(SUGAR, "Error in deleting in transaction " + e.getMessage(), e);
 		} finally {
 			sqLiteDatabase.endTransaction();
 			sqLiteDatabase.setLockingEnabled(true);
@@ -275,10 +281,16 @@ public class SugarRecord {
 		return result;
 	}
 
+
 	public static long save(Object object) {
 		return save(getSugarDataBase(), object);
 	}
 
+	/**
+	 * @param db
+	 * @param object
+	 * @return
+	 */
 	static long save(SQLiteDatabase db, Object object) {
 		Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
 		List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
@@ -314,10 +326,15 @@ public class SugarRecord {
 			((SugarRecord) object).setId(id);
 		}
 
-		Log.i(SUGAR, object.getClass().getSimpleName() + " saved : " + id);
+		if (BuildConfig.DEBUG) {
+			Log.d(SUGAR, object.getClass().getSimpleName() + " saved : " + id);
+		}
+
+		getSugarContext().notifyChange(object.getClass(), id);
 
 		return id;
 	}
+
 
 	public static long update(Object object) {
 		return update(getSugarDataBase(), object);
@@ -355,11 +372,19 @@ public class SugarRecord {
 		long rowsEffected = db.update(NamingHelper.toSQLName(object.getClass()), values, whereClause
 				.toString(), whereArgsArray);
 
+
 		if (rowsEffected == 0) {
-			return save(db, object);
+			// FIXME This is WRONG. The save method returns an ID, but this update method should
+			// FIXME return a count. I am not sure of the implications of changing the count to 1
+			// FIXME at this moment, so I'll have to come back to it. -bpappin
+			final long recordId = save(db, object);
+			return recordId;
 		} else {
+			getSugarContext().notifyChange(object.getClass());
 			return rowsEffected;
 		}
+
+
 	}
 
 
@@ -394,10 +419,20 @@ public class SugarRecord {
 		Long id = getId();
 		Class<?> type = getClass();
 		if (id != null && id > 0L) {
-			Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
-			return getSugarDataBase().delete(NamingHelper.toSQLName(type), "Id=?", new String[]{
-					id.toString()
-			}) == 1;
+
+			final boolean deleted =
+					getSugarDataBase().delete(NamingHelper.toSQLName(type), "Id=?", new String[]{
+							id.toString()
+					}) == 1;
+			if (deleted) {
+				if (BuildConfig.DEBUG) {
+					Log.d(SUGAR, type.getSimpleName() + " deleted : " + id);
+				}
+				getSugarContext().notifyChange(type, id);
+			} else {
+				Log.w(SUGAR, type.getSimpleName() + " was not deleted : " + id);
+			}
+			return deleted;
 		} else {
 			Log.i(SUGAR, "Cannot delete object: " + type.getSimpleName() +
 						 " - object has not been saved");
@@ -415,7 +450,14 @@ public class SugarRecord {
 				if (id != null && id > 0L) {
 					boolean deleted = getSugarDataBase().delete(NamingHelper
 							.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
-					Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
+					if (deleted) {
+						if (BuildConfig.DEBUG) {
+							Log.d(SUGAR, type.getSimpleName() + " deleted : " + id);
+						}
+						getSugarContext().notifyChange(type, id);
+					} else {
+						Log.w(SUGAR, type.getSimpleName() + " was not deleted : " + id);
+					}
 					return deleted;
 				} else {
 					Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() +
@@ -497,7 +539,6 @@ public class SugarRecord {
 					cursor.close();
 				}
 			}
-
 			return entity;
 		}
 
