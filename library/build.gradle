@@ -33,6 +33,9 @@ android {
     }
 }
 
+// This configuration is used to publish the library to a local repo while a being forked and modified.
+// It should really be set up so that the version are all in line, and set to be a SNAPSHOT.
+// The version listed here is a temp hack to allow me to keep working.
 android.libraryVariants
 publishing {
     publications {
@@ -40,7 +43,7 @@ publishing {
 
             groupId 'com.github.satyan'
             artifactId 'sugar'
-            version '1.5.XX4'
+            version '1.5.XX6'
 
             artifact bundleRelease
         }

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.orm.Configuration;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Table;
@@ -251,11 +252,11 @@ public class ReflectionUtil {
         }
     }
 
-    public static List<Class> getDomainClasses(Context context) {
+    public static List<Class> getDomainClasses(Configuration configuration) {
         List<Class> domainClasses = new ArrayList<Class>();
         try {
-            for (String className : getAllClasses(context)) {
-                Class domainClass = getDomainClass(className, context);
+            for (String className : getAllClasses(configuration)) {
+                Class domainClass = getDomainClass(className, configuration.getContext());
                 if (domainClass != null) domainClasses.add(domainClass);
             }
         } catch (IOException e) {
@@ -292,11 +293,11 @@ public class ReflectionUtil {
     }
 
 
-    private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
-        String packageName = ManifestHelper.getDomainPackageName(context);
+    private static List<String> getAllClasses(Configuration configuration) throws PackageManager.NameNotFoundException, IOException {
+        String packageName = configuration.getDomain(); // ManifestHelper.getDomainPackageName(context);
         List<String> classNames = new ArrayList<String>();
         try {
-            List<String> allClasses = MultiDexHelper.getAllClasses(context);
+            List<String> allClasses = MultiDexHelper.getAllClasses(configuration.getContext());
             for (String classString : allClasses) {
                 if (classString.startsWith(packageName)) classNames.add(classString);
             }
