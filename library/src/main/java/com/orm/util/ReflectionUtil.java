@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.orm.Configuration;
@@ -30,8 +29,8 @@ import java.util.Map;
 
 public class ReflectionUtil {
 
-	public static final String TAG = "Sugar/ReflectUtil";
-	public static boolean DEBUG = true;
+	public static final String TAG = "ReflectionUtil";
+	private static final boolean DEBUG_DOMAIN = false;
 
 	public static List<Field> getTableFields(Class table) {
 		List<Field> fieldList = SugarConfig.getFields(table);
@@ -39,9 +38,7 @@ public class ReflectionUtil {
 			return fieldList;
 		}
 
-		if (DEBUG) {
-			Log.d(TAG, "Fetching properties");
-		}
+		Log.d(TAG, "Fetching properties");
 		List<Field> typeFields = new ArrayList<Field>();
 
 		getAllFields(typeFields, table);
@@ -69,89 +66,35 @@ public class ReflectionUtil {
 		return fields;
 	}
 
-	public static void addFieldValueToColumn(ContentValues values, Field field, Object entity,
+	public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
 											 Map<Object, Long> entitiesMap) {
-
-		if (DEBUG) {
-			Log.d(TAG, "addFieldValueToColumn: entity=" + entity.getClass().getName());
-		}
-		field.setAccessible(true);
-		Class<?> columnType = field.getType();
-
-		if (DEBUG) {
-			Log.d(TAG, "\tColumn Type: " + columnType.getName());
-		}
-
+		column.setAccessible(true);
+		Class<?> columnType = column.getType();
 		try {
-			String columnName = NamingHelper.toSQLName(field);
-			if (DEBUG) {
-				Log.d(TAG, "\tColumn Name: " + columnName);
-			}
-			//if(true) {
-			//	throw new RuntimeException("colname: " + columnName);
-			//}
-			//assert !columnName.equalsIgnoreCase("id");
-			Object columnValue = field.get(entity);
-
-			if (DEBUG) {
-				Log.d(TAG, "\tColumn Value: " + columnValue);
-			}
+			String columnName = NamingHelper.toSQLName(column);
+			Object columnValue = column.get(object);
 
 			if (columnType.isAnnotationPresent(Table.class)) {
-				if (DEBUG) {
-					Log.d(TAG, "\tColumn is an annotated table.");
-				}
+				// XXX Nested table field by annotation.
+				Field field;
 				try {
-					Field idField = columnType.getDeclaredField("id");
-					idField.setAccessible(true);
-					//values.put(columnName,
-					//		(idField != null)
-					//		? String.valueOf(idField.get(columnValue)) : "0");
-
-
-					final String value = (idField != null)
-										 ? String.valueOf(idField.get(columnValue)) : "0";
-					if (DEBUG) {
-						Log.d(TAG, "\tSetting values: " + BaseColumns._ID + "=" + value);
-					}
-					values.put(BaseColumns._ID, value);
-
+					field = columnType.getDeclaredField("id");
+					field.setAccessible(true);
+					values.put(columnName,
+							(field != null)
+							? String.valueOf(field.get(columnValue)) : "0");
 				} catch (NoSuchFieldException e) {
-					if (DEBUG) {
-						Log.d(TAG, "\tNo such field \"id\".", e);
-					}
 					if (entitiesMap.containsKey(columnValue)) {
-						//values.put(columnName, entitiesMap.get(columnValue));
-						final Long value = entitiesMap.get(columnValue);
-						if (DEBUG) {
-							Log.d(TAG, "\tSetting values: " + BaseColumns._ID + "=" + value);
-						}
-						values.put(BaseColumns._ID, value);
+						values.put(columnName, entitiesMap.get(columnValue));
 					}
 				}
 			} else if (SugarRecord.class.isAssignableFrom(columnType)) {
-				if (DEBUG) {
-					Log.d(TAG, "\tColumn is a SugarRecord.");
-				}
-				//values.put(columnName,
-				//		(columnValue != null)
-				//		? String.valueOf(((SugarRecord) columnValue).getId())
-				//		: "0");
-
-				final String value = (columnValue != null)
-									 ? String.valueOf(((SugarRecord) columnValue).getId())
-									 : "0";
-				if (DEBUG) {
-					Log.d(TAG, "\tSetting values: " + BaseColumns._ID + "=" + value);
-				}
-				values.put(BaseColumns._ID, value);
-
-
+				// XXX Nested table field by extends SugarRecord.
+				values.put(columnName,
+						(columnValue != null)
+						? String.valueOf(((SugarRecord) columnValue).getId())
+						: "0");
 			} else {
-				if (DEBUG) {
-					Log.d(TAG, "\tColumn is a property.");
-					Log.d(TAG, "\tSetting values: " + columnName + "=" + columnValue);
-				}
 				if (columnType.equals(Short.class) || columnType.equals(short.class)) {
 					values.put(columnName, (Short) columnValue);
 				} else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
@@ -166,25 +109,25 @@ public class ReflectionUtil {
 					values.put(columnName, (Boolean) columnValue);
 				} else if (columnType.equals(BigDecimal.class)) {
 					try {
-						values.put(columnName, field.get(entity).toString());
+						values.put(columnName, column.get(object).toString());
 					} catch (NullPointerException e) {
 						values.putNull(columnName);
 					}
 				} else if (Timestamp.class.equals(columnType)) {
 					try {
-						values.put(columnName, ((Timestamp) field.get(entity)).getTime());
+						values.put(columnName, ((Timestamp) column.get(object)).getTime());
 					} catch (NullPointerException e) {
 						values.put(columnName, (Long) null);
 					}
 				} else if (Date.class.equals(columnType)) {
 					try {
-						values.put(columnName, ((Date) field.get(entity)).getTime());
+						values.put(columnName, ((Date) column.get(object)).getTime());
 					} catch (NullPointerException e) {
 						values.put(columnName, (Long) null);
 					}
 				} else if (Calendar.class.equals(columnType)) {
 					try {
-						values.put(columnName, ((Calendar) field.get(entity)).getTimeInMillis());
+						values.put(columnName, ((Calendar) column.get(object)).getTimeInMillis());
 					} catch (NullPointerException e) {
 						values.put(columnName, (Long) null);
 					}
@@ -206,7 +149,7 @@ public class ReflectionUtil {
 			}
 
 		} catch (IllegalAccessException e) {
-			Log.e(TAG, "Field not accessible.", e);
+			Log.e(TAG, e.getMessage());
 		}
 	}
 
@@ -215,15 +158,12 @@ public class ReflectionUtil {
 		try {
 			Class fieldType = field.getType();
 			String colName = NamingHelper.toSQLName(field);
-			if ("id".equals(colName)) {
-				// XXX Forcing the columns to the standard name.
-				colName = BaseColumns._ID;
-			}
+
 			int columnIndex = cursor.getColumnIndex(colName);
 
 			//TODO auto upgrade to add new columns
 			if (columnIndex < 0) {
-				Log.e(TAG, "Invalid colName, you should upgrade database");
+				Log.e("TAG", "Invalid colName, you should upgrade database");
 				return;
 			}
 
@@ -231,7 +171,7 @@ public class ReflectionUtil {
 				return;
 			}
 
-			if (colName.equalsIgnoreCase("id") || colName.equalsIgnoreCase(BaseColumns._ID)) {
+			if (colName.equalsIgnoreCase("id")) {
 				long cid = cursor.getLong(columnIndex);
 				field.set(object, Long.valueOf(cid));
 			} else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
@@ -285,7 +225,7 @@ public class ReflectionUtil {
 				} catch (Exception e) {
 					Log.e(TAG,
 							"Enum cannot be read from Sqlite3 database. Please check the type of field " +
-							field.getName(), e);
+							field.getName());
 				}
 			} else {
 				Log.e(TAG,
@@ -293,9 +233,9 @@ public class ReflectionUtil {
 						field.getName() + "(" + field.getType().getName() + ")");
 			}
 		} catch (IllegalArgumentException e) {
-			Log.e(TAG, "field set error", e);
+			Log.e("field set error", e.getMessage());
 		} catch (IllegalAccessException e) {
-			Log.e(TAG, "field set error", e);
+			Log.e("field set error", e.getMessage());
 		}
 	}
 
@@ -361,7 +301,9 @@ public class ReflectionUtil {
 			 discoveredClass.isAnnotationPresent(Table.class)) &&
 			!Modifier.isAbstract(discoveredClass.getModifiers())) {
 
-			//Log.d(TAG, "domain class : " + discoveredClass.getSimpleName());
+			if(DEBUG_DOMAIN) {
+				Log.d(TAG, "domain class : " + discoveredClass.getSimpleName());
+			}
 			return discoveredClass;
 
 		} else {

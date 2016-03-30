@@ -26,16 +26,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
 
 	public static final String TAG = "SugarRecord";
-	private static final boolean DEBUG_SAVE = true;
-	private static final boolean DEBUG_FIND = true;
-	
+	private static final boolean DEBUG_CURSOR = true;
+
 	@Column(name = BaseColumns._ID)
 	private Long id = null;
 
@@ -48,10 +46,7 @@ public class SugarRecord {
 	}
 
 	public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
-		final int delete = getSugarDataBase()
-				.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
-		getSugarContext().notifyChange(type);
-		return delete;
+		return getSugarDataBase().delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
 	}
 
 	public static <T> Cursor getCursor(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
@@ -60,20 +55,6 @@ public class SugarRecord {
 						groupBy, null, orderBy, limit);
 		return new SugarCursor(raw);
 	}
-
-	//public static <T> long insert(Class<T> type, ContentValues values) {
-	//	long rowID = getSugarDataBase().insertOrThrow(NamingHelper.toSQLName(type), null, values);
-	//	//Uri result = Uri.withAppendedPath(uri, Long.toString(rowID));
-	//	getSugarContext().notifyChange(type, rowID);
-	//	return rowID;
-	//}
-	//
-	//public static <T> int update(Class<T> type, ContentValues values, String whereClause, String[] whereArgs) {
-	//	int count = getSugarDataBase()
-	//			.update(NamingHelper.toSQLName(type), values, whereClause, whereArgs);
-	//	getSugarContext().notifyChange(type);
-	//	return count;
-	//}
 
 	@SuppressWarnings("deprecation")
 	public static <T> void saveInTx(T... objects) {
@@ -86,13 +67,12 @@ public class SugarRecord {
 		try {
 			sqLiteDatabase.beginTransaction();
 			sqLiteDatabase.setLockingEnabled(false);
-			//notifyType = null;
 			for (T object : objects) {
 				save(object);
 			}
 			sqLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
-			Log.w(TAG, "Error in saving in transaction " + e.getMessage(), e);
+			Log.i(TAG, "Error in saving in transaction " + e.getMessage());
 		} finally {
 			sqLiteDatabase.endTransaction();
 			sqLiteDatabase.setLockingEnabled(true);
@@ -115,7 +95,7 @@ public class SugarRecord {
 			}
 			sqLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
-			Log.w(TAG, "Error in saving in transaction " + e.getMessage(), e);
+			Log.i(TAG, "Error in saving in transaction " + e.getMessage());
 		} finally {
 			sqLiteDatabase.endTransaction();
 			sqLiteDatabase.setLockingEnabled(true);
@@ -142,7 +122,7 @@ public class SugarRecord {
 			sqLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
 			deletedRows = 0;
-			Log.w(TAG, "Error in deleting in transaction " + e.getMessage(), e);
+			Log.i(TAG, "Error in deleting in transaction " + e.getMessage());
 		} finally {
 			sqLiteDatabase.endTransaction();
 			sqLiteDatabase.setLockingEnabled(true);
@@ -159,8 +139,7 @@ public class SugarRecord {
 	}
 
 	public static <T> T findById(Class<T> type, Long id) {
-		List<T> list = find(type,
-				BaseColumns._ID + "=?", new String[]{String.valueOf(id)}, null, null, "1");
+		List<T> list = find(type, id(), new String[]{String.valueOf(id)}, null, null, "1");
 		if (list.isEmpty()) {
 			return null;
 		}
@@ -228,7 +207,6 @@ public class SugarRecord {
 	}
 
 	public static void executeQuery(String query, String... arguments) {
-		Log.w(TAG, "This is being executed without notifying the content providers of the potential change");
 		getSugarDataBase().execSQL(query, arguments);
 	}
 
@@ -236,11 +214,6 @@ public class SugarRecord {
 		Cursor cursor = getSugarDataBase()
 				.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
 						groupBy, null, orderBy, limit);
-
-		if (DEBUG_FIND) {
-			Log.d(TAG, "Dumping cursor:");
-			DatabaseUtils.dumpCursor(cursor);
-		}
 
 		return getEntitiesFromCursor(cursor, type);
 	}
@@ -255,8 +228,7 @@ public class SugarRecord {
 				result.add(entity);
 			}
 		} catch (Exception e) {
-			//e.printStackTrace();
-			Log.e(TAG, "Could not inflate object from cursor.", e);
+			e.printStackTrace();
 		} finally {
 			cursor.close();
 		}
@@ -280,8 +252,7 @@ public class SugarRecord {
 			sqliteStatement = getSugarDataBase().compileStatement(
 					"SELECT count(*) FROM " + NamingHelper.toSQLName(type) + filter);
 		} catch (SQLiteException e) {
-			//e.printStackTrace();
-			Log.e(TAG, "Query failed.", e);
+			e.printStackTrace();
 			return result;
 		}
 
@@ -300,87 +271,50 @@ public class SugarRecord {
 		return result;
 	}
 
-
 	public static long save(Object object) {
 		return save(getSugarDataBase(), object);
 	}
 
-	/**
-	 * @param db
-	 * @param entity
-	 * @return
-	 */
-	static long save(SQLiteDatabase db, Object entity) {
-		if (DEBUG_SAVE) {
-			Log.d(TAG, "Saving entity: " + entity.getClass().getSimpleName());
-		}
-
+	static long save(SQLiteDatabase db, Object object) {
 		Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
-		List<Field> members = ReflectionUtil.getTableFields(entity.getClass());
-		ContentValues values = new ContentValues(members.size());
+		List<Field> fields = ReflectionUtil.getTableFields(object.getClass());
+		ContentValues values = new ContentValues(fields.size());
 		Field idField = null;
-		for (Field field : members) {
-			if (DEBUG_SAVE) {
-				Log.i(TAG, "Table Field: " + field.getName());
-			}
-			ReflectionUtil.addFieldValueToColumn(values, field, entity, entitiesMap);
-			if (field.getName().equals("id") || field.getName().equals(BaseColumns._ID)) {
-				if (DEBUG_SAVE) {
-					Log.i(TAG, "\tTable Field is an ID field.");
-				}
+		for (Field field : fields) {
+			ReflectionUtil.addFieldValueToColumn(values, field, object, entitiesMap);
+			if (field.getName().equals("id")) {
 				idField = field;
 			}
 		}
 
-		boolean isSugarEntity = isSugarEntity(entity.getClass());
-		if (isSugarEntity && entitiesMap.containsKey(entity)) {
-			values.put(BaseColumns._ID, entitiesMap.get(entity));
+		boolean isSugarEntity = isSugarEntity(object.getClass());
+		if (isSugarEntity && entitiesMap.containsKey(object)) {
+			//values.put("id", entitiesMap.get(object));
+			values.put(BaseColumns._ID, entitiesMap.get(object));
 		}
 
-		if (DEBUG_SAVE) {
-			//DatabaseUtils.dumpCurrentRow();
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-				Set<String> keySet = values.keySet();
-				for (String key : keySet) {
-					//System.out.println("VALUE: " + key + "=" + values.getAsString(key));
-					Log.d(TAG, "VALUE: " + key + "=" + values.getAsString(key));
-				}
-			}
-		}
-		//if (values.containsKey("id")) {
-		//	values.put(BaseColumns._ID, values.getAsLong("id"));
-		//	values.remove("id");
-		//	//BaseColumns._ID
-		//}
-
-
-		long id = db.insertWithOnConflict(NamingHelper.toSQLName(entity.getClass()), null, values,
+		long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
 				SQLiteDatabase.CONFLICT_REPLACE);
 
-		if (entity.getClass().isAnnotationPresent(Table.class)) {
+		if (object.getClass().isAnnotationPresent(Table.class)) {
 			if (idField != null) {
 				idField.setAccessible(true);
 				try {
-					idField.set(entity, new Long(id));
+					idField.set(object, new Long(id));
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
 			} else {
-				entitiesMap.put(entity, id);
+				entitiesMap.put(object, id);
 			}
-		} else if (SugarRecord.class.isAssignableFrom(entity.getClass())) {
-			((SugarRecord) entity).setId(id);
+		} else if (SugarRecord.class.isAssignableFrom(object.getClass())) {
+			((SugarRecord) object).setId(id);
 		}
 
-		if (SugarContext.isDebug()) {
-			Log.d(TAG, entity.getClass().getSimpleName() + " saved : " + id);
-		}
-
-		getSugarContext().notifyChange(entity.getClass(), id);
+		Log.i(TAG, object.getClass().getSimpleName() + " saved : " + id);
 
 		return id;
 	}
-
 
 	public static long update(Object object) {
 		return update(getSugarDataBase(), object);
@@ -407,7 +341,7 @@ public class SugarRecord {
 					e.printStackTrace();
 				}
 			} else {
-				if (!(column.getName().equals("id") || column.getName().equals(BaseColumns._ID))) {
+				if (!column.getName().equals("id")) {
 					ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
 				}
 			}
@@ -418,19 +352,11 @@ public class SugarRecord {
 		long rowsEffected = db.update(NamingHelper.toSQLName(object.getClass()), values, whereClause
 				.toString(), whereArgsArray);
 
-
 		if (rowsEffected == 0) {
-			// FIXME This is WRONG. The save method returns an ID, but this update method should
-			// FIXME return a count. I am not sure of the implications of changing the count to 1
-			// FIXME at this moment, so I'll have to come back to it. -bpappin
-			final long recordId = save(db, object);
-			return recordId;
+			return save(db, object);
 		} else {
-			getSugarContext().notifyChange(object.getClass());
 			return rowsEffected;
 		}
-
-
 	}
 
 
@@ -440,24 +366,20 @@ public class SugarRecord {
 	}
 
 	private static void inflate(Cursor cursor, Object entity, Map<Object, Long> entitiesMap) {
-		if(DEBUG_FIND){
-			Log.d(TAG, "Inflate Row: " + DatabaseUtils.dumpCurrentRowToString(cursor));
+		if (DEBUG_CURSOR) {
+			Log.d(TAG, "Row Dump (inflate): " + DatabaseUtils.dumpCurrentRowToString(cursor));
 		}
-		List<Field> fields = ReflectionUtil.getTableFields(entity.getClass());
+		List<Field> columns = ReflectionUtil.getTableFields(entity.getClass());
 		if (!entitiesMap.containsKey(entity)) {
 			entitiesMap.put(entity, cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
 		}
 
-		for (Field field : fields) {
+		for (Field field : columns) {
 			field.setAccessible(true);
 			Class<?> fieldType = field.getType();
 			if (isSugarEntity(fieldType)) {
 				try {
-					final String idFieldName = NamingHelper.toSQLName(field);
-					//Log.w(TAG, "### ID Field name: " + idFieldName);
-
-					long id = cursor.getLong(cursor.getColumnIndex(idFieldName));
-					//Log.w(TAG, "### \tvalue: " + id);
+					long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
 					field.set(entity, (id > 0) ? findById(fieldType, id) : null);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
@@ -469,26 +391,14 @@ public class SugarRecord {
 	}
 
 	public boolean delete() {
-		// FIXME WTF, this cuases a stack overflow. Reverting to old busted shit until i can sort it out.
-		//return delete(getSugarDataBase(), this);
 		Long id = getId();
 		Class<?> type = getClass();
 		if (id != null && id > 0L) {
-
-			final boolean deleted =
-					getSugarDataBase().delete(NamingHelper.toSQLName(type),
-							BaseColumns._ID + " = ?", new String[]{
-									id.toString()
-							}) == 1;
-			if (deleted) {
-				if (SugarContext.isDebug()) {
-					Log.d(TAG, type.getSimpleName() + " deleted : " + id);
-				}
-				getSugarContext().notifyChange(type, id);
-			} else {
-				Log.w(TAG, type.getSimpleName() + " was not deleted : " + id);
-			}
-			return deleted;
+			Log.i(TAG, type.getSimpleName() + " deleted : " + id);
+			return getSugarDataBase().delete(NamingHelper
+					.toSQLName(type), id(), new String[]{
+					id.toString()
+			}) == 1;
 		} else {
 			Log.i(TAG, "Cannot delete object: " + type.getSimpleName() +
 					   " - object has not been saved");
@@ -496,11 +406,15 @@ public class SugarRecord {
 		}
 	}
 
-	public static boolean delete(Object object) {
-		return delete(getSugarDataBase(), object);
+	private static String id() {
+		return column(BaseColumns._ID);
 	}
 
-	public static boolean delete(SQLiteDatabase db, Object object) {
+	private static String column(String name) {
+		return name + " = ?";
+	}
+
+	public static boolean delete(Object object) {
 		Class<?> type = object.getClass();
 		if (type.isAnnotationPresent(Table.class)) {
 			try {
@@ -508,17 +422,9 @@ public class SugarRecord {
 				field.setAccessible(true);
 				Long id = (Long) field.get(object);
 				if (id != null && id > 0L) {
-					boolean deleted = db.delete(NamingHelper
-									.toSQLName(type),
-							BaseColumns._ID + "=?", new String[]{id.toString()}) == 1;
-					if (deleted) {
-						if (SugarContext.isDebug()) {
-							Log.d(TAG, type.getSimpleName() + " deleted : " + id);
-						}
-						getSugarContext().notifyChange(type, id);
-					} else {
-						Log.w(TAG, type.getSimpleName() + " was not deleted : " + id);
-					}
+					boolean deleted = getSugarDataBase().delete(NamingHelper
+							.toSQLName(type), id(), new String[]{id.toString()}) == 1;
+					Log.i(TAG, type.getSimpleName() + " deleted : " + id);
 					return deleted;
 				} else {
 					Log.i(TAG, "Cannot delete object: " + object.getClass().getSimpleName() +
@@ -600,6 +506,7 @@ public class SugarRecord {
 					cursor.close();
 				}
 			}
+
 			return entity;
 		}
 
