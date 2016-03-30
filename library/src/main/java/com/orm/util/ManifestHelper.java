@@ -5,6 +5,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.orm.helper.ClassicSchemaGenerator;
+import com.orm.helper.SugarDatabaseHelper;
+
 /**
  * Helper class for accessing properties in the AndroidManifest
  */
@@ -13,19 +16,21 @@ public class ManifestHelper {
 	/**
 	 * Key for the database name meta data.
 	 */
-	public final static String METADATA_DATABASE = "DATABASE";
+	public final static String METADATA_DATABASE = "SUGAR_DATABASE";
 	/**
 	 * Key for the database verison meta data.
 	 */
-	public final static String METADATA_VERSION = "VERSION";
+	public final static String METADATA_VERSION = "SUGAR_VERSION";
 	public final static String METADATA_SUGAR_AUTHORITY = "SUGAR_AUTHORITY";
-	public final static String METADATA_DOMAIN_PACKAGE_NAME = "DOMAIN_PACKAGE_NAME";
-	public final static String METADATA_QUERY_LOG = "QUERY_LOG";
+	public final static String METADATA_DOMAIN_PACKAGE_NAME = "SUGAR_DOMAIN_PACKAGE_NAME";
+	public final static String METADATA_QUERY_LOG = "SUGAR_QUERY_LOG";
+	private static final String METADATA_HELPER_CLASS = "SUGAR_SCHEMA_HELPER_CLASS";
 	/**
 	 * The default name for the database unless specified in the AndroidManifest.
 	 */
-	public final static String DATABASE_DEFAULT_NAME = "Sugar.db";
-
+	public final static String DATABASE_DEFAULT_NAME = "sugar.db";
+	private static final String DEFAULT_HELPER_CLASS_NAME = ClassicSchemaGenerator.class.getName();
+	
 	/**
 	 * Grabs the database version from the manifest.
 	 *
@@ -149,5 +154,20 @@ public class ManifestHelper {
 		}
 
 		return value;
+	}
+	
+	public static SugarDatabaseHelper getHelper(Context context) {
+		String helperClassName = getMetaDataString(context, METADATA_HELPER_CLASS);
+
+		if (helperClassName == null) {
+			helperClassName = DEFAULT_HELPER_CLASS_NAME;
+		}
+
+		try {
+			Class<?> clazz = Class.forName(helperClassName);
+			return (SugarDatabaseHelper) clazz.newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException("Could not load schema helper class", e);
+		}
 	}
 }

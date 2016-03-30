@@ -85,7 +85,7 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 
 		try {
 			List<String> files = Arrays.asList(getConfiguration().getContext().getAssets()
-															.list("sugar_upgrades"));
+																 .list("sugar_upgrades"));
 			Collections.sort(files, new NumberComparator());
 			for (String file : files) {
 				Log.i(SUGAR, "filename : " + file);
@@ -111,7 +111,8 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 
 	private void executeScript(SQLiteDatabase db, String file) {
 		try {
-			InputStream is = getConfiguration().getContext().getAssets().open("sugar_upgrades/" + file);
+			InputStream is = getConfiguration().getContext().getAssets()
+											   .open("sugar_upgrades/" + file);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			StringBuilder sb = new StringBuilder();
 			String line;
@@ -180,7 +181,8 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 		String tableName = NamingHelper.toSQLName(table);
 		Log.i(TAG, "\t" + tableName);
 		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-		sb.append(tableName).append(" ( "+ BaseColumns._ID +" INTEGER PRIMARY KEY AUTOINCREMENT ");
+		sb.append(tableName)
+		  .append(" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT ");
 
 		for (Field column : fields) {
 			String columnName = NamingHelper.toSQLName(column);

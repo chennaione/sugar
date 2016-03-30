@@ -17,6 +17,16 @@ public class ClassicSchemaGenerator extends SugarSchemaGenerator {
 
 
 	/**
+	 * If this constructor is used, you *must* call setConfiguration(Configuration) before any
+	 * other operations is performed.
+	 * <p>
+	 * This is done automatically if passed to a Configuration object.
+	 */
+	public ClassicSchemaGenerator() {
+		super();
+	}
+
+	/**
 	 * @param configuration
 	 */
 	public ClassicSchemaGenerator(Configuration configuration) {
