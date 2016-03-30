@@ -32,7 +32,7 @@ import static com.orm.SugarContext.getSugarContext;
 public class SugarRecord {
 
 	public static final String TAG = "SugarRecord";
-	private static final boolean DEBUG_CURSOR = true;
+	public static final boolean DEBUG_CURSOR = false;
 
 	@Column(name = BaseColumns._ID)
 	private Long id = null;
@@ -46,7 +46,12 @@ public class SugarRecord {
 	}
 
 	public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
-		return getSugarDataBase().delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+		final int deleted = getSugarDataBase()
+				.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+		if (deleted > 0) {
+			getSugarContext().notifyChange(type);
+		}
+		return deleted;
 	}
 
 	public static <T> Cursor getCursor(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
@@ -311,7 +316,7 @@ public class SugarRecord {
 			((SugarRecord) object).setId(id);
 		}
 
-		Log.i(TAG, object.getClass().getSimpleName() + " saved : " + id);
+		getSugarContext().notifyChange(object.getClass(), id);
 
 		return id;
 	}
@@ -322,27 +327,28 @@ public class SugarRecord {
 
 	static long update(SQLiteDatabase db, Object object) {
 		Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
-		List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
-		ContentValues values = new ContentValues(columns.size());
+		List<Field> fields = ReflectionUtil.getTableFields(object.getClass());
+		ContentValues values = new ContentValues(fields.size());
 
 		StringBuilder whereClause = new StringBuilder();
 		List<String> whereArgs = new ArrayList<>();
 
-		for (Field column : columns) {
-			if (column.isAnnotationPresent(Unique.class)) {
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(Unique.class)) {
 				try {
-					column.setAccessible(true);
-					String columnName = NamingHelper.toSQLName(column);
-					Object columnValue = column.get(object);
+					field.setAccessible(true);
+					String columnName = NamingHelper.toSQLName(field);
+					Object columnValue = field.get(object);
 
-					whereClause.append(columnName).append(" = ?");
+					whereClause.append(column(columnName));
 					whereArgs.add(String.valueOf(columnValue));
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					Log.w(TAG, "Could not access field: " + field.getName(), e);
 				}
 			} else {
-				if (!column.getName().equals("id")) {
-					ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+				if (!field.getName().equals("id")) {
+					ReflectionUtil.addFieldValueToColumn(values, field, object, entitiesMap);
 				}
 			}
 		}
@@ -353,8 +359,13 @@ public class SugarRecord {
 				.toString(), whereArgsArray);
 
 		if (rowsEffected == 0) {
-			return save(db, object);
+			// FIXME This is WRONG. The save method returns an ID, but this update method should
+			// FIXME return a count. I am not sure of the implications of changing the count to 1
+			// FIXME at this moment, so I'll have to come back to it. -bpappin
+			final long recordId = save(db, object);
+			return recordId;
 		} else {
+			getSugarContext().notifyChange(object.getClass());
 			return rowsEffected;
 		}
 	}
@@ -394,11 +405,19 @@ public class SugarRecord {
 		Long id = getId();
 		Class<?> type = getClass();
 		if (id != null && id > 0L) {
-			Log.i(TAG, type.getSimpleName() + " deleted : " + id);
-			return getSugarDataBase().delete(NamingHelper
+
+			final boolean deleted = getSugarDataBase().delete(NamingHelper
 					.toSQLName(type), id(), new String[]{
 					id.toString()
 			}) == 1;
+			if (deleted) {
+				Log.d(TAG, type.getSimpleName() + " deleted : " + id);
+				getSugarContext().notifyChange(type, id);
+			} else {
+				Log.w(TAG, type.getSimpleName() + " was not deleted : " + id);
+			}
+
+			return deleted;
 		} else {
 			Log.i(TAG, "Cannot delete object: " + type.getSimpleName() +
 					   " - object has not been saved");
@@ -424,7 +443,12 @@ public class SugarRecord {
 				if (id != null && id > 0L) {
 					boolean deleted = getSugarDataBase().delete(NamingHelper
 							.toSQLName(type), id(), new String[]{id.toString()}) == 1;
-					Log.i(TAG, type.getSimpleName() + " deleted : " + id);
+					if (deleted) {
+						Log.d(TAG, type.getSimpleName() + " deleted : " + id);
+						getSugarContext().notifyChange(type, id);
+					} else {
+						Log.w(TAG, type.getSimpleName() + " was not deleted : " + id);
+					}
 					return deleted;
 				} else {
 					Log.i(TAG, "Cannot delete object: " + object.getClass().getSimpleName() +
