@@ -1,5 +1,7 @@
 package com.orm.util;
 
+import android.provider.BaseColumns;
+
 import com.orm.dsl.Column;
 import com.orm.dsl.Table;
 
@@ -15,8 +17,8 @@ public class NamingHelper {
      *         "_id" (not case sensitive) in which case "_id" is returned
      */
     public static String toSQLNameDefault(String camelCased) {
-        if (camelCased.equalsIgnoreCase("_id")) {
-            return "_id";
+        if (camelCased.equalsIgnoreCase("_id")||camelCased.equalsIgnoreCase("id")) {
+            return BaseColumns._ID;
         }
 
         StringBuilder sb = new StringBuilder();

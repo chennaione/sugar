@@ -3,6 +3,7 @@ package com.orm.helper;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.orm.Configuration;
@@ -174,19 +175,23 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 	}
 
 	public String createTableSQL(Class<?> table) {
-		//Log.i(SUGAR, "Create table if not exists");
+		//Log.i(TAG, "Create table if not exists");
 		List<Field> fields = ReflectionUtil.getTableFields(table);
 		String tableName = NamingHelper.toSQLName(table);
 		Log.i(TAG, "\t" + tableName);
 		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-		sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
+		sb.append(tableName).append(" ( "+ BaseColumns._ID +" INTEGER PRIMARY KEY AUTOINCREMENT ");
 
 		for (Field column : fields) {
 			String columnName = NamingHelper.toSQLName(column);
 			String columnType = QueryBuilder.getColumnType(column.getType());
 
+			//Log.d("TESTING", "columnName:"+columnName+", columnType:"+columnType);
+			//Log.i(TAG, "TESTING columnName:"+columnName+", columnType:"+columnType);
+
 			if (columnType != null) {
-				if (columnName.equalsIgnoreCase("Id")) {
+				// XXX ID is already included as a special column.
+				if (columnName.equalsIgnoreCase(BaseColumns._ID)) {
 					continue;
 				}
 

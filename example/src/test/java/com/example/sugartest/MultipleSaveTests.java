@@ -6,9 +6,11 @@ import com.example.models.StringFieldAnnotatedNoIdModel;
 import com.example.models.StringFieldExtendedModel;
 import com.orm.SugarRecord;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLog;
 
 import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
@@ -17,6 +19,11 @@ import static org.junit.Assert.assertNull;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk=18)
 public class MultipleSaveTests {
+    @Before
+    public void setUp() throws Exception {
+        ShadowLog.stream = System.out;
+        //you other setup here
+    }
     @Test
     public void stringMultipleSaveOriginalExtendedTest() {
         String string = "Test String";

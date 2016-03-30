@@ -4,9 +4,11 @@ import com.example.models.SimpleAnnotatedModel;
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLog;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -25,6 +27,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk=18)
 public class SimpleAnnotatedModelTests {
+
+    @Before
+    public void setUp() throws Exception {
+        ShadowLog.stream = System.out;
+        //you other setup here
+    }
     @Test
     public void emptyDatabaseTest() throws Exception {
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));

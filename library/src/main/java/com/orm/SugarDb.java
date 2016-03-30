@@ -135,17 +135,17 @@ public class SugarDb extends SQLiteOpenHelper {
 
 	@Override
 	public synchronized SQLiteDatabase getReadableDatabase() {
-		Log.d("SUGAR", "getReadableDatabase");
+		Log.d("TAG", "getReadableDatabase");
 		openedConnections++;
 		return super.getReadableDatabase();
 	}
 
 	@Override
 	public synchronized void close() {
-		Log.d("SUGAR", "getReadableDatabase");
+		Log.d("TAG", "getReadableDatabase");
 		openedConnections--;
 		if (openedConnections == 0) {
-			Log.d("SUGAR", "closing");
+			Log.d("TAG", "closing");
 			super.close();
 		}
 	}

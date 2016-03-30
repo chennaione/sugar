@@ -33,7 +33,7 @@ public class Configuration {
 							.version(ManifestHelper.getDatabaseVersion(context))
 							.debug(ManifestHelper.getDebugEnabled(context)).helper()
 							.domain(ManifestHelper.getDomainPackageName(context))
-							.authority(context.getApplicationContext().getPackageName());
+							.authority(ManifestHelper.getAuthority(context));
 	}
 
 	public static final Configuration get(Context context) {

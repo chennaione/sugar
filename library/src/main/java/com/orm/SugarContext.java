@@ -5,9 +5,6 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.util.Log;
 
-import com.orm.dsl.BuildConfig;
-import com.orm.util.NamingHelper;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -46,13 +43,21 @@ public class SugarContext {
 		instance = new SugarContext(configuration);
 	}
 
+	//public static void initMaybe(Configuration configuration) {
+	//	instance = new SugarContext(configuration);
+	//}
+
 	public static void terminate() {
 		if (instance == null) {
 			return;
 		}
 		instance.doTerminate();
 	}
-
+	
+	public static boolean isDebug() {
+		return getSugarContext().configuration.isDebug();
+	}
+	
 	/*
 	 * Per issue #106 on Github, this method won't be called in
 	 * any real Android device. This method is used purely in
@@ -73,6 +78,10 @@ public class SugarContext {
 		return entitiesMap;
 	}
 
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
 	/**
 	 * Shortcut to ContentResolver.notifyChange(Uri uri, ContentObserver observer, boolean
 	 * syncToNetwork)
@@ -83,7 +92,7 @@ public class SugarContext {
 	 */
 	public void notifyChange(Uri uri, ContentObserver observer, boolean syncToNetwork) {
 		if (configuration != null) {
-			if (BuildConfig.DEBUG) {
+			if (configuration.isDebug()) {
 				Log.d(TAG, "Notify of data change: " + uri);
 			}
 			configuration.getContext().getApplicationContext().getContentResolver()
@@ -94,41 +103,19 @@ public class SugarContext {
 	}
 
 	public <T> void notifyChange(Class<T> type) {
-		notifyChange(createUri(type, null), null, false);
+		notifyChange(SugarContentProvider.createUri(type, null), null, false);
 	}
 	
 	public <T> void notifyChange(Class<T> type, ContentObserver observer, boolean syncToNetwork) {
-		notifyChange(createUri(type, null), observer, syncToNetwork);
+		notifyChange(SugarContentProvider.createUri(type, null), observer, syncToNetwork);
 	}
 
 	public <T> void notifyChange(Class<T> type, Long id) {
-		notifyChange(createUri(type, id), null, false);
+		notifyChange(SugarContentProvider.createUri(type, id), null, false);
 	}
 
 	public <T> void notifyChange(Class<T> type, Long id, ContentObserver observer, boolean syncToNetwork) {
-		notifyChange(createUri(type, id), observer, syncToNetwork);
+		notifyChange(SugarContentProvider.createUri(type, id), observer, syncToNetwork);
 	}
 
-	//private Uri getBaseUri() {
-	//	return Uri.parse("content://" + configuration.getAuthority());
-	//}
-
-	public <T> Uri createUri(Class<T> type, Long id) {
-		if (configuration == null) {
-			Log.w(TAG, "Configuration is not set; authority is empty.");
-			return null;
-		}
-		final StringBuilder uri = new StringBuilder();
-		uri.append("content://");
-		uri.append(configuration.getAuthority());
-		uri.append("/");
-		uri.append(NamingHelper.toSQLName(type));
-
-		if (id != null) {
-			uri.append("/");
-			uri.append(id.toString());
-		}
-
-		return Uri.parse(uri.toString());
-	}
 }

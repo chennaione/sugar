@@ -1,5 +1,7 @@
 package com.orm;
 
+import android.provider.BaseColumns;
+
 import com.orm.helper.ClassicSchemaGenerator;
 import com.orm.models.EmptyModel;
 import com.orm.models.IntUniqueModel;
@@ -22,7 +24,7 @@ public class SchemaGeneratorTest {
 		String createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(EmptyModel.class) +
-				" ( ID INTEGER PRIMARY KEY AUTOINCREMENT  ) ",
+				" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT  ) ",
 				createSQL);
 	}
 
@@ -34,7 +36,7 @@ public class SchemaGeneratorTest {
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " +
 				NamingHelper.toSQLName(StringFieldExtendedModel.class) +
-				" ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
+				" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
 				"NAME TEXT ) ",
 				createSQL);
 
@@ -43,7 +45,7 @@ public class SchemaGeneratorTest {
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " +
 				NamingHelper.toSQLName(StringFieldAnnotatedModel.class) +
-				" ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
+				" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
 				"NAME TEXT ) ",
 				createSQL2);
 
@@ -53,7 +55,7 @@ public class SchemaGeneratorTest {
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " +
 				NamingHelper.toSQLName(StringFieldExtendedModelAnnotatedColumn.class) +
-				" ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
+				" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
 				"anyName TEXT ) ",
 				createSQL3);
 	}
@@ -65,7 +67,7 @@ public class SchemaGeneratorTest {
 		String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(IntUniqueModel.class) +
-				" ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
+				" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
 				"VALUE INTEGER UNIQUE ) ",
 				createSQL);
 	}
@@ -78,7 +80,7 @@ public class SchemaGeneratorTest {
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " +
 				NamingHelper.toSQLName(MultiColumnUniqueModel.class) +
-				" ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
+				" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
 				"A INTEGER, B INTEGER, " +
 				"UNIQUE(A, B) ON CONFLICT REPLACE ) ",
 				createSQL);
