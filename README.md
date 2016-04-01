@@ -175,11 +175,11 @@ books.add(new Book("isbn789", "Title here 3", "4nd edition"))
 SugarRecord.saveInTx(books);
 ```
 
-### Using the ContentProvider for the CursorLoader
+# Using the ContentProvider for the CursorLoader
 
 Content providers are vital when using CursorLoaders and SyncAdapters, this modification adds a ContentProvider to work with those systems.
 
-##Modify the manifest
+###Modify the manifest
 
 The names of the manifest meta properties have change in this version to avoid conflicts with other libraries.
 
@@ -206,7 +206,7 @@ The names of the manifest meta properties have change in this version to avoid c
 	
 </application>
 ```
-## Setting up a CursorLoader
+### Setting up a CursorLoader
 
 This version changes the default ID column name from "id" to the standard "_id" (as defined by android.provider.BaseColumns._ID).
 The ID column name change is importnat because several built in components of SimpleCursorAdapter expect the id column to have a specific name.
