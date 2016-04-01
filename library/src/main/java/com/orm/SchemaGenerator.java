@@ -177,7 +177,7 @@ public class SchemaGenerator {
     }
 
     protected String createTableSQL(Class<?> table) {
-        KeyWord link = new KeyWord;
+        KeyWord link = new KeyWord();
         Log.i(SUGAR, "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
