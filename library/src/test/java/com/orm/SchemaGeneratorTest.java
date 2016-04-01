@@ -20,7 +20,7 @@ public class SchemaGeneratorTest {
 	@Test
 	public void testEmptyTableCreation() throws Exception {
 		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
-				.maifest(new DummyContext()));
+				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(EmptyModel.class) +
@@ -31,7 +31,7 @@ public class SchemaGeneratorTest {
 	@Test
 	public void testSimpleColumnTableCreation() throws Exception {
 		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
-				.maifest(new DummyContext()));
+				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " +
@@ -63,7 +63,7 @@ public class SchemaGeneratorTest {
 	@Test
 	public void testUniqueTableCreation() {
 		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
-				.maifest(new DummyContext()));
+				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(IntUniqueModel.class) +
@@ -75,7 +75,7 @@ public class SchemaGeneratorTest {
 	@Test
 	public void testMultiColumnUniqueTableCreation() {
 		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
-				.maifest(new DummyContext()));
+				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
 		assertEquals(
 				"CREATE TABLE IF NOT EXISTS " +

@@ -36,7 +36,7 @@ public class SugarContext {
 	}
 
 	public static void init(Context context) {
-		instance = new SugarContext(Configuration.maifest(context));
+		instance = new SugarContext(Configuration.manifest(context));
 	}
 
 	public static void init(Configuration configuration) {

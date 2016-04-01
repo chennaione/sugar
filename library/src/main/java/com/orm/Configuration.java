@@ -28,7 +28,7 @@ public class Configuration {
 		this.context = context;
 	}
 
-	public static final Configuration maifest(Context context) {
+	public static final Configuration manifest(Context context) {
 		return Configuration.get(context).name(ManifestHelper.getDatabaseName(context))
 							.version(ManifestHelper.getDatabaseVersion(context))
 							.debug(ManifestHelper.getDebugEnabled(context)).helper()

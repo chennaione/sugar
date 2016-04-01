@@ -27,7 +27,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public boolean onCreate() {
 		//final Configuration configuration = getConfiguration();
 
-		SugarContext.init(Configuration.maifest(getContext()));
+		SugarContext.init(Configuration.manifest(getContext()));
 
 		//SugarContext.getSugarContext().getConfiguration()
 
