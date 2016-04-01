@@ -209,7 +209,7 @@ The names of the manifest meta properties have change in this version to avoid c
 ### Setting up a CursorLoader
 
 This version changes the default ID column name from "id" to the standard "_id" (as defined by android.provider.BaseColumns._ID).
-The ID column name change is importnat because several built in components of SimpleCursorAdapter expect the id column to have a specific name.
+The ID column name change is important because several built in components of SimpleCursorAdapter expect the _id column to have a specific name.
 
 ```java
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -255,7 +255,7 @@ public class MyPojo {
 
 ```
 
-Setting up the columns that way will ensure you dont get a typo and the columns can be used in quiery builders.
+Setting up the columns that way will ensure you don't get a typo and the column names can be used in quiery builders.
 
 You can also use the column names when setting up your SimpleCursorAdapter.
 
@@ -273,7 +273,7 @@ You can also use the column names when setting up your SimpleCursorAdapter.
 				}, 0);
 ```
 
-### When using ProGuard
+# When using ProGuard
 ```java
 # Ensures entities remain un-obfuscated so table and columns are named correctly
 -keep class com.yourpackage.yourapp.domainclasspackage.** { *; }
