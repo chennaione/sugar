@@ -1,7 +1,8 @@
-package com.orm;
+package com.orm.helper;
 
 import android.provider.BaseColumns;
 
+import com.orm.Configuration;
 import com.orm.helper.ClassicSchemaGenerator;
 import com.orm.models.EmptyModel;
 import com.orm.models.IntUniqueModel;

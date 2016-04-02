@@ -7,6 +7,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.orm.Configuration;
+import com.orm.KeyWords;
 import com.orm.dsl.Column;
 import com.orm.dsl.MultiUnique;
 import com.orm.dsl.NotNull;
@@ -177,14 +178,24 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 
 	public String createTableSQL(Class<?> table) {
 		//Log.i(TAG, "Create table if not exists");
+		KeyWords link = new KeyWords();
+
 		List<Field> fields = ReflectionUtil.getTableFields(table);
 		String tableName = NamingHelper.toSQLName(table);
+
+
+		if (link.isaReservedWords(tableName)) {
+			// FIXME, This should throw an exception for a fail-fast pattern.
+			Log.e(SUGAR, "ERROR, SQLITE RESERVED WORD \"" + tableName + "\" USED IN " + tableName);
+		}
+
 		Log.i(TAG, "\t" + tableName);
 		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
 		sb.append(tableName)
 		  .append(" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT ");
 
 		for (Field column : fields) {
+			// FIXME keysword check should be done on the column names as well.
 			String columnName = NamingHelper.toSQLName(column);
 			String columnType = QueryBuilder.getColumnType(column.getType());
 

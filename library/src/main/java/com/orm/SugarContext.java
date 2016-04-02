@@ -70,7 +70,7 @@ public class SugarContext {
 		}
 	}
 
-	protected SugarDb getSugarDb() {
+	public SugarDb getSugarDb() {
 		return sugarDb;
 	}
 
