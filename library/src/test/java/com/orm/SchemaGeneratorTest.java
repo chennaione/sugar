@@ -1,6 +1,5 @@
 package com.orm;
 
-import com.orm.dsl.Table;
 import com.orm.models.EmptyModel;
 import com.orm.models.IntUniqueModel;
 import com.orm.models.MultiColumnUniqueModel;
