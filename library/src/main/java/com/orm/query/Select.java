@@ -6,11 +6,20 @@ import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class Select<T> implements Iterable {
+    private static final String SPACE = " ";
+    private static final String SINGLE_QUOTE = "'";
+    private static final String LEFT_PARENTHESIS = "(";
+    private static final String RIGHT_PARENTHESIS = ")";
+    private static final String SELECT_FROM = "SELECT * FROM ";
+    private static final String WHERE = "WHERE ";
+    private static final String ORDER_BY = "ORDER BY ";
+    private static final String GROUP_BY = "GROUP BY ";
+    private static final String LIMIT = "LIMIT ";
+    private static final String OFFSET = "OFFSET ";
 
     private Class<T> record;
     private String[] arguments;
@@ -19,24 +28,14 @@ public class Select<T> implements Iterable {
     private String groupBy = "";
     private String limit = "";
     private String offset = "";
-    private List<String> args = new ArrayList<String>();
-    private static final String SPACE =" ";
-    private static final String SINGLE_QUOTE ="'";
-    private static final String LEFT_PARENTHESIS="(";
-    private static final String RIGHT_PARENTHESIS=")";
-    private static final String SELECT_FROM="SELECT * FROM ";
-    private static final String WHERE="WHERE ";
-    private static final String ORDER_BY ="ORDER BY ";
-    private static final String GROUP_BY ="GROUP BY ";
-    private static final String LIMIT ="LIMIT ";
-    private static final String OFFSET ="OFFSET ";
+    private List<String> args = new ArrayList<>();
 
     public Select(Class<T> record) {
         this.record = record;
     }
 
     public static <T> Select<T> from(Class<T> record) {
-        return new Select<T>(record);
+        return new Select<>(record);
     }
 
     public Select<T> orderBy(String prop) {
