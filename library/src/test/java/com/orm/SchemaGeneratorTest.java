@@ -1,8 +1,6 @@
 package com.orm;
 
-import com.orm.dsl.Table;
 import com.orm.models.EmptyModel;
-import com.orm.models.TRANSACTION;
 import com.orm.models.IntUniqueModel;
 import com.orm.models.MultiColumnUniqueModel;
 import com.orm.models.StringFieldAnnotatedModel;
@@ -74,12 +72,5 @@ public class SchemaGeneratorTest {
                         "A INTEGER, B INTEGER, " +
                         "UNIQUE(A, B) ON CONFLICT REPLACE ) ",
                 createSQL);
-    }
-    @Test
-    public void testKeyWordModel(){
-        SchemaGenerator schemaGenerator = new SchemaGenerator(new DummyContext() );
-        String createSQL = schemaGenerator.createTableSQL(TRANSACTION.class);
-        assertEquals("ERROR, SQLITE KEYWORD USED IN "+NamingHelper.toSQLName(TRANSACTION.class),createSQL);
-
     }
 }

@@ -181,10 +181,9 @@ public class SchemaGenerator {
         Log.i(SUGAR, "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
-        if(link.ReservedWords(tableName))
+        if(link.isaReservedWords(tableName))
         {
-            return "ERROR, SQLITE KEYWORD USED IN " +tableName;
-
+            Log.i(SUGAR,"ERROR, SQLITE RESERVED WORD USED IN " + tableName);
         }
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
