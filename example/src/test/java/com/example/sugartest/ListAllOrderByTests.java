@@ -6,7 +6,6 @@ import android.provider.BaseColumns;
 import com.example.models.IntegerFieldExtendedModel;
 import com.orm.Configuration;
 import com.orm.SugarRecord;
-import com.orm.query.DummyContext;
 
 import org.junit.Before;
 import org.junit.Test;

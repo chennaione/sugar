@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.example.models.SimpleExtendedModel;
 import com.orm.Configuration;
 import com.orm.SugarRecord;
-import com.orm.query.DummyContext;
 import com.orm.util.NamingHelper;
 
 import org.junit.Before;
