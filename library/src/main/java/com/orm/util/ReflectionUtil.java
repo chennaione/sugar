@@ -66,12 +66,12 @@ public class ReflectionUtil {
 		return fields;
 	}
 
-	public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
+	public static void addFieldValueToColumn(Configuration config, ContentValues values, Field column, Object object,
 											 Map<Object, Long> entitiesMap) {
 		column.setAccessible(true);
 		Class<?> columnType = column.getType();
 		try {
-			String columnName = NamingHelper.toSQLName(column);
+			String columnName = NamingHelper.toSQLName(config, column);
 			Object columnValue = column.get(object);
 
 			if (columnType.isAnnotationPresent(Table.class)) {
@@ -153,11 +153,11 @@ public class ReflectionUtil {
 		}
 	}
 
-	public static void setFieldValueFromCursor(Cursor cursor, Field field, Object object) {
+	public static void setFieldValueFromCursor(Configuration config, Cursor cursor, Field field, Object object) {
 		field.setAccessible(true);
 		try {
 			Class fieldType = field.getType();
-			String colName = NamingHelper.toSQLName(field);
+			String colName = NamingHelper.toSQLName(config, field);
 
 			int columnIndex = cursor.getColumnIndex(colName);
 

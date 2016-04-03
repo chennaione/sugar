@@ -25,17 +25,15 @@ public class SugarContentProvider extends android.content.ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		//final Configuration configuration = getConfiguration();
 
+		// XXX This must always happen first.
 		SugarContext.init(Configuration.manifest(getContext()));
 
-		//SugarContext.getSugarContext().getConfiguration()
-
-		final String authority = SugarContext.getSugarContext().getConfiguration()
-											 .getAuthority();
+		final String authority = getConfiguration()
+				.getAuthority();
 
 		List<Class> classList = ReflectionUtil
-				.getDomainClasses(SugarContext.getSugarContext().getConfiguration());
+				.getDomainClasses(getConfiguration());
 
 
 		final int size = classList.size();
@@ -46,12 +44,14 @@ public class SugarContentProvider extends android.content.ContentProvider {
 
 			// content://<authority>/<table>
 			uriMatcher
-					.addURI(authority, NamingHelper.toSQLName(tableClass).toLowerCase(), tableKey);
+					.addURI(authority, NamingHelper.toSQLName(getConfiguration(), tableClass)
+												   .toLowerCase(), tableKey);
 			typeCodes.put(tableKey, tableClass);
 
 			// content://<authority>/<table>/<id>
 			uriMatcher.addURI(authority,
-					NamingHelper.toSQLName(tableClass).toLowerCase() + "/#", itemKey);
+					NamingHelper.toSQLName(getConfiguration(), tableClass).toLowerCase() +
+					"/#", itemKey);
 			typeCodes.put(itemKey, tableClass);
 		}
 
@@ -89,7 +89,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 		mimeTypeBufer.append(".");
 		mimeTypeBufer.append(SugarContext.getSugarContext().getConfiguration().getAuthority());
 		mimeTypeBufer.append(".");
-		mimeTypeBufer.append(NamingHelper.toSQLName(type));
+		mimeTypeBufer.append(NamingHelper.toSQLName(getConfiguration(), type));
 		return mimeTypeBufer.toString();
 	}
 
@@ -97,7 +97,8 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		final Class<?> type = getModelType(uri);
-		final Long id = getDatabase().insert(NamingHelper.toSQLName(type), null, values);
+		final Long id = getDatabase()
+				.insert(NamingHelper.toSQLName(getConfiguration(), type), null, values);
 
 		if (id != null && id > 0) {
 			Uri retUri = createUri(type, id);
@@ -113,7 +114,8 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 		final Class<?> type = getModelType(uri);
 		final int count = getDatabase()
-				.update(NamingHelper.toSQLName(type), values, selection, selectionArgs);
+				.update(NamingHelper
+						.toSQLName(getConfiguration(), type), values, selection, selectionArgs);
 
 		notifyChange(uri);
 
@@ -124,7 +126,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		final Class<?> type = getModelType(uri);
 		final int count = getDatabase()
-				.delete(NamingHelper.toSQLName(type), selection, selectionArgs);
+				.delete(NamingHelper.toSQLName(getConfiguration(), type), selection, selectionArgs);
 
 		notifyChange(uri);
 
@@ -135,7 +137,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		final Class<?> type = getModelType(uri);
 		final Cursor cursor = getDatabase().query(
-				NamingHelper.toSQLName(type),
+				NamingHelper.toSQLName(getConfiguration(), type),
 				projection,
 				selection,
 				selectionArgs,
@@ -152,9 +154,10 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public static Uri createUri(Class<?> type, Long id) {
 		final StringBuilder uri = new StringBuilder();
 		uri.append("content://");
-		uri.append(SugarContext.getSugarContext().getConfiguration().getAuthority());
+		final Configuration configuration = SugarContext.getSugarContext().getConfiguration();
+		uri.append(configuration.getAuthority());
 		uri.append("/");
-		uri.append(NamingHelper.toSQLName(type).toLowerCase());
+		uri.append(NamingHelper.toSQLName(configuration, type).toLowerCase());
 
 		if (id != null) {
 			uri.append("/");
@@ -181,5 +184,9 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	
 	public SQLiteDatabase getDatabase() {
 		return SugarContext.getSugarContext().getSugarDb().getDB();
+	}
+	
+	public Configuration getConfiguration() {
+		return SugarContext.getSugarContext().getConfiguration();
 	}
 }

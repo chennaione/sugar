@@ -1,9 +1,12 @@
 package com.example.sugartest;
 
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 
 import com.example.models.SimpleAnnotatedModel;
+import com.orm.Configuration;
 import com.orm.SugarRecord;
+import com.orm.query.DummyContext;
 import com.orm.util.NamingHelper;
 
 import org.junit.Before;
@@ -30,11 +33,25 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk = 18)
 public class SimpleAnnotatedModelTests {
 
+	private Configuration config = Configuration.get(null);
+
+	private String idName() {
+		return config.getIdColumnName();
+	}
+
+	@NonNull
+	private String id() {
+		return idName() + " = ?";
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		ShadowLog.stream = System.out;
 		//you other setup here
 	}
+
+
+
 
 	@Test
 	public void emptyDatabaseTest() throws Exception {
@@ -72,19 +89,19 @@ public class SimpleAnnotatedModelTests {
 		save(new SimpleAnnotatedModel());
 		save(new SimpleAnnotatedModel());
 		assertEquals(1L, SugarRecord
-				.count(SimpleAnnotatedModel.class, BaseColumns._ID + " = ?", new String[]{"1"}));
+				.count(SimpleAnnotatedModel.class, id(), new String[]{"1"}));
 	}
 
 	@Test
 	public void whereNoCountTest() throws Exception {
 		assertEquals(0L, SugarRecord
-				.count(SimpleAnnotatedModel.class, BaseColumns._ID + " = ?", new String[]{"1"}));
+				.count(SimpleAnnotatedModel.class, id(), new String[]{"1"}));
 		save(new SimpleAnnotatedModel());
 		save(new SimpleAnnotatedModel());
 		assertEquals(0L, SugarRecord
-				.count(SimpleAnnotatedModel.class, BaseColumns._ID + " = ?", new String[]{"3"}));
+				.count(SimpleAnnotatedModel.class, id(), new String[]{"3"}));
 		assertEquals(0L, SugarRecord
-				.count(SimpleAnnotatedModel.class, BaseColumns._ID + " = ?", new String[]{"a"}));
+				.count(SimpleAnnotatedModel.class, id(), new String[]{"a"}));
 	}
 
 	@Test
@@ -141,10 +158,11 @@ public class SimpleAnnotatedModelTests {
 			save(new SimpleAnnotatedModel());
 		}
 		assertEquals(elementNumber - 1, SugarRecord.deleteAll(SimpleAnnotatedModel.class,
-				BaseColumns._ID+" > ?",
+				idName() + " > ?",
 				new String[]{"1"}));
 		assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
 	}
+	
 
 	@Test
 	public void deleteInTransactionFewTest() throws Exception {
@@ -199,7 +217,7 @@ public class SimpleAnnotatedModelTests {
 		save(new SimpleAnnotatedModel());
 		save(new SimpleAnnotatedModel());
 		List<SimpleAnnotatedModel> models =
-				SugarRecord.find(SimpleAnnotatedModel.class, BaseColumns._ID + " = ?", "2");
+				SugarRecord.find(SimpleAnnotatedModel.class, id(), "2");
 		assertEquals(1, models.size());
 		assertEquals(new Long(2L), models.get(0).getId());
 	}
@@ -212,8 +230,8 @@ public class SimpleAnnotatedModelTests {
 		List<SimpleAnnotatedModel> models =
 				SugarRecord.findWithQuery(SimpleAnnotatedModel.class, "Select * from " +
 																	  NamingHelper
-																			  .toSQLName(SimpleAnnotatedModel.class) +
-																	  " where " + BaseColumns._ID +
+																			  .toSQLName(config, SimpleAnnotatedModel.class) +
+																	  " where " + idName() +
 																	  " >= ? ", "50");
 		for (SimpleAnnotatedModel model : models) {
 			assertEquals(new Long(75), model.getId(), 25L);
@@ -315,7 +333,7 @@ public class SimpleAnnotatedModelTests {
 		}
 		Iterator<SimpleAnnotatedModel> cursor = SugarRecord
 				.findAsIterator(SimpleAnnotatedModel.class,
-						BaseColumns._ID + " >= ?", "50");
+						idName() + " >= ?", "50");
 		for (int i = 50; i <= 100; i++) {
 			assertTrue(cursor.hasNext());
 			SimpleAnnotatedModel model = cursor.next();
@@ -332,8 +350,8 @@ public class SimpleAnnotatedModelTests {
 		Iterator<SimpleAnnotatedModel> cursor =
 				SugarRecord.findWithQueryAsIterator(SimpleAnnotatedModel.class,
 						"Select * from " +
-						NamingHelper.toSQLName(SimpleAnnotatedModel.class) +
-						" where " + BaseColumns._ID + " >= ? ", "50");
+						NamingHelper.toSQLName(config, SimpleAnnotatedModel.class) +
+						" where " + idName() + " >= ? ", "50");
 		for (int i = 50; i <= 100; i++) {
 			assertTrue(cursor.hasNext());
 			SimpleAnnotatedModel model = cursor.next();
@@ -347,7 +365,7 @@ public class SimpleAnnotatedModelTests {
 		save(new SimpleAnnotatedModel());
 		Iterator<SimpleAnnotatedModel> cursor = SugarRecord
 				.findAsIterator(SimpleAnnotatedModel.class,
-						BaseColumns._ID + " = ?", "1");
+						id(), "1");
 		assertTrue(cursor.hasNext());
 		SimpleAnnotatedModel model = cursor.next();
 		assertNotNull(model);
@@ -361,7 +379,7 @@ public class SimpleAnnotatedModelTests {
 		save(new SimpleAnnotatedModel());
 		Iterator<SimpleAnnotatedModel> cursor = SugarRecord
 				.findAsIterator(SimpleAnnotatedModel.class,
-						BaseColumns._ID + " = ?", "1");
+						id(), "1");
 		assertTrue(cursor.hasNext());
 		SimpleAnnotatedModel model = cursor.next();
 		assertNotNull(model);
@@ -369,6 +387,8 @@ public class SimpleAnnotatedModelTests {
 		// This should throw a UnsupportedOperationException
 		cursor.remove();
 	}
+
+
 
 	@Test
 	public void vacuumTest() throws Exception {

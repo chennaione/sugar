@@ -63,7 +63,7 @@ public class ClassicSchemaGenerator extends SugarSchemaGenerator {
 		String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
 
 		for (Class domain : domainClasses) {
-			String tableName = NamingHelper.toSQLName(domain);
+			String tableName = NamingHelper.toSQLName(getConfiguration(), domain);
 			Cursor c = db.rawQuery(String.format(sql, tableName), null);
 			if (c.moveToFirst() && c.getInt(0) == 0) {
 				createTable(domain, db);

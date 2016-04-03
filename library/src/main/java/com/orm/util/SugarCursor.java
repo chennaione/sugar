@@ -5,8 +5,14 @@ import android.database.CursorWrapper;
 import android.provider.BaseColumns;
 
 public class SugarCursor extends CursorWrapper {
-	public SugarCursor(Cursor cursor) {
+	private String idName = BaseColumns._ID;
+
+	public SugarCursor(String idName, Cursor cursor) {
 		super(cursor);
+
+		if (idName != null) {
+			this.idName = idName;
+		}
 	}
 
 	@Override
@@ -15,7 +21,7 @@ public class SugarCursor extends CursorWrapper {
 			return super.getColumnIndexOrThrow(columnName);
 		} catch (IllegalArgumentException e) {
 			if (columnName.equals("_id") || columnName.equalsIgnoreCase("ID")) {
-				return super.getColumnIndexOrThrow(BaseColumns._ID);
+				return super.getColumnIndexOrThrow(idName);
 			} else {
 				throw e;
 			}
@@ -25,7 +31,7 @@ public class SugarCursor extends CursorWrapper {
 	@Override
 	public int getColumnIndex(String columnName) {
 		if (columnName.equals("_id") || columnName.equalsIgnoreCase("ID")) {
-			columnName = BaseColumns._ID;
+			columnName = idName;
 		}
 		return super.getColumnIndex(columnName);
 	}

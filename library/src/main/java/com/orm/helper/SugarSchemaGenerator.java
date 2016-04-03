@@ -138,12 +138,12 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 	protected void addColumns(Class<?> table, SQLiteDatabase sqLiteDatabase) {
 
 		List<Field> fields = ReflectionUtil.getTableFields(table);
-		String tableName = NamingHelper.toSQLName(table);
+		String tableName = NamingHelper.toSQLName(getConfiguration(), table);
 		ArrayList<String> presentColumns = getColumnNames(sqLiteDatabase, tableName);
 		ArrayList<String> alterCommands = new ArrayList<>();
 
 		for (Field column : fields) {
-			String columnName = NamingHelper.toSQLName(column);
+			String columnName = NamingHelper.toSQLName(getConfiguration(), column);
 			String columnType = QueryBuilder.getColumnType(column.getType());
 
 			if (column.isAnnotationPresent(Column.class)) {
@@ -181,7 +181,7 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 		KeyWords link = new KeyWords();
 
 		List<Field> fields = ReflectionUtil.getTableFields(table);
-		String tableName = NamingHelper.toSQLName(table);
+		String tableName = NamingHelper.toSQLName(getConfiguration(), table);
 
 
 		if (link.isaReservedWords(tableName)) {
@@ -192,11 +192,11 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 		Log.i(TAG, "\t" + tableName);
 		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
 		sb.append(tableName)
-		  .append(" ( " + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT ");
+		  .append(" ( " + idName() + " INTEGER PRIMARY KEY AUTOINCREMENT ");
 
 		for (Field column : fields) {
 			// FIXME keysword check should be done on the column names as well.
-			String columnName = NamingHelper.toSQLName(column);
+			String columnName = NamingHelper.toSQLName(getConfiguration(), column);
 			String columnType = QueryBuilder.getColumnType(column.getType());
 
 			//Log.d("TESTING", "columnName:"+columnName+", columnType:"+columnType);
@@ -204,7 +204,7 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 
 			if (columnType != null) {
 				// XXX ID is already included as a special column.
-				if (columnName.equalsIgnoreCase(BaseColumns._ID)) {
+				if (columnName.equalsIgnoreCase(idName())) {
 					continue;
 				}
 
@@ -249,7 +249,7 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 
 			String[] constraintFields = constraint.split(",");
 			for (int i = 0; i < constraintFields.length; i++) {
-				String columnName = NamingHelper.toSQLNameDefault(constraintFields[i]);
+				String columnName = NamingHelper.toSQLNameDefault(getConfiguration(), constraintFields[i]);
 				sb.append(columnName);
 
 				if (i < (constraintFields.length - 1)) {
@@ -265,7 +265,11 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 
 		return sb.toString();
 	}
-
+	
+	private String idName() {
+		return getConfiguration().getIdColumnName();
+	}
+	
 	protected void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
 		String createSQL = createTableSQL(table);
 

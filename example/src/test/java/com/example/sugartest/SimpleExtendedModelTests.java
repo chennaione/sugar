@@ -1,9 +1,12 @@
 package com.example.sugartest;
 
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 
 import com.example.models.SimpleExtendedModel;
+import com.orm.Configuration;
 import com.orm.SugarRecord;
+import com.orm.query.DummyContext;
 import com.orm.util.NamingHelper;
 
 import org.junit.Before;
@@ -29,6 +32,18 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = 18)
 public class SimpleExtendedModelTests {
+
+	private Configuration config = Configuration.get(null);
+
+	private String idName() {
+		return config.getIdColumnName();
+	}
+
+	@NonNull
+	private String id() {
+		return idName() + " = ?";
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		ShadowLog.stream = System.out;
@@ -71,19 +86,19 @@ public class SimpleExtendedModelTests {
 		save(new SimpleExtendedModel());
 		save(new SimpleExtendedModel());
 		assertEquals(1L, SugarRecord
-				.count(SimpleExtendedModel.class, BaseColumns._ID + " = ?", new String[]{"1"}));
+				.count(SimpleExtendedModel.class, id(), new String[]{"1"}));
 	}
 
 	@Test
 	public void whereNoCountTest() throws Exception {
 		assertEquals(0L, SugarRecord
-				.count(SimpleExtendedModel.class, BaseColumns._ID + " = ?", new String[]{"1"}));
+				.count(SimpleExtendedModel.class, id(), new String[]{"1"}));
 		save(new SimpleExtendedModel());
 		save(new SimpleExtendedModel());
 		assertEquals(0L, SugarRecord
-				.count(SimpleExtendedModel.class, BaseColumns._ID + " = ?", new String[]{"3"}));
+				.count(SimpleExtendedModel.class, id(), new String[]{"3"}));
 		assertEquals(0L, SugarRecord
-				.count(SimpleExtendedModel.class, BaseColumns._ID + " = ?", new String[]{"a"}));
+				.count(SimpleExtendedModel.class, id(), new String[]{"a"}));
 	}
 
 	@Test
@@ -148,7 +163,7 @@ public class SimpleExtendedModelTests {
 			save(new SimpleExtendedModel());
 		}
 		assertEquals(elementNumber - 1, SugarRecord.deleteAll(SimpleExtendedModel.class,
-				BaseColumns._ID + " > ?",
+				idName() + " > ?",
 				new String[]{"1"}));
 		assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
 	}
@@ -206,7 +221,7 @@ public class SimpleExtendedModelTests {
 		save(new SimpleExtendedModel());
 		save(new SimpleExtendedModel());
 		List<SimpleExtendedModel> models =
-				SugarRecord.find(SimpleExtendedModel.class, BaseColumns._ID + " = ?", "2");
+				SugarRecord.find(SimpleExtendedModel.class, id(), "2");
 		assertEquals(1, models.size());
 		assertEquals(new Long(2L), models.get(0).getId());
 	}
@@ -219,8 +234,8 @@ public class SimpleExtendedModelTests {
 		List<SimpleExtendedModel> models =
 				SugarRecord.findWithQuery(SimpleExtendedModel.class, "Select * from " +
 																	 NamingHelper
-																			 .toSQLName(SimpleExtendedModel.class) +
-																	 " where " + BaseColumns._ID +
+																			 .toSQLName(config, SimpleExtendedModel.class) +
+																	 " where " + idName() +
 																	 " >= ? ", "50");
 		for (SimpleExtendedModel model : models) {
 			assertEquals(new Long(75), model.getId(), 25L);
@@ -321,7 +336,7 @@ public class SimpleExtendedModelTests {
 			save(new SimpleExtendedModel());
 		}
 		Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
-				BaseColumns._ID + " >= ?", "50");
+				idName() + " >= ?", "50");
 		for (int i = 50; i <= 100; i++) {
 			assertTrue(cursor.hasNext());
 			SimpleExtendedModel model = cursor.next();
@@ -338,8 +353,8 @@ public class SimpleExtendedModelTests {
 		Iterator<SimpleExtendedModel> cursor =
 				SugarRecord.findWithQueryAsIterator(SimpleExtendedModel.class,
 						"Select * from " +
-						NamingHelper.toSQLName(SimpleExtendedModel.class) +
-						" where " + BaseColumns._ID + " >= ? ", "50");
+						NamingHelper.toSQLName(config, SimpleExtendedModel.class) +
+						" where " + idName() + " >= ? ", "50");
 		for (int i = 50; i <= 100; i++) {
 			assertTrue(cursor.hasNext());
 			SimpleExtendedModel model = cursor.next();
@@ -352,7 +367,7 @@ public class SimpleExtendedModelTests {
 	public void findAsIteratorOutOfBoundsTest() throws Exception {
 		save(new SimpleExtendedModel());
 		Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
-				BaseColumns._ID + " = ?", "1");
+				id(), "1");
 		assertTrue(cursor.hasNext());
 		SimpleExtendedModel model = cursor.next();
 		assertNotNull(model);
@@ -365,7 +380,7 @@ public class SimpleExtendedModelTests {
 	public void disallowRemoveCursorTest() throws Exception {
 		save(new SimpleExtendedModel());
 		Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
-				BaseColumns._ID + " = ?", "1");
+				id(), "1");
 		assertTrue(cursor.hasNext());
 		SimpleExtendedModel model = cursor.next();
 		assertNotNull(model);

@@ -6,11 +6,9 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.orm.dsl.Column;
 import com.orm.dsl.Table;
 import com.orm.dsl.Unique;
 import com.orm.util.NamingHelper;
@@ -34,8 +32,13 @@ public class SugarRecord {
 	public static final String TAG = "SugarRecord";
 	public static final boolean DEBUG_CURSOR = false;
 
-	@Column(name = BaseColumns._ID)
+	//@Column(name = BaseColumns._ID)
 	private Long id = null;
+
+	private static Configuration getConfiguration() {
+		return getSugarContext()
+				.getConfiguration();
+	}
 
 	private static SQLiteDatabase getSugarDataBase() {
 		return getSugarContext().getSugarDb().getDB();
@@ -47,18 +50,20 @@ public class SugarRecord {
 
 	public static <T> int deleteAll(Class<T> type, String whereClause, String... whereArgs) {
 		final int deleted = getSugarDataBase()
-				.delete(NamingHelper.toSQLName(type), whereClause, whereArgs);
+				.delete(NamingHelper.toSQLName(getConfiguration(), type), whereClause, whereArgs);
 		if (deleted > 0) {
 			getSugarContext().notifyChange(type);
 		}
 		return deleted;
 	}
 
+
+
 	public static <T> Cursor getCursor(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
 		Cursor raw = getSugarDataBase()
-				.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+				.query(NamingHelper.toSQLName(getConfiguration(), type), null, whereClause, whereArgs,
 						groupBy, null, orderBy, limit);
-		return new SugarCursor(raw);
+		return new SugarCursor(idName(), raw);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -156,14 +161,21 @@ public class SugarRecord {
 	}
 
 	public static <T> List<T> findById(Class<T> type, String[] ids) {
+
 		String whereClause =
-				BaseColumns._ID + " IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+				idName() + " IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
 		return find(type, whereClause, ids);
 	}
-
+	
+	private static String idName() {
+		return getConfiguration().getIdColumnName();
+	}
+	
 	public static <T> T first(Class<T> type) {
 		List<T> list = findWithQuery(type,
-				"SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY " + BaseColumns._ID +
+				"SELECT * FROM " +
+				NamingHelper.toSQLName(getConfiguration(), type) + " ORDER BY " +
+				idName() +
 				" ASC LIMIT 1");
 		if (list.isEmpty()) {
 			return null;
@@ -173,7 +185,9 @@ public class SugarRecord {
 
 	public static <T> T last(Class<T> type) {
 		List<T> list = findWithQuery(type,
-				"SELECT * FROM " + NamingHelper.toSQLName(type) + " ORDER BY " + BaseColumns._ID +
+				"SELECT * FROM " +
+				NamingHelper.toSQLName(getConfiguration(), type) + " ORDER BY " +
+				idName() +
 				" DESC LIMIT 1");
 		if (list.isEmpty()) {
 			return null;
@@ -196,7 +210,7 @@ public class SugarRecord {
 
 	public static <T> Iterator<T> findAsIterator(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
 		Cursor cursor = getSugarDataBase()
-				.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+				.query(NamingHelper.toSQLName(getConfiguration(), type), null, whereClause, whereArgs,
 						groupBy, null, orderBy, limit);
 		return new CursorIterator<T>(type, cursor);
 	}
@@ -217,7 +231,7 @@ public class SugarRecord {
 
 	public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
 		Cursor cursor = getSugarDataBase()
-				.query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+				.query(NamingHelper.toSQLName(getConfiguration(), type), null, whereClause, whereArgs,
 						groupBy, null, orderBy, limit);
 
 		return getEntitiesFromCursor(cursor, type);
@@ -255,7 +269,8 @@ public class SugarRecord {
 		SQLiteStatement sqliteStatement;
 		try {
 			sqliteStatement = getSugarDataBase().compileStatement(
-					"SELECT count(*) FROM " + NamingHelper.toSQLName(type) + filter);
+					"SELECT count(*) FROM " +
+					NamingHelper.toSQLName(getConfiguration(), type) + filter);
 		} catch (SQLiteException e) {
 			e.printStackTrace();
 			return result;
@@ -286,7 +301,7 @@ public class SugarRecord {
 		ContentValues values = new ContentValues(fields.size());
 		Field idField = null;
 		for (Field field : fields) {
-			ReflectionUtil.addFieldValueToColumn(values, field, object, entitiesMap);
+			ReflectionUtil.addFieldValueToColumn(getConfiguration(), values, field, object, entitiesMap);
 			if (field.getName().equals("id")) {
 				idField = field;
 			}
@@ -295,10 +310,11 @@ public class SugarRecord {
 		boolean isSugarEntity = isSugarEntity(object.getClass());
 		if (isSugarEntity && entitiesMap.containsKey(object)) {
 			//values.put("id", entitiesMap.get(object));
-			values.put(BaseColumns._ID, entitiesMap.get(object));
+			values.put(idName(), entitiesMap.get(object));
 		}
 
-		long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
+		long id = db.insertWithOnConflict(NamingHelper
+				.toSQLName(getConfiguration(), object.getClass()), null, values,
 				SQLiteDatabase.CONFLICT_REPLACE);
 
 		if (object.getClass().isAnnotationPresent(Table.class)) {
@@ -337,7 +353,8 @@ public class SugarRecord {
 			if (field.isAnnotationPresent(Unique.class)) {
 				try {
 					field.setAccessible(true);
-					String columnName = NamingHelper.toSQLName(field);
+					String columnName = NamingHelper
+							.toSQLName(getConfiguration(), field);
 					Object columnValue = field.get(object);
 
 					whereClause.append(column(columnName));
@@ -348,14 +365,16 @@ public class SugarRecord {
 				}
 			} else {
 				if (!field.getName().equals("id")) {
-					ReflectionUtil.addFieldValueToColumn(values, field, object, entitiesMap);
+					ReflectionUtil.addFieldValueToColumn(getConfiguration(), values, field, object, entitiesMap);
 				}
 			}
 		}
 
 		String[] whereArgsArray = whereArgs.toArray(new String[whereArgs.size()]);
 		// Get SugarRecord based on Unique values
-		long rowsEffected = db.update(NamingHelper.toSQLName(object.getClass()), values, whereClause
+		long rowsEffected = db.update(NamingHelper
+				.toSQLName(getConfiguration(), object
+						.getClass()), values, whereClause
 				.toString(), whereArgsArray);
 
 		if (rowsEffected == 0) {
@@ -382,7 +401,7 @@ public class SugarRecord {
 		}
 		List<Field> columns = ReflectionUtil.getTableFields(entity.getClass());
 		if (!entitiesMap.containsKey(entity)) {
-			entitiesMap.put(entity, cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
+			entitiesMap.put(entity, cursor.getLong(cursor.getColumnIndex(idName())));
 		}
 
 		for (Field field : columns) {
@@ -390,13 +409,14 @@ public class SugarRecord {
 			Class<?> fieldType = field.getType();
 			if (isSugarEntity(fieldType)) {
 				try {
-					long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toSQLName(field)));
+					long id = cursor.getLong(cursor.getColumnIndex(NamingHelper
+							.toSQLName(getConfiguration(), field)));
 					field.set(entity, (id > 0) ? findById(fieldType, id) : null);
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
 			} else {
-				ReflectionUtil.setFieldValueFromCursor(cursor, field, entity);
+				ReflectionUtil.setFieldValueFromCursor(getConfiguration(), cursor, field, entity);
 			}
 		}
 	}
@@ -407,7 +427,7 @@ public class SugarRecord {
 		if (id != null && id > 0L) {
 
 			final boolean deleted = getSugarDataBase().delete(NamingHelper
-					.toSQLName(type), id(), new String[]{
+					.toSQLName(getConfiguration(), type), id(), new String[]{
 					id.toString()
 			}) == 1;
 			if (deleted) {
@@ -426,7 +446,7 @@ public class SugarRecord {
 	}
 
 	private static String id() {
-		return column(BaseColumns._ID);
+		return column(idName());
 	}
 
 	private static String column(String name) {
@@ -442,7 +462,9 @@ public class SugarRecord {
 				Long id = (Long) field.get(object);
 				if (id != null && id > 0L) {
 					boolean deleted = getSugarDataBase().delete(NamingHelper
-							.toSQLName(type), id(), new String[]{id.toString()}) == 1;
+							.toSQLName(getConfiguration(), type), id(), new String[]{
+							id.toString()
+					}) == 1;
 					if (deleted) {
 						Log.d(TAG, type.getSimpleName() + " deleted : " + id);
 						getSugarContext().notifyChange(type, id);

@@ -1,6 +1,7 @@
 package com.orm;
 
 import android.content.Context;
+import android.provider.BaseColumns;
 
 import com.orm.helper.ClassicSchemaGenerator;
 import com.orm.helper.SugarDatabaseHelper;
@@ -22,6 +23,7 @@ public class Configuration {
 	private SugarDatabaseHelper databaseHelper;
 	private boolean debug = false;
 	private String domain;
+	private String idColumnName = BaseColumns._ID;
 
 
 	public Configuration(Context context) {
@@ -34,7 +36,7 @@ public class Configuration {
 							.debug(ManifestHelper.getDebugEnabled(context)).helper()
 							.domain(ManifestHelper.getDomainPackageName(context))
 							.authority(ManifestHelper.getAuthority(context))
-							.helper(ManifestHelper.getHelper(context));
+							.helper(ManifestHelper.getHelper(context)).idColumnName(ManifestHelper.getIdColumnName(context));
 	}
 
 	public static final Configuration get(Context context) {
@@ -79,6 +81,11 @@ public class Configuration {
 		return this;
 	}
 
+	public Configuration idColumnName(String name) {
+		this.idColumnName = name;
+		return this;
+	}
+
 	/**
 	 * Uses the classic helper.
 	 *
@@ -95,6 +102,10 @@ public class Configuration {
 
 	public Context getContext() {
 		return context;
+	}
+
+	public String getIdColumnName() {
+		return idColumnName;
 	}
 
 	public String getDatabaseName() {

@@ -6,7 +6,7 @@ apply from: '../maven_push.gradle'
 apply plugin: 'maven-publish'
 
 
-version '1.5.XX'
+version '2.0.0-SNAPSHOT'
 group 'com.github.satyan'
 
 android {
@@ -43,7 +43,7 @@ publishing {
 
             groupId 'com.github.satyan'
             artifactId 'sugar'
-            version '1.6.1-SNAPSHOT'
+            version '2.0.0-SNAPSHOT'
 
             artifact bundleRelease
         }

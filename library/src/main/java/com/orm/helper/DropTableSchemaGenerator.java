@@ -41,7 +41,7 @@ public class DropTableSchemaGenerator extends SugarSchemaGenerator {
 		Log.i(TAG, "Dropping all database tables...");
 		List<Class> tables = getDomainClasses(getConfiguration());
 		for (Class table : tables) {
-			sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + NamingHelper.toSQLName(table));
+			sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + NamingHelper.toSQLName(getConfiguration(), table));
 		}
 	}
 

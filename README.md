@@ -190,6 +190,10 @@ The names of the manifest meta properties have change in this version to avoid c
 <meta-data android:name="SUGAR_VERSION" android:value="114"/>
 <meta-data android:name="SUGAR_QUERY_LOG" android:value="true"/>
 <meta-data android:name="SUGAR_DOMAIN_PACKAGE_NAME" android:value="my.model.package"/>
+
+<!-- Enable this for legacy compatibility with Sugar 1.5 or earlier. -->
+<!-- <meta-data android:name="SUGAR_ID_COLUMN_NAME" android:value="id"/> -->
+
 <!-- the name of the authority should be the same as the one use in the provider definition. -->
 <meta-data android:name="SUGAR_AUTHORITY" android:value="my.content.authority"/> 
 <!-- This changes the behaviour of the schema generator. If removed, the legacy behaviour will be used. -->

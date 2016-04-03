@@ -3,6 +3,7 @@ package com.orm.util;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.orm.helper.ClassicSchemaGenerator;
@@ -25,11 +26,13 @@ public class ManifestHelper {
 	public final static String METADATA_DOMAIN_PACKAGE_NAME = "SUGAR_DOMAIN_PACKAGE_NAME";
 	public final static String METADATA_QUERY_LOG = "SUGAR_QUERY_LOG";
 	private static final String METADATA_HELPER_CLASS = "SUGAR_SCHEMA_HELPER_CLASS";
+	private static final String METADATA_ID_COLUMN_NAME = "SUGAR_ID_COLUMN_NAME";
 	/**
 	 * The default name for the database unless specified in the AndroidManifest.
 	 */
 	public final static String DATABASE_DEFAULT_NAME = "sugar.db";
 	private static final String DEFAULT_HELPER_CLASS_NAME = ClassicSchemaGenerator.class.getName();
+
 	
 	/**
 	 * Grabs the database version from the manifest.
@@ -169,5 +172,15 @@ public class ManifestHelper {
 		} catch (Exception e) {
 			throw new RuntimeException("Could not load schema helper class", e);
 		}
+	}
+	
+	public static String getIdColumnName(Context context) {
+		String idColName = getMetaDataString(context, METADATA_ID_COLUMN_NAME);
+
+		if (idColName == null) {
+			idColName = BaseColumns._ID;
+		}
+
+		return idColName;
 	}
 }

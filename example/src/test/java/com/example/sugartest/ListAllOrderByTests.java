@@ -4,7 +4,9 @@ package com.example.sugartest;
 import android.provider.BaseColumns;
 
 import com.example.models.IntegerFieldExtendedModel;
+import com.orm.Configuration;
 import com.orm.SugarRecord;
+import com.orm.query.DummyContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +24,9 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = 18)
 public class ListAllOrderByTests {
+
+	private Configuration config = Configuration.get(null);
+
 	@Before
 	public void setUp() throws Exception {
 		ShadowLog.stream = System.out;
@@ -30,7 +35,8 @@ public class ListAllOrderByTests {
 
 	@Test
 	public void listAllOrderByEmptyTest() {
-		assertEquals(0L, SugarRecord.listAll(IntegerFieldExtendedModel.class, BaseColumns._ID).size());
+
+		assertEquals(0L, SugarRecord.listAll(IntegerFieldExtendedModel.class, config.getIdColumnName()).size());
 	}
 
 	@Test
@@ -39,7 +45,7 @@ public class ListAllOrderByTests {
 			save(new IntegerFieldExtendedModel(i));
 		}
 		List<IntegerFieldExtendedModel> models =
-				SugarRecord.listAll(IntegerFieldExtendedModel.class, BaseColumns._ID);
+				SugarRecord.listAll(IntegerFieldExtendedModel.class, config.getIdColumnName());
 		assertEquals(100L, models.size());
 		Long id = models.get(0).getId();
 		for (int i = 1; i < 100; i++) {
