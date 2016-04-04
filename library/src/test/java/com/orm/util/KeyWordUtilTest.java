@@ -21,4 +21,9 @@ public class KeyWordUtilTest {
         assertEquals(false, KeyWordUtil.isKeyword("NAME"));
         assertEquals(false, KeyWordUtil.isKeyword("LOCATION"));
     }
+
+    @Test
+    public void testNullKeyword() {
+        assertEquals(false, KeyWordUtil.isKeyword(null));
+    }
 }

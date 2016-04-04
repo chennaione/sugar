@@ -9,7 +9,7 @@ import static com.orm.util.ContextUtil.*;
 /**
  * Helper class for accessing properties in the AndroidManifest
  */
-public class ManifestHelper {
+public final class ManifestHelper {
     private static final String LOG_TAG = "Sugar";
 
     /**
@@ -28,6 +28,9 @@ public class ManifestHelper {
      * The default name for the database unless specified in the AndroidManifest.
      */
     public final static String DATABASE_DEFAULT_NAME = "Sugar.db";
+
+    //Prevent instantiation
+    private ManifestHelper() { }
 
     /**
      * Grabs the database version from the manifest.

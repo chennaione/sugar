@@ -25,6 +25,10 @@ public final class KeyWordUtil {
     private KeyWordUtil() { }
 
     public static boolean isKeyword(String word) {
+        if (null == word) {
+            return false;
+        }
+
         for (String keyWord: KEY_WORDS) {
             if (keyWord.equals(word)) {
                 return true;
