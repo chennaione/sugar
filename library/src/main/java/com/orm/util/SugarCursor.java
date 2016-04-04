@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 
 public class SugarCursor extends CursorWrapper {
+
     public SugarCursor(Cursor cursor) {
         super(cursor);
     }

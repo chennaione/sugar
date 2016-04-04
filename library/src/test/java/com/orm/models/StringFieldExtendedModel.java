@@ -8,9 +8,7 @@ import com.orm.SugarRecord;
 public class StringFieldExtendedModel extends SugarRecord {
     public String name;
 
-    public StringFieldExtendedModel() {
-
-    }
+    public StringFieldExtendedModel() { }
 
     public StringFieldExtendedModel(String name) {
         this.name = name;

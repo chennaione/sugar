@@ -7,6 +7,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class QueryBuilderTests {
+
     @Test(expected=RuntimeException.class)
     public void noArgumentsTest() {
         QueryBuilder.generatePlaceholders(0);

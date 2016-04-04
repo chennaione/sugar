@@ -7,6 +7,7 @@ import com.orm.models.StringFieldAnnotatedModel;
 import com.orm.models.StringFieldExtendedModel;
 import com.orm.models.StringFieldExtendedModelAnnotatedColumn;
 import com.orm.query.DummyContext;
+import com.orm.util.ContextUtil;
 import com.orm.util.NamingHelper;
 
 import org.junit.Test;
@@ -14,9 +15,11 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class SchemaGeneratorTest {
+
     @Test
     public void testEmptyTableCreation() throws Exception {
-        SchemaGenerator schemaGenerator = new SchemaGenerator(new DummyContext());
+        ContextUtil.init(new DummyContext());
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(EmptyModel.class) +
@@ -26,7 +29,8 @@ public class SchemaGeneratorTest {
 
     @Test
     public void testSimpleColumnTableCreation() throws Exception {
-        SchemaGenerator schemaGenerator = new SchemaGenerator(new DummyContext());
+        ContextUtil.init(new DummyContext());
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldExtendedModel.class) +
@@ -53,7 +57,8 @@ public class SchemaGeneratorTest {
 
     @Test
     public void testUniqueTableCreation() {
-        SchemaGenerator schemaGenerator = new SchemaGenerator(new DummyContext());
+        ContextUtil.init(new DummyContext());
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(IntUniqueModel.class) +
@@ -64,7 +69,8 @@ public class SchemaGeneratorTest {
 
     @Test
     public void testMultiColumnUniqueTableCreation() {
-        SchemaGenerator schemaGenerator = new SchemaGenerator(new DummyContext());
+        ContextUtil.init(new DummyContext());
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(MultiColumnUniqueModel.class) +

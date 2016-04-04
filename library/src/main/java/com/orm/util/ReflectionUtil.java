@@ -26,6 +26,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
+import static com.orm.util.ContextUtil.getContext;
+
 public class ReflectionUtil {
 
     public static List<Field> getTableFields(Class table) {
@@ -33,11 +35,11 @@ public class ReflectionUtil {
         if (fieldList != null) return fieldList;
 
         Log.d("Sugar", "Fetching properties");
-        List<Field> typeFields = new ArrayList<Field>();
+        List<Field> typeFields = new ArrayList<>();
 
         getAllFields(typeFields, table);
 
-        List<Field> toStore = new ArrayList<Field>();
+        List<Field> toStore = new ArrayList<>();
         for (Field field : typeFields) {
             if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
                 toStore.add(field);
@@ -163,7 +165,7 @@ public class ReflectionUtil {
 
             if (colName.equalsIgnoreCase("id")) {
                 long cid = cursor.getLong(columnIndex);
-                field.set(object, Long.valueOf(cid));
+                field.set(object, cid);
             } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                 field.set(object,
                         cursor.getLong(columnIndex));
@@ -217,22 +219,18 @@ public class ReflectionUtil {
                 }
             } else
                 Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
-        } catch (IllegalArgumentException e) {
-            Log.e("field set error", e.getMessage());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             Log.e("field set error", e.getMessage());
         }
     }
 
     private static Field getDeepField(String fieldName, Class<?> type) throws NoSuchFieldException {
         try {
-            Field field = type.getDeclaredField(fieldName);
-            return field;
+            return type.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
             Class superclass = type.getSuperclass();
             if (superclass != null) {
-                Field field = getDeepField(fieldName, superclass);
-                return field;
+                return getDeepField(fieldName, superclass);
             } else {
                 throw e;
             }
@@ -244,23 +242,19 @@ public class ReflectionUtil {
             Field field = getDeepField("id", object.getClass());
             field.setAccessible(true);
             field.set(object, value);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static List<Class> getDomainClasses(Context context) {
-        List<Class> domainClasses = new ArrayList<Class>();
+    public static List<Class> getDomainClasses() {
+        List<Class> domainClasses = new ArrayList<>();
         try {
-            for (String className : getAllClasses(context)) {
-                Class domainClass = getDomainClass(className, context);
+            for (String className : getAllClasses()) {
+                Class domainClass = getDomainClass(className);
                 if (domainClass != null) domainClasses.add(domainClass);
             }
-        } catch (IOException e) {
-            Log.e("Sugar", e.getMessage());
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (IOException | PackageManager.NameNotFoundException  e) {
             Log.e("Sugar", e.getMessage());
         }
 
@@ -268,10 +262,10 @@ public class ReflectionUtil {
     }
 
 
-    private static Class getDomainClass(String className, Context context) {
+    private static Class getDomainClass(String className) {
         Class<?> discoveredClass = null;
         try {
-            discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
+            discoveredClass = Class.forName(className, true, getContext().getClass().getClassLoader());
         } catch (Throwable e) {
             String error = (e.getMessage() == null) ? "getDomainClass " + className + " error" : e.getMessage();
             Log.e("Sugar", error);
@@ -292,11 +286,11 @@ public class ReflectionUtil {
     }
 
 
-    private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
-        String packageName = ManifestHelper.getDomainPackageName(context);
-        List<String> classNames = new ArrayList<String>();
+    private static List<String> getAllClasses() throws PackageManager.NameNotFoundException, IOException {
+        String packageName = ManifestHelper.getDomainPackageName();
+        List<String> classNames = new ArrayList<>();
         try {
-            List<String> allClasses = MultiDexHelper.getAllClasses(context);
+            List<String> allClasses = MultiDexHelper.getAllClasses();
             for (String classString : allClasses) {
                 if (classString.startsWith(packageName)) classNames.add(classString);
             }
@@ -304,7 +298,7 @@ public class ReflectionUtil {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Enumeration<URL> urls = classLoader.getResources("");
             while (urls.hasMoreElements()) {
-                List<String> fileNames = new ArrayList<String>();
+                List<String> fileNames = new ArrayList<>();
                 String classDirectoryName = urls.nextElement().getFile();
                 if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")
                         || classDirectoryName.contains("retrolambda")) {
@@ -317,9 +311,10 @@ public class ReflectionUtil {
                     }
                 }
             }
-        } finally {
-//            if (null != dexfile) dexfile.close();
         }
+//        } finally {
+//            if (null != dexfile) dexfile.close();
+//        }
 
         return classNames;
     }

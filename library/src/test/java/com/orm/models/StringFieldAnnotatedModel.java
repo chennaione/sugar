@@ -11,9 +11,7 @@ import com.orm.dsl.Table;
 public class StringFieldAnnotatedModel extends SugarRecord {
     public String name;
 
-    public StringFieldAnnotatedModel() {
-
-    }
+    public StringFieldAnnotatedModel() { }
 
     public StringFieldAnnotatedModel(String name) {
         this.name = name;
