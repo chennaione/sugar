@@ -1,26 +1,32 @@
 package com.orm;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.orm.util.ManifestHelper;
 import com.orm.util.SugarCursorFactory;
 
 import static com.orm.util.ManifestHelper.getDatabaseVersion;
 import static com.orm.util.ManifestHelper.getDebugEnabled;
+import static com.orm.util.ManifestHelper.getDbName;
+
+import static com.orm.util.ContextUtil.*;
 
 public class SugarDb extends SQLiteOpenHelper {
+    private static final String LOG_TAG = "Sugar";
 
     private final SchemaGenerator schemaGenerator;
     private SQLiteDatabase sqLiteDatabase;
     private int openedConnections = 0;
 
-    public SugarDb(Context context) {
-        super(context, ManifestHelper.getDatabaseName(context),
-                new SugarCursorFactory(getDebugEnabled(context)), getDatabaseVersion(context));
-        schemaGenerator = new SchemaGenerator(context);
+    //Prevent instantiation
+    private SugarDb() {
+        super(getContext(), getDbName(), new SugarCursorFactory(getDebugEnabled()), getDatabaseVersion());
+        schemaGenerator = SchemaGenerator.getInstance();
+    }
+
+    public static SugarDb getInstance() {
+        return new SugarDb();
     }
 
     @Override
@@ -43,17 +49,17 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @Override
     public synchronized SQLiteDatabase getReadableDatabase() {
-        Log.d("SUGAR", "getReadableDatabase");
+        Log.d(LOG_TAG, "getReadableDatabase");
         openedConnections++;
         return super.getReadableDatabase();
     }
 
     @Override
     public synchronized void close() {
-        Log.d("SUGAR", "getReadableDatabase");
+        Log.d(LOG_TAG, "getReadableDatabase");
         openedConnections--;
         if(openedConnections == 0) {
-            Log.d("SUGAR", "closing");
+            Log.d(LOG_TAG, "closing");
             super.close();
         }
     }

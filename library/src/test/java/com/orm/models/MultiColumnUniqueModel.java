@@ -13,8 +13,7 @@ public class MultiColumnUniqueModel extends SugarRecord {
     private int a;
     private int b;
 
-    public MultiColumnUniqueModel() {
-    }
+    public MultiColumnUniqueModel() { }
 
     public MultiColumnUniqueModel(int a, int b) {
         this.a = a;

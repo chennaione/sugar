@@ -1,6 +1,5 @@
 package com.orm;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,6 +9,7 @@ import com.orm.dsl.Column;
 import com.orm.dsl.MultiUnique;
 import com.orm.dsl.NotNull;
 import com.orm.dsl.Unique;
+import com.orm.util.KeyWordUtil;
 import com.orm.util.MigrationFileParser;
 import com.orm.util.NamingHelper;
 import com.orm.util.NumberComparator;
@@ -27,29 +27,30 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.orm.util.ReflectionUtil.getDomainClasses;
+import static com.orm.util.ContextUtil.getAssets;
 
 public class SchemaGenerator {
-
-    private Context context;
-
     public static final String NULL = " NULL";
     public static final String NOT_NULL = " NOT NULL";
     public static final String UNIQUE = " UNIQUE";
     public static final String SUGAR = "Sugar";
 
-    public SchemaGenerator(Context context) {
-        this.context = context;
+    //Prevent instantiation
+    private SchemaGenerator() { }
+
+    public static SchemaGenerator getInstance() {
+        return new SchemaGenerator();
     }
 
     public void createDatabase(SQLiteDatabase sqLiteDatabase) {
-        List<Class> domainClasses = getDomainClasses(context);
+        List<Class> domainClasses = getDomainClasses();
         for (Class domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
         }
     }
 
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        List<Class> domainClasses = getDomainClasses(context);
+        List<Class> domainClasses = getDomainClasses();
         String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
 
         for (Class domain : domainClasses) {
@@ -78,7 +79,7 @@ public class SchemaGenerator {
 
 
     public void deleteTables(SQLiteDatabase sqLiteDatabase) {
-        List<Class> tables = getDomainClasses(context);
+        List<Class> tables = getDomainClasses();
         for (Class table : tables) {
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + NamingHelper.toSQLName(table));
         }
@@ -88,7 +89,7 @@ public class SchemaGenerator {
         boolean isSuccess = false;
 
         try {
-            List<String> files = Arrays.asList(this.context.getAssets().list("sugar_upgrades"));
+            List<String> files = Arrays.asList(getAssets().list("sugar_upgrades"));
             Collections.sort(files, new NumberComparator());
             for (String file : files) {
                 Log.i(SUGAR, "filename : " + file);
@@ -114,7 +115,7 @@ public class SchemaGenerator {
 
     private void executeScript(SQLiteDatabase db, String file) {
         try {
-            InputStream is = this.context.getAssets().open("sugar_upgrades/" + file);
+            InputStream is = getAssets().open("sugar_upgrades/" + file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder sb = new StringBuilder();
             String line;
@@ -137,7 +138,6 @@ public class SchemaGenerator {
     }
 
     private void addColumns(Class<?> table, SQLiteDatabase sqLiteDatabase) {
-
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
         ArrayList<String> presentColumns = getColumnNames(sqLiteDatabase, tableName);
@@ -177,14 +177,14 @@ public class SchemaGenerator {
     }
 
     protected String createTableSQL(Class<?> table) {
-        KeyWords link = new KeyWords();
         Log.i(SUGAR, "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toSQLName(table);
-        if(link.isaReservedWords(tableName))
-        {
+
+        if(KeyWordUtil.isKeyword(tableName)) {
             Log.i(SUGAR,"ERROR, SQLITE RESERVED WORD USED IN " + tableName);
         }
+
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 

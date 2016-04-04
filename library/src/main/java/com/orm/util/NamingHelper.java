@@ -69,7 +69,7 @@ public class NamingHelper {
     /**
      * Maps a Java Class to the name of the class.
      *
-     * @param table  the generic {@link java.lang.Class<T>} that defines a database table
+     * @param table  the generic {@link java.lang.Class} that defines a database table
      * @return if the given class is annotated with {@link com.orm.dsl.Table} then the value for
      *         {@link com.orm.dsl.Table#name()} will be returned. Else, the class' simple name will 
      *         be converted from CamelCase to UNDER_SCORE notation

@@ -16,7 +16,6 @@ public class SugarCursorFactory implements SQLiteDatabase.CursorFactory {
     }
 
     public SugarCursorFactory(boolean debugEnabled) {
-
         this.debugEnabled = debugEnabled;
     }
 

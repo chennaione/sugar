@@ -1,20 +1,15 @@
 package com.orm.util;
 
-import com.orm.util.MigrationFileParser;
-
 import org.junit.Test;
-import org.junit.Before;
 
 import java.lang.String;
 
 import static junit.framework.Assert.assertEquals;
 
-public class MigrationFileParserTest{
-    MigrationFileParser emptyFile;
+public class MigrationFileParserTest {
 
     @Test
-    public void testSingleLineStatement()
-    {
+    public void testSingleLineStatement() {
         MigrationFileParser singleLineComment = new MigrationFileParser("insert into table--comment");
 
         String statements[] = singleLineComment.getStatements();
@@ -27,8 +22,9 @@ public class MigrationFileParserTest{
         assertEquals("Testing single line statement size",1,statements.length);
         assertEquals("Testing single line statement content","insert into table",statements[0]);
     }
+
     @Test
-    public void testMultiLineComment(){
+    public void testMultiLineComment() {
         MigrationFileParser multiLineComment = new MigrationFileParser("insert into table /**comment \n new line 2 \n new line 3 */hello");
 
         String statements[] = multiLineComment.getStatements();
@@ -37,7 +33,7 @@ public class MigrationFileParserTest{
     }
 
     @Test
-    public void testMixedComment(){
+    public void testMixedComment() {
         MigrationFileParser mixedComment = new MigrationFileParser("insert into/*multiline\n **comment*/--comment");
 
         String statements[] = mixedComment.getStatements();

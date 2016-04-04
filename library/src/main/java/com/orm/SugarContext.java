@@ -2,6 +2,8 @@ package com.orm;
 
 import android.content.Context;
 
+import com.orm.util.ContextUtil;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -12,8 +14,8 @@ public class SugarContext {
     private SugarDb sugarDb;
     private Map<Object, Long> entitiesMap;
 
-    private SugarContext(Context context) {
-        this.sugarDb = new SugarDb(context);
+    private SugarContext() {
+        this.sugarDb = SugarDb.getInstance();
         this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }
     
@@ -25,7 +27,8 @@ public class SugarContext {
     }
 
     public static void init(Context context) {
-        instance = new SugarContext(context);
+        ContextUtil.init(context);
+        instance = new SugarContext();
     }
 
     public static void terminate() {
@@ -33,6 +36,7 @@ public class SugarContext {
             return;
         }
         instance.doTerminate();
+        ContextUtil.terminate();
     }
 
     /*
