@@ -265,7 +265,7 @@ public class ReflectionUtil {
     private static Class getDomainClass(String className) {
         Class<?> discoveredClass = null;
         try {
-            discoveredClass = Class.forName(className, true, getContext().getClass().getClassLoader());
+            discoveredClass = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
         } catch (Throwable e) {
             String error = (e.getMessage() == null) ? "getDomainClass " + className + " error" : e.getMessage();
             Log.e("Sugar", error);
