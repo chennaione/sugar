@@ -198,7 +198,11 @@ public class SugarRecord {
     }
 
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
-        Cursor cursor = getSugarDataBase().query(NamingHelper.toSQLName(type), null, whereClause, whereArgs,
+
+        String args[];
+        args = (whereArgs == null) ? null : replaceArgs(whereArgs);
+
+        Cursor cursor = getSugarDataBase().query(NamingHelper.toSQLName(type), null, whereClause, args,
                 groupBy, null, orderBy, limit);
 
         return getEntitiesFromCursor(cursor, type);
@@ -477,6 +481,19 @@ public class SugarRecord {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+    }
+
+    public static String[] replaceArgs(String[] args){
+
+        String [] replace = new String[args.length];
+        for (int i=0; i<args.length; i++){
+
+            replace[i]= (args[i].equals("true")) ? replace[i]="1" : (args[i].equals("false")) ? replace[i]="0" : args[i];
+
+        }
+
+        return replace;
+
     }
 
 }
