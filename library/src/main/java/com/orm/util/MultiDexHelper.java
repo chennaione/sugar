@@ -25,7 +25,7 @@ import static com.orm.util.ContextUtil.getPackageName;
 public class MultiDexHelper {
     private static final String EXTRACTED_NAME_EXT = ".classes";
     private static final String EXTRACTED_SUFFIX = ".zip";
-    private static final String INSTANT_RUN_DEX_DIR_PATH = "files/instant-run/dex/";
+
     private static final String SECONDARY_FOLDER_NAME = "code_cache" + File.separator + "secondary-dexes";
     private static final String PREFS_FILE = "multidex.version";
     private static final String KEY_DEX_NUMBER = "dex.number";
@@ -39,7 +39,7 @@ public class MultiDexHelper {
     }
 
     /**
-     * get all the dex path, including instant-run classes
+     * get all the dex path
      *
      * @return all the dex path
      * @throws PackageManager.NameNotFoundException
@@ -49,16 +49,9 @@ public class MultiDexHelper {
         ApplicationInfo applicationInfo = getPackageManager().getApplicationInfo(getPackageName(), 0);
         File sourceApk = new File(applicationInfo.sourceDir);
         File dexDir = new File(applicationInfo.dataDir, SECONDARY_FOLDER_NAME);
-        File instantRunDir = new File(applicationInfo.dataDir, INSTANT_RUN_DEX_DIR_PATH); //default instant-run dir
 
         List<String> sourcePaths = new ArrayList<>();
         sourcePaths.add(applicationInfo.sourceDir); //add the default apk path
-
-        if (instantRunDir.exists()) { //check if app using instant run
-            for(final File dexFile : instantRunDir.listFiles()) { //add all sources from instan-run
-                sourcePaths.add(dexFile.getAbsolutePath());
-            }
-        }
 
         //the prefix of extracted file, ie: test.classes
         String extractedFilePrefix = sourceApk.getName() + EXTRACTED_NAME_EXT;
