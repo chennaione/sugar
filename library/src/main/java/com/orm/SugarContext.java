@@ -14,11 +14,10 @@ public class SugarContext {
     private static SugarContext instance = null;
     private SugarDb sugarDb;
     private Map<Object, Long> entitiesMap;
-    private boolean debugEnabled;
 
     private SugarContext() {
-        this.debugEnabled = ManifestHelper.getDebugEnabled();
-        this.sugarDb = SugarDb.getInstance(debugEnabled);
+        ManifestHelper.loadDebugEnabled();
+        this.sugarDb = SugarDb.getInstance();
         this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }
     
