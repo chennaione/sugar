@@ -11,6 +11,7 @@ import static com.orm.util.ContextUtil.*;
  */
 public final class ManifestHelper {
     private static final String LOG_TAG = "Sugar";
+    private static Boolean debugEnabled = null;
 
     /**
      * Key for the database name meta data.
@@ -88,8 +89,8 @@ public final class ManifestHelper {
      *
      * @return true if the debug flag is enabled
      */
-    public static boolean getDebugEnabled() {
-        return getMetaDataBoolean(METADATA_QUERY_LOG);
+    public static boolean isDebugEnabled() {
+        return (null == debugEnabled) ? debugEnabled = getMetaDataBoolean(METADATA_QUERY_LOG) : debugEnabled;
     }
 
     private static String getMetaDataString(String name) {
