@@ -10,6 +10,7 @@ import com.orm.util.SugarCursorFactory;
 import static com.orm.util.ContextUtil.getContext;
 import static com.orm.helper.ManifestHelper.getDatabaseVersion;
 import static com.orm.helper.ManifestHelper.getDbName;
+import static com.orm.SugarContext.getDbConfiguration;
 
 public class SugarDb extends SQLiteOpenHelper {
     private static final String LOG_TAG = "Sugar";
@@ -31,6 +32,19 @@ public class SugarDb extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         schemaGenerator.createDatabase(sqLiteDatabase);
+    }
+
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        final SugarDbConfiguration configuration = getDbConfiguration();
+
+        if (null != configuration) {
+            db.setLocale(configuration.getDatabaseLocale());
+            db.setMaximumSize(configuration.getMaxSize());
+            db.setPageSize(configuration.getPageSize());
+        }
+
+        super.onConfigure(db);
     }
 
     @Override
