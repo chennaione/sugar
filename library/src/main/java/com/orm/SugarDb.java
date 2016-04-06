@@ -6,6 +6,8 @@ import android.util.Log;
 
 import com.orm.util.SugarCursorFactory;
 
+import java.util.Locale;
+
 import static com.orm.util.ManifestHelper.getDatabaseVersion;
 import static com.orm.util.ManifestHelper.getDebugEnabled;
 import static com.orm.util.ManifestHelper.getDbName;
@@ -32,6 +34,12 @@ public class SugarDb extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         schemaGenerator.createDatabase(sqLiteDatabase);
+    }
+
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        db.setLocale(Locale.getDefault());
+        super.onConfigure(db);
     }
 
     @Override
