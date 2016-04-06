@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.orm.dsl.Ignore;
+import com.orm.dsl.NotNull;
+import com.orm.dsl.PrimaryKey;
 import com.orm.dsl.Table;
 import com.orm.dsl.Unique;
 import com.orm.util.ManifestHelper;
@@ -17,6 +20,7 @@ import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -132,8 +137,38 @@ public class SugarRecord {
         return find(type, null, null, null, orderBy, null);
     }
 
+    /**
+     * Find field of parameter using @PrimaryKey notation
+     * @return One field of class
+     */
+    private static Field findPrimaryKeyNotationField(@NotNull Class type){
+        Field primaryField = null;
+        Field[] fields = type.getDeclaredFields();
+        for(Field field : fields){
+
+            if(!field.isAnnotationPresent(Ignore.class)
+               && !Modifier.isStatic(field.getModifiers())
+               && !Modifier.isTransient(field.getModifiers())){
+
+                if(field.isAnnotationPresent(PrimaryKey.class)){
+                    primaryField = field;
+                }
+
+            }
+        }
+        return primaryField;
+    }
+
     public static <T> T findById(Class<T> type, Long id) {
-        List<T> list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        List<T> list;
+        Field primaryKeyField = findPrimaryKeyNotationField(type);
+        if (primaryKeyField != null) {
+            String pk = NamingHelper.toSQLName(primaryKeyField);
+            list = find(type, pk + "=?", new String[] {String.valueOf(id)}, null, null, "1");
+        }else{
+            list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        }
+
         if (list.isEmpty()) return null;
         return list.get(0);
     }
@@ -143,7 +178,15 @@ public class SugarRecord {
     }
 
     public static <T> List<T> findById(Class<T> type, String[] ids) {
-        String whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        String whereClause;
+        Field primaryKeyField = findPrimaryKeyNotationField(type);
+        if (primaryKeyField != null) {
+            String pk = NamingHelper.toSQLName(primaryKeyField);
+            whereClause = pk+" IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        }else{
+            whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
+        }
+
         return find(type, whereClause, ids);
     }
 
@@ -269,18 +312,36 @@ public class SugarRecord {
         Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
-        Field idField = null;
-        for (Field column : columns) {
-            ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
-            if (column.getName().equals("id")) {
-                idField = column;
+        boolean isSugarEntity = isSugarEntity(object.getClass());
+
+        Field idField = findPrimaryKeyNotationField(object.getClass());
+        if(idField != null){
+            for(Field column : columns){
+                ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+
+                if(!column.isAnnotationPresent(Ignore.class)){
+                    if(column.isAnnotationPresent(PrimaryKey.class)){
+                        idField = column;
+                    }
+                }
+            }
+
+            if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put(NamingHelper.toSQLName(idField), entitiesMap.get(object));
+            }
+        }else{
+            for(Field column : columns){
+                ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                if(column.getName().equals("id")){
+                    idField = column;
+                }
+            }
+
+            if (isSugarEntity && entitiesMap.containsKey(object)) {
+                values.put("id", entitiesMap.get(object));
             }
         }
 
-        boolean isSugarEntity = isSugarEntity(object.getClass());
-        if (isSugarEntity && entitiesMap.containsKey(object)) {
-                values.put("id", entitiesMap.get(object));
-        }
 
         long id = db.insertWithOnConflict(NamingHelper.toSQLName(object.getClass()), null, values,
                 SQLiteDatabase.CONFLICT_REPLACE);
@@ -332,8 +393,15 @@ public class SugarRecord {
                     e.printStackTrace();
                 }
             } else {
-                if (!column.getName().equals("id")) {
-                    ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                Field idField = findPrimaryKeyNotationField(object.getClass());
+                if(idField != null){
+                    if(!column.getName().equals(NamingHelper.toSQLName(idField))){
+                        ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                    }
+                }else{
+                    if(!column.getName().equals("id")){
+                        ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
+                    }
                 }
             }
         }
@@ -357,9 +425,19 @@ public class SugarRecord {
 
     private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
-        if (!entitiesMap.containsKey(object)) {
-            entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+
+        Field idField = findPrimaryKeyNotationField(object.getClass());
+        if(idField != null){
+            if (!entitiesMap.containsKey(object)) {
+                entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex((NamingHelper.toSQLName(idField)))));
+            }
+        }else{
+            if (!entitiesMap.containsKey(object)) {
+                entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+            }
         }
+
+
 
         for (Field field : columns) {
         	field.setAccessible(true);
@@ -377,6 +455,8 @@ public class SugarRecord {
         }
     }
 
+    //FIXME I don't know how make this method using PrimaryKey notation without the 'Object'. Suggestions?
+    @Deprecated
     public boolean delete() {
         Long id = getId();
         Class<?> type = getClass();
@@ -393,11 +473,20 @@ public class SugarRecord {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
             try {
-                Field field = type.getDeclaredField("id");
+
+                Field idField = findPrimaryKeyNotationField(object.getClass());
+                Field field = (idField != null)?idField:type.getDeclaredField("id");
+
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
-                    boolean deleted = getSugarDataBase().delete(NamingHelper.toSQLName(type), "Id=?", new String[]{id.toString()}) == 1;
+                    boolean deleted;
+                    if(idField != null){
+                        deleted = getSugarDataBase().delete(NamingHelper.toSQLName(type), NamingHelper.toSQLName(idField) + "=?",
+                                                            new String[] {id.toString()}) == 1;
+                    }else{
+                        deleted = getSugarDataBase().delete(NamingHelper.toSQLName(type), "Id=?", new String[] {id.toString()}) == 1;
+                    }
                     Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
                     return deleted;
                 } else {
@@ -405,14 +494,34 @@ public class SugarRecord {
                     return false;
                 }
             } catch (NoSuchFieldException e) {
-                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
+                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no pk");
                 return false;
             } catch (IllegalAccessException e) {
-                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
+                Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access pk");
                 return false;
             }
         } else if (SugarRecord.class.isAssignableFrom(type)) {
-            return ((SugarRecord) object).delete();
+            Field idField = findPrimaryKeyNotationField(object.getClass());
+            if(idField != null){
+                idField.setAccessible(true);
+                Long id = null;
+                try{
+                    id = idField.getLong(object);
+                }catch(IllegalAccessException e){
+                    Log.i(SUGAR, "Cannot delete object using primaryKey notation " + e.getMessage(),e);
+                    return false;
+                }
+                if (id != null && id > 0L) {
+                    Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
+                    return getSugarDataBase().delete(NamingHelper.toSQLName(type), NamingHelper.toSQLName(idField)+"=?",
+                                                     new String[]{id.toString()}) == 1;
+                } else {
+                    Log.i(SUGAR, "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
+                    return false;
+                }
+            }else{
+                return ((SugarRecord) object).delete();
+            }
         } else {
             Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
             return false;
@@ -432,10 +541,12 @@ public class SugarRecord {
         inflate(cursor, this, getSugarContext().getEntitiesMap());
     }
 
+    //FIXME I don't know how make this method using PrimaryKey notation without the 'Object'. Suggestions?
     public Long getId() {
         return id;
     }
 
+    //FIXME I don't know how make this method using PrimaryKey notation without the 'Object'. Suggestions?
     public void setId(Long id) {
         this.id = id;
     }
