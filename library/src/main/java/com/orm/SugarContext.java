@@ -3,7 +3,6 @@ package com.orm;
 import android.content.Context;
 
 import com.orm.util.ContextUtil;
-import com.orm.util.ManifestHelper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -16,7 +15,6 @@ public class SugarContext {
     private Map<Object, Long> entitiesMap;
 
     private SugarContext() {
-        ManifestHelper.loadDebugEnabled();
         this.sugarDb = SugarDb.getInstance();
         this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }
