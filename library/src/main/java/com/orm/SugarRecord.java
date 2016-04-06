@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.orm.dsl.Table;
 import com.orm.dsl.Unique;
+import com.orm.util.ManifestHelper;
 import com.orm.util.NamingHelper;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;
