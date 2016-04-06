@@ -44,6 +44,6 @@ public class ManifestHelperTest {
     @Test
     public void testGetDebugEnabled() {
         initContext();
-        assertEquals(false, getDebugEnabled());
+        assertEquals(false, isDebugEnabled());
     }
 }
