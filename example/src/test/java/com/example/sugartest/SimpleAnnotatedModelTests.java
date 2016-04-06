@@ -2,7 +2,7 @@ package com.example.sugartest;
 
 import com.example.models.SimpleAnnotatedModel;
 import com.orm.SugarRecord;
-import com.orm.util.NamingHelper;
+import com.orm.helper.NamingHelper;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,7 +1,7 @@
 package com.orm.models;
 
 import com.orm.SugarRecord;
-import com.orm.dsl.Column;
+import com.orm.annotation.Column;
 
 /**
  * Created by sibelius on 02/12/15.

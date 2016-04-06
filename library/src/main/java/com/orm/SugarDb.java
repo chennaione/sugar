@@ -4,12 +4,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.orm.util.ManifestHelper;
+import com.orm.helper.ManifestHelper;
 import com.orm.util.SugarCursorFactory;
 
 import static com.orm.util.ContextUtil.getContext;
-import static com.orm.util.ManifestHelper.getDatabaseVersion;
-import static com.orm.util.ManifestHelper.getDbName;
+import static com.orm.helper.ManifestHelper.getDatabaseVersion;
+import static com.orm.helper.ManifestHelper.getDbName;
 
 public class SugarDb extends SQLiteOpenHelper {
     private static final String LOG_TAG = "Sugar";

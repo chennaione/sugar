@@ -7,8 +7,11 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.orm.SugarRecord;
-import com.orm.dsl.Ignore;
-import com.orm.dsl.Table;
+import com.orm.annotation.Ignore;
+import com.orm.annotation.Table;
+import com.orm.helper.ManifestHelper;
+import com.orm.helper.MultiDexHelper;
+import com.orm.helper.NamingHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +28,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-
-import static com.orm.util.ContextUtil.getContext;
 
 public class ReflectionUtil {
 

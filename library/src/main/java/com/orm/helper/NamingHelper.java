@@ -1,11 +1,14 @@
-package com.orm.util;
+package com.orm.helper;
 
-import com.orm.dsl.Column;
-import com.orm.dsl.Table;
+import com.orm.annotation.Column;
+import com.orm.annotation.Table;
 
 import java.lang.reflect.Field;
 
-public class NamingHelper {
+public final class NamingHelper {
+
+    //Prevent instantiation
+    private NamingHelper() { }
 
     /**
      * Converts a given CamelCasedString to UPPER_CASE_UNDER_SCORE.
@@ -53,7 +56,7 @@ public class NamingHelper {
      *
      * @param field  the {@link java.lang.reflect.Field} that will be mapped
      * @return the name of the given Field as represented in the database. If the Field is annotated
-     *         with {@link com.orm.dsl.Column} then the {@link com.orm.dsl.Column#name()} will be
+     *         with {@link com.orm.annotation.Column} then the {@link com.orm.annotation.Column#name()} will be
      *         returned. Else, the Field's {@link java.lang.reflect.Field#getName()} will be
      *         converted from CamelCase to UNDER_SCORE notation
      */
@@ -70,8 +73,8 @@ public class NamingHelper {
      * Maps a Java Class to the name of the class.
      *
      * @param table  the generic {@link java.lang.Class} that defines a database table
-     * @return if the given class is annotated with {@link com.orm.dsl.Table} then the value for
-     *         {@link com.orm.dsl.Table#name()} will be returned. Else, the class' simple name will 
+     * @return if the given class is annotated with {@link com.orm.annotation.Table} then the value for
+     *         {@link com.orm.annotation.Table#name()} will be returned. Else, the class' simple name will
      *         be converted from CamelCase to UNDER_SCORE notation
      */
     public static String toSQLName(Class<?> table) {

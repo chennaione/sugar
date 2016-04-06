@@ -5,13 +5,13 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.orm.dsl.Column;
-import com.orm.dsl.MultiUnique;
-import com.orm.dsl.NotNull;
-import com.orm.dsl.Unique;
+import com.orm.annotation.Column;
+import com.orm.annotation.MultiUnique;
+import com.orm.annotation.NotNull;
+import com.orm.annotation.Unique;
 import com.orm.util.KeyWordUtil;
 import com.orm.util.MigrationFileParser;
-import com.orm.util.NamingHelper;
+import com.orm.helper.NamingHelper;
 import com.orm.util.NumberComparator;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;

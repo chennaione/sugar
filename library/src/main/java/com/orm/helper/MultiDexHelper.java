@@ -1,4 +1,4 @@
-package com.orm.util;
+package com.orm.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,13 +22,16 @@ import static com.orm.util.ContextUtil.getPackageName;
  * Created by xudshen@hotmail.com on 14/11/13.
  */
 //http://stackoverflow.com/a/26892658
-public class MultiDexHelper {
+public final class MultiDexHelper {
     private static final String EXTRACTED_NAME_EXT = ".classes";
     private static final String EXTRACTED_SUFFIX = ".zip";
     private static final String INSTANT_RUN_DEX_DIR_PATH = "files/instant-run/dex/";
     private static final String SECONDARY_FOLDER_NAME = "code_cache" + File.separator + "secondary-dexes";
     private static final String PREFS_FILE = "multidex.version";
     private static final String KEY_DEX_NUMBER = "dex.number";
+
+    //Prevent instantiation..
+    private MultiDexHelper() { }
 
     private static SharedPreferences getMultiDexPreferences() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {

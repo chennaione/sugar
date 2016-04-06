@@ -3,7 +3,7 @@ package com.orm.query;
 import android.database.Cursor;
 
 import com.orm.SugarRecord;
-import com.orm.util.NamingHelper;
+import com.orm.helper.NamingHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;

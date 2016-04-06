@@ -1,8 +1,7 @@
 package com.orm.models;
 
 import com.orm.SugarRecord;
-import com.orm.dsl.MultiUnique;
-import com.orm.dsl.Unique;
+import com.orm.annotation.MultiUnique;
 
 /**
  * Created by sibelius on 02/12/15.

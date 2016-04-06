@@ -1,6 +1,6 @@
 package com.orm;
 
-import com.orm.util.NamingHelper;
+import com.orm.helper.NamingHelper;
 
 import org.junit.Test;
 

@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.orm.dsl.Table;
-import com.orm.dsl.Unique;
-import com.orm.util.ManifestHelper;
-import com.orm.util.NamingHelper;
+import com.orm.annotation.Table;
+import com.orm.annotation.Unique;
+import com.orm.helper.ManifestHelper;
+import com.orm.helper.NamingHelper;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;

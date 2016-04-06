@@ -1,7 +1,7 @@
 package com.example.models;
 
 
-import com.orm.dsl.Table;
+import com.orm.annotation.Table;
 
 @Table
 public class NestedMixedBBModel {

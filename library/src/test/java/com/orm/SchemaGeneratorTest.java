@@ -8,7 +8,7 @@ import com.orm.models.StringFieldExtendedModel;
 import com.orm.models.StringFieldExtendedModelAnnotatedColumn;
 import com.orm.query.DummyContext;
 import com.orm.util.ContextUtil;
-import com.orm.util.NamingHelper;
+import com.orm.helper.NamingHelper;
 
 import org.junit.Test;
 

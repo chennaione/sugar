@@ -5,7 +5,7 @@ import com.orm.query.DummyContext;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static com.orm.util.ManifestHelper.*;
+import static com.orm.helper.ManifestHelper.*;
 import static com.orm.util.ContextUtil.init;
 
 /**
