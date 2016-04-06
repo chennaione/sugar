@@ -4,13 +4,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.orm.util.ManifestHelper;
 import com.orm.util.SugarCursorFactory;
 
+import static com.orm.util.ContextUtil.getContext;
 import static com.orm.util.ManifestHelper.getDatabaseVersion;
-import static com.orm.util.ManifestHelper.getDebugEnabled;
 import static com.orm.util.ManifestHelper.getDbName;
-
-import static com.orm.util.ContextUtil.*;
 
 public class SugarDb extends SQLiteOpenHelper {
     private static final String LOG_TAG = "Sugar";
@@ -20,13 +19,21 @@ public class SugarDb extends SQLiteOpenHelper {
     private int openedConnections = 0;
 
     //Prevent instantiation
-    private SugarDb() {
-        super(getContext(), getDbName(), new SugarCursorFactory(getDebugEnabled()), getDatabaseVersion());
+    private SugarDb(boolean debugEnabled) {
+        super(getContext(), getDbName(), new SugarCursorFactory(debugEnabled), getDatabaseVersion());
         schemaGenerator = SchemaGenerator.getInstance();
+    }
+
+    private SugarDb() {
+        this(ManifestHelper.getDebugEnabled());
     }
 
     public static SugarDb getInstance() {
         return new SugarDb();
+    }
+
+    public static SugarDb getInstance(boolean debugEnabled) {
+        return new SugarDb(debugEnabled);
     }
 
     @Override
