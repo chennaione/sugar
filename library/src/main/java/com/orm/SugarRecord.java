@@ -265,8 +265,7 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
-        SugarContext context = getSugarContext();
-        Map<Object, Long> entitiesMap = context.getEntitiesMap();
+        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
@@ -300,7 +299,7 @@ public class SugarRecord {
             ((SugarRecord) object).setId(id);
         }
 
-        if (context.isDebugEnabled()) {
+        if (ManifestHelper.isDebugEnabled()) {
             Log.i(SUGAR, object.getClass().getSimpleName() + " saved : " + id);
         }
 
