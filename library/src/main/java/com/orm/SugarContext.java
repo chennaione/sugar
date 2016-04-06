@@ -60,8 +60,4 @@ public class SugarContext {
     Map<Object, Long> getEntitiesMap() {
         return entitiesMap;
     }
-
-    public boolean isDebugEnabled() {
-        return debugEnabled;
-    }
 }
