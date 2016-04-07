@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static com.orm.SugarContext.getSugarContext;
 
 public class SugarRecord {
     public static final String SUGAR = "Sugar";
@@ -33,7 +32,7 @@ public class SugarRecord {
     private Long id = null;
 
     private static SQLiteDatabase getSugarDataBase() {
-        return getSugarContext().getSugarDb().getDB();
+        return SugarContext.getInstance().getSugarDb().getDB();
     }
 
     public static <T> int deleteAll(Class<T> type) {
@@ -127,7 +126,7 @@ public class SugarRecord {
     public static <T> List<T> listAll(Class<T> type) {
         return find(type, null, null, null, null, null);
     }
-    
+
     public static <T> List<T> listAll(Class<T> type, String orderBy) {
         return find(type, null, null, null, orderBy, null);
     }
@@ -215,7 +214,7 @@ public class SugarRecord {
         try {
             while (cursor.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                inflate(cursor, entity, getSugarContext().getEntitiesMap());
+                inflate(cursor, entity, SugarContext.getInstance().getEntitiesMap());
                 result.add(entity);
             }
         } catch (Exception e) {
@@ -266,7 +265,7 @@ public class SugarRecord {
     }
 
     static long save(SQLiteDatabase db, Object object) {
-        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
+        Map<Object, Long> entitiesMap = SugarContext.getInstance().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
@@ -312,7 +311,7 @@ public class SugarRecord {
     }
 
     static long update(SQLiteDatabase db, Object object) {
-        Map<Object, Long> entitiesMap = getSugarContext().getEntitiesMap();
+        Map<Object, Long> entitiesMap = SugarContext.getInstance().getEntitiesMap();
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         ContentValues values = new ContentValues(columns.size());
 
@@ -388,7 +387,7 @@ public class SugarRecord {
             return false;
         }
     }
-    
+
     public static boolean delete(Object object) {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
@@ -429,7 +428,7 @@ public class SugarRecord {
 
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
-        inflate(cursor, this, getSugarContext().getEntitiesMap());
+        inflate(cursor, this, SugarContext.getInstance().getEntitiesMap());
     }
 
     public Long getId() {
@@ -467,7 +466,7 @@ public class SugarRecord {
 
             try {
                 entity = type.getDeclaredConstructor().newInstance();
-                inflate(cursor, entity, getSugarContext().getEntitiesMap());
+                inflate(cursor, entity, SugarContext.getInstance().getEntitiesMap());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

@@ -7,7 +7,7 @@ public class SugarTransactionHelper {
     private static final String LOG_TAG = SugarTransactionHelper.class.getSimpleName();
 
     public static void doInTransaction(SugarTransactionHelper.Callback callback) {
-        SQLiteDatabase database = SugarContext.getSugarContext().getSugarDb().getDB();
+        SQLiteDatabase database = SugarContext.getInstance().getSugarDb().getDB();
         database.beginTransaction();
 
         try {

@@ -192,41 +192,39 @@ public class SchemaGenerator {
             String columnName = NamingHelper.toSQLName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
-            if (columnType != null) {
-                if (columnName.equalsIgnoreCase("Id")) {
+            if (columnType == null || columnName.equalsIgnoreCase("Id")) {
                     continue;
+            }
+
+            if (column.isAnnotationPresent(Column.class)) {
+                Column columnAnnotation = column.getAnnotation(Column.class);
+                columnName = columnAnnotation.name();
+
+                sb.append(", ").append(columnName).append(" ").append(columnType);
+
+                if (columnAnnotation.notNull()) {
+                    if (columnType.endsWith(NULL)) {
+                        sb.delete(sb.length() - 5, sb.length());
+                    }
+                    sb.append(NOT_NULL);
                 }
 
-                if (column.isAnnotationPresent(Column.class)) {
-                    Column columnAnnotation = column.getAnnotation(Column.class);
-                    columnName = columnAnnotation.name();
+                if (columnAnnotation.unique()) {
+                    sb.append(UNIQUE);
+                }
 
-                    sb.append(", ").append(columnName).append(" ").append(columnType);
+            } else {
+                sb.append(", ").append(columnName).append(" ").append(columnType);
 
-                    if (columnAnnotation.notNull()) {
-                        if (columnType.endsWith(NULL)) {
-                            sb.delete(sb.length() - 5, sb.length());
-                        }
-                        sb.append(NOT_NULL);
+                if (column.isAnnotationPresent(NotNull.class)) {
+                    if (columnType.endsWith(NULL)) {
+                        sb.delete(sb.length() - 5, sb.length());
                     }
+                    sb.append(NOT_NULL);
+                }
 
-                    if (columnAnnotation.unique()) {
-                        sb.append(UNIQUE);
-                    }
-
-                } else {
-                    sb.append(", ").append(columnName).append(" ").append(columnType);
-
-                    if (column.isAnnotationPresent(NotNull.class)) {
-                        if (columnType.endsWith(NULL)) {
-                            sb.delete(sb.length() - 5, sb.length());
-                        }
-                        sb.append(NOT_NULL);
-                    }
-
-                    if (column.isAnnotationPresent(Unique.class)) {
-                        sb.append(UNIQUE);
-                    }
+                if (column.isAnnotationPresent(Unique.class)) {
+                    sb.append(UNIQUE);
                 }
             }
         }
