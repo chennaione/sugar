@@ -26,10 +26,6 @@ public final class SugarTransactionHelper {
             Log.d(LOG_TAG, "Could execute callback within transaction", e);
         } finally {
             database.endTransaction();
-
-            if (database.isOpen()) {
-                database.close();
-            }
         }
     }
 
