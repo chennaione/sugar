@@ -7,6 +7,8 @@ import java.lang.reflect.Field;
 
 public class NamingHelper {
 
+    private static final char UNDER_SCORE = '_';
+
     /**
      * Converts a given CamelCasedString to UPPER_CASE_UNDER_SCORE.
      *
@@ -24,27 +26,18 @@ public class NamingHelper {
 
         for (int i = 0; i < buf.length; i++) {
             char prevChar = (i > 0) ? buf[i - 1] : 0;
-            char c = buf[i];
+            char currentChar = buf[i];
             char nextChar = (i < buf.length - 1) ? buf[i + 1] : 0;
-            boolean isFirstChar = (i == 0);
 
-            if (isFirstChar || Character.isLowerCase(c) || Character.isDigit(c)) {
-                sb.append(Character.toUpperCase(c));
-            } else if (Character.isUpperCase(c)) {
-                if (Character.isLetterOrDigit(prevChar)) {
-                    if (Character.isLowerCase(prevChar)) {
-                        sb.append('_').append(c);
-                    } else if (nextChar > 0 && Character.isLowerCase(nextChar)) {
-                        sb.append('_').append(c);
-                    } else {
-                        sb.append(c);
-                    }
-                } else {
-                    sb.append(c);
-                }
+            if (i == 0 || Character.isLowerCase(currentChar) || Character.isDigit(currentChar)) {
+                sb.append(Character.toUpperCase(currentChar));
+            } else if (Character.isUpperCase(currentChar) &&
+                      (Character.isLowerCase(prevChar) || Character.isLowerCase(nextChar))) {
+                sb.append(UNDER_SCORE).append(currentChar);
+            } else {
+                sb.append(currentChar);
             }
         }
-
         return sb.toString();
     }
 
@@ -71,13 +64,13 @@ public class NamingHelper {
      *
      * @param table  the generic {@link java.lang.Class} that defines a database table
      * @return if the given class is annotated with {@link com.orm.dsl.Table} then the value for
-     *         {@link com.orm.dsl.Table#name()} will be returned. Else, the class' simple name will 
+     *         {@link com.orm.dsl.Table#name()} will be returned. Else, the class' simple name will
      *         be converted from CamelCase to UNDER_SCORE notation
      */
     public static String toSQLName(Class<?> table) {
         if (table.isAnnotationPresent(Table.class)) {
             Table annotation = table.getAnnotation(Table.class);
-            if ("".equals(annotation.name())) {
+            if (annotation.name().isEmpty()) {
                 return NamingHelper.toSQLNameDefault(table.getSimpleName());
             }
             return annotation.name();
