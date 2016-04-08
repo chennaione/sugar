@@ -30,7 +30,7 @@ public class SchemaGeneratorTest {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
         assertEquals(
-                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(EmptyModel.class) +
+                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(EmptyModel.class) +
                     " ( ID INTEGER PRIMARY KEY AUTOINCREMENT  ) ",
                 createSQL);
     }
@@ -40,21 +40,21 @@ public class SchemaGeneratorTest {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
         assertEquals(
-                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldExtendedModel.class) +
+                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(StringFieldExtendedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "STRING TEXT ) ",
                 createSQL);
 
         String createSQL2 = schemaGenerator.createTableSQL(StringFieldAnnotatedModel.class);
 
-        assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldAnnotatedModel.class) +
+        assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(StringFieldAnnotatedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "STRING TEXT ) ",
                 createSQL2);
 
         String createSQL3 = schemaGenerator.createTableSQL(StringFieldExtendedModelAnnotatedColumn.class);
 
-        assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldExtendedModelAnnotatedColumn.class) +
+        assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(StringFieldExtendedModelAnnotatedColumn.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "anyName TEXT ) ",
                 createSQL3);
@@ -65,7 +65,7 @@ public class SchemaGeneratorTest {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
         assertEquals(
-                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(IntUniqueModel.class) +
+                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(IntUniqueModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "VALUE INTEGER UNIQUE ) ",
                 createSQL);
@@ -76,7 +76,7 @@ public class SchemaGeneratorTest {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
         assertEquals(
-                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(MultiColumnUniqueModel.class) +
+                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(MultiColumnUniqueModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "A INTEGER, B INTEGER, " +
                         "UNIQUE(A, B) ON CONFLICT REPLACE ) ",

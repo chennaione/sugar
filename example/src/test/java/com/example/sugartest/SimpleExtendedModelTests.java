@@ -202,7 +202,7 @@ public class SimpleExtendedModelTests {
         }
         List<SimpleExtendedModel> models =
                 SugarRecord.findWithQuery(SimpleExtendedModel.class, "Select * from " +
-                                          NamingHelper.toSQLName(SimpleExtendedModel.class) +
+                                          NamingHelper.toTableName(SimpleExtendedModel.class) +
                                           " where id >= ? ", "50");
         for (SimpleExtendedModel model : models) {
             assertEquals(new Long(75), model.getId(), 25L);
@@ -320,7 +320,7 @@ public class SimpleExtendedModelTests {
         Iterator<SimpleExtendedModel> cursor =
                 SugarRecord.findWithQueryAsIterator(SimpleExtendedModel.class,
                                                     "Select * from " +
-                                                    NamingHelper.toSQLName(SimpleExtendedModel.class) +
+                                                    NamingHelper.toTableName(SimpleExtendedModel.class) +
                                                     " where id >= ? ", "50");
         for (int i = 50; i <= 100; i++) {
             assertTrue(cursor.hasNext());

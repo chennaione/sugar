@@ -27,5 +27,4 @@ public class SugarConfig {
         fields.clear();
         fields = new HashMap<>();
     }
-
 }

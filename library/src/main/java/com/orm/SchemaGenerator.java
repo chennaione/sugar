@@ -54,7 +54,7 @@ public class SchemaGenerator {
         String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
 
         for (Class domain : domainClasses) {
-            String tableName = NamingHelper.toSQLName(domain);
+            String tableName = NamingHelper.toTableName(domain);
             Cursor c = sqLiteDatabase.rawQuery(String.format(sql, tableName), null);
             if (c.moveToFirst() && c.getInt(0) == 0) {
                 createTable(domain, sqLiteDatabase);
@@ -81,7 +81,7 @@ public class SchemaGenerator {
     public void deleteTables(SQLiteDatabase sqLiteDatabase) {
         List<Class> tables = getDomainClasses();
         for (Class table : tables) {
-            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + NamingHelper.toSQLName(table));
+            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + NamingHelper.toTableName(table));
         }
     }
 
@@ -139,12 +139,12 @@ public class SchemaGenerator {
 
     private void addColumns(Class<?> table, SQLiteDatabase sqLiteDatabase) {
         List<Field> fields = ReflectionUtil.getTableFields(table);
-        String tableName = NamingHelper.toSQLName(table);
+        String tableName = NamingHelper.toTableName(table);
         ArrayList<String> presentColumns = getColumnNames(sqLiteDatabase, tableName);
         ArrayList<String> alterCommands = new ArrayList<>();
 
         for (Field column : fields) {
-            String columnName = NamingHelper.toSQLName(column);
+            String columnName = NamingHelper.toColumnName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
             if (column.isAnnotationPresent(Column.class)) {
@@ -179,7 +179,7 @@ public class SchemaGenerator {
     protected String createTableSQL(Class<?> table) {
         Log.i(SUGAR, "Create table if not exists");
         List<Field> fields = ReflectionUtil.getTableFields(table);
-        String tableName = NamingHelper.toSQLName(table);
+        String tableName = NamingHelper.toTableName(table);
 
         if(KeyWordUtil.isKeyword(tableName)) {
             Log.i(SUGAR,"ERROR, SQLITE RESERVED WORD USED IN " + tableName);
@@ -189,7 +189,7 @@ public class SchemaGenerator {
         sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
-            String columnName = NamingHelper.toSQLName(column);
+            String columnName = NamingHelper.toColumnName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
 
             if (columnType != null) {

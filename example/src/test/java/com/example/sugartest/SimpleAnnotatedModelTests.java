@@ -195,7 +195,7 @@ public class SimpleAnnotatedModelTests {
         }
         List<SimpleAnnotatedModel> models =
                 SugarRecord.findWithQuery(SimpleAnnotatedModel.class, "Select * from " +
-                        NamingHelper.toSQLName(SimpleAnnotatedModel.class) +
+                        NamingHelper.toTableName(SimpleAnnotatedModel.class) +
                         " where id >= ? ", "50");
         for (SimpleAnnotatedModel model : models) {
             assertEquals(new Long(75), model.getId(), 25L);
@@ -313,7 +313,7 @@ public class SimpleAnnotatedModelTests {
         Iterator<SimpleAnnotatedModel> cursor =
                 SugarRecord.findWithQueryAsIterator(SimpleAnnotatedModel.class,
                         "Select * from " +
-                                NamingHelper.toSQLName(SimpleAnnotatedModel.class) +
+                                NamingHelper.toTableName(SimpleAnnotatedModel.class) +
                                 " where id >= ? ", "50");
         for (int i = 50; i <= 100; i++) {
             assertTrue(cursor.hasNext());

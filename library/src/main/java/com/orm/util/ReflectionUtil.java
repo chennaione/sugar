@@ -1,7 +1,6 @@
 package com.orm.util;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.Log;
@@ -29,7 +28,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-public class ReflectionUtil {
+public final class ReflectionUtil {
+
+    //Prevent instantiation..
+    private ReflectionUtil() { }
 
     public static List<Field> getTableFields(Class table) {
         List<Field> fieldList = SugarConfig.getFields(table);
@@ -66,7 +68,7 @@ public class ReflectionUtil {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
-            String columnName = NamingHelper.toSQLName(column);
+            String columnName = NamingHelper.toColumnName(column);
             Object columnValue = column.get(object);
 
             if (columnType.isAnnotationPresent(Table.class)) {
@@ -150,7 +152,7 @@ public class ReflectionUtil {
         field.setAccessible(true);
         try {
             Class fieldType = field.getType();
-            String colName = NamingHelper.toSQLName(field);
+            String colName = NamingHelper.toColumnName(field);
 
             int columnIndex = cursor.getColumnIndex(colName);
 
@@ -342,7 +344,7 @@ public class ReflectionUtil {
         }
     }
 
-    private static String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
-        return context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).sourceDir;
+    private static String getSourcePath() throws PackageManager.NameNotFoundException {
+        return ContextUtil.getPackageManager().getApplicationInfo(ContextUtil.getPackageName(), 0).sourceDir;
     }
 }

@@ -60,7 +60,7 @@ public final class NamingHelper {
      *         returned. Else, the Field's {@link java.lang.reflect.Field#getName()} will be
      *         converted from CamelCase to UNDER_SCORE notation
      */
-    public static String toSQLName(Field field) {
+    public static String toColumnName(Field field) {
         if (field.isAnnotationPresent(Column.class)) {
             Column annotation = field.getAnnotation(Column.class);
             return annotation.name();
@@ -77,7 +77,7 @@ public final class NamingHelper {
      *         {@link com.orm.annotation.Table#name()} will be returned. Else, the class' simple name will
      *         be converted from CamelCase to UNDER_SCORE notation
      */
-    public static String toSQLName(Class<?> table) {
+    public static String toTableName(Class<?> table) {
         if (table.isAnnotationPresent(Table.class)) {
             Table annotation = table.getAnnotation(Table.class);
             if ("".equals(annotation.name())) {

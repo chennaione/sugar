@@ -23,7 +23,7 @@ public class NamingHelperTest {
             List<String> columnList = new ArrayList<>();
 
             for(Field field: fieldList) {
-                columnList.add(NamingHelper.toSQLName(field));
+                columnList.add(NamingHelper.toColumnName(field));
             }
 
             boolean isIdInList = inList(columnList, "ID");
@@ -46,7 +46,7 @@ public class NamingHelperTest {
 
     @Test
     public void testToSQLNameFromClass() {
-        assertEquals("TEST_RECORD", NamingHelper.toSQLName(TestRecord.class));
+        assertEquals("TEST_RECORD", NamingHelper.toTableName(TestRecord.class));
     }
 
     @Test
