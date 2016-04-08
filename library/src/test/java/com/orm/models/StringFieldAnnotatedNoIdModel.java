@@ -1,13 +1,14 @@
 package com.orm.models;
 
-import com.orm.SugarRecord;
+import com.orm.annotation.Table;
 
-public class StringFieldExtendedModel extends SugarRecord {
+@Table
+public class StringFieldAnnotatedNoIdModel {
     private String string;
 
-    public StringFieldExtendedModel() {}
+    public StringFieldAnnotatedNoIdModel() {}
 
-    public StringFieldExtendedModel(String string) {
+    public StringFieldAnnotatedNoIdModel(String string) {
         this.string = string;
     }
 

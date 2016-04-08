@@ -35,7 +35,7 @@ public class SchemaGeneratorTest {
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldExtendedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
-                        "NAME TEXT ) ",
+                        "STRING TEXT ) ",
                 createSQL);
 
         String createSQL2 = schemaGenerator.createTableSQL(StringFieldAnnotatedModel.class);
@@ -43,7 +43,7 @@ public class SchemaGeneratorTest {
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldAnnotatedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
-                        "NAME TEXT ) ",
+                        "STRING TEXT ) ",
                 createSQL2);
 
         String createSQL3 = schemaGenerator.createTableSQL(StringFieldExtendedModelAnnotatedColumn.class);

@@ -1,0 +1,403 @@
+package com.orm.record;
+
+import com.orm.ClientApp;
+import com.orm.RobolectricGradleTestRunner;
+import com.orm.SugarContext;
+import com.orm.SugarRecord;
+import com.orm.helper.NamingHelper;
+import com.orm.models.SimpleExtendedModel;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static com.orm.SugarRecord.save;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(sdk=18, application = ClientApp.class)
+public class SimpleExtendedModelTests {
+
+    @Test
+    public void emptyDatabaseTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void oneSaveTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void twoSaveTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void manySaveTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 100; i++) {
+            save(new SimpleExtendedModel());
+        }
+        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void defaultIdTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        assertEquals(1L, save(new SimpleExtendedModel()));
+    }
+
+    @Test
+    public void whereCountTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class, "id = ?", new String[]{"1"}));
+    }
+
+    @Test
+    public void whereNoCountTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class, "id = ?", new String[]{"1"}));
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class, "id = ?", new String[]{"3"}));
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class, "id = ?", new String[]{"a"}));
+    }
+
+    @Test
+    public void whereBrokenCountTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        assertEquals(-1L, SugarRecord.count(SimpleExtendedModel.class, "di = ?", new String[]{"1"}));
+    }
+
+    @Test
+    public void saveMethodTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        model.save();
+        assertEquals(-1L, SugarRecord.count(SimpleExtendedModel.class, "di = ?", new String[]{"1"}));
+    }
+
+    @Test
+    public void deleteTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        save(model);
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+        assertTrue(SugarRecord.delete(model));
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteUnsavedTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        assertFalse(SugarRecord.delete(model));
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteWrongTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SimpleExtendedModel model = new SimpleExtendedModel();
+        save(model);
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+        Field idField = model.getClass().getSuperclass().getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(model, Long.MAX_VALUE);
+        assertFalse(SugarRecord.delete(model));
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteAllTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        int elementNumber = 100;
+        for (int i = 1; i <= elementNumber; i++) {
+            save(new SimpleExtendedModel());
+        }
+        assertEquals(elementNumber, SugarRecord.deleteAll(SimpleExtendedModel.class));
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    @SuppressWarnings("all")
+    public void deleteAllWhereTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        int elementNumber = 100;
+        for (int i = 1; i <= elementNumber; i++) {
+            save(new SimpleExtendedModel());
+        }
+        assertEquals(elementNumber - 1, SugarRecord.deleteAll(SimpleExtendedModel.class,
+                                                              "id > ?",
+                                                              new String[]{"1"}));
+        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionFewTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SimpleExtendedModel first = new SimpleExtendedModel();
+        SimpleExtendedModel second = new SimpleExtendedModel();
+        SimpleExtendedModel third = new SimpleExtendedModel();
+        save(first);
+        save(second);
+        // Not saving last model
+        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(2, SugarRecord.deleteInTx(first, second, third));
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void deleteInTransactionManyTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        long elementNumber = 100;
+        List<SimpleExtendedModel> models = new ArrayList<>();
+        for (int i = 1; i <= elementNumber; i++) {
+            SimpleExtendedModel model = new SimpleExtendedModel();
+            models.add(model);
+            // Not saving last model
+            if (i < elementNumber) {
+                save(model);
+            }
+        }
+        assertEquals(elementNumber - 1, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(elementNumber - 1, SugarRecord.deleteInTx(models));
+        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void saveInTransactionTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SugarRecord.saveInTx(new SimpleExtendedModel(), new SimpleExtendedModel());
+        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
+    }
+
+    @Test
+    public void listAllTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 100; i++) {
+            save(new SimpleExtendedModel());
+        }
+        List<SimpleExtendedModel> models = SugarRecord.listAll(SimpleExtendedModel.class);
+        assertEquals(100, models.size());
+        for (long i = 1; i <= 100; i++) {
+            assertEquals(Long.valueOf(i), models.get((int) i - 1).getId());
+        }
+    }
+
+    @Test
+    public void findTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        List<SimpleExtendedModel> models =
+                SugarRecord.find(SimpleExtendedModel.class, "id = ?", "2");
+        assertEquals(1, models.size());
+        assertEquals(Long.valueOf(2L), models.get(0).getId());
+    }
+
+    @Test
+    public void findWithQueryTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 100; i++) {
+            save(new SimpleExtendedModel());
+        }
+        List<SimpleExtendedModel> models =
+                SugarRecord.findWithQuery(SimpleExtendedModel.class, "Select * from " +
+                                          NamingHelper.toSQLName(SimpleExtendedModel.class) +
+                                          " where id >= ? ", "50");
+        for (SimpleExtendedModel model : models) {
+            assertEquals(75, model.getId(), 25L);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("all")
+    public void findByIdTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        assertEquals(Long.valueOf(1L), SugarRecord.findById(SimpleExtendedModel.class, 1L).getId());
+    }
+
+    @Test
+    public void findByIdIntegerTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        assertEquals(Long.valueOf(1L), SugarRecord.findById(SimpleExtendedModel.class, 1).getId());
+    }
+
+    @Test
+    public void findByIdStringsNullTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        assertEquals(0, SugarRecord.findById(SimpleExtendedModel.class, new String[]{""}).size());
+    }
+
+    @Test
+    public void findByIdStringsOneTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1"});
+        assertEquals(1, models.size());
+        assertEquals(Long.valueOf(1L), models.get(0).getId());
+    }
+
+    @Test
+    public void findByIdStringsTwoTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        save(new SimpleExtendedModel());
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1", "3"});
+        assertEquals(2, models.size());
+        assertEquals(Long.valueOf(1L), models.get(0).getId());
+        assertEquals(Long.valueOf(3L), models.get(1).getId());
+    }
+
+    @Test
+    public void findByIdStringsManyTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 10; i++) {
+            save(new SimpleExtendedModel());
+        }
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1", "3", "6", "10"});
+        assertEquals(4, models.size());
+        assertEquals(Long.valueOf(1L), models.get(0).getId());
+        assertEquals(Long.valueOf(3L), models.get(1).getId());
+        assertEquals(Long.valueOf(6L), models.get(2).getId());
+        assertEquals(Long.valueOf(10L), models.get(3).getId());
+    }
+
+    @Test
+    public void findByIdStringsOrderTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 10; i++) {
+            save(new SimpleExtendedModel());
+        }
+        List<SimpleExtendedModel> models =
+                SugarRecord.findById(SimpleExtendedModel.class, new String[]{"10", "6", "3", "1"});
+        assertEquals(4, models.size());
+        // The order of the query doesn't matter
+        assertEquals(Long.valueOf(1L), models.get(0).getId());
+        assertEquals(Long.valueOf(3L), models.get(1).getId());
+        assertEquals(Long.valueOf(6L), models.get(2).getId());
+        assertEquals(Long.valueOf(10L), models.get(3).getId());
+    }
+
+    @Test
+    public void findByIdNullTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        assertNull(SugarRecord.findById(SimpleExtendedModel.class, 2L));
+    }
+
+    @Test
+    public void findAllTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 100; i++) {
+            save(new SimpleExtendedModel());
+        }
+        Iterator<SimpleExtendedModel> cursor = SugarRecord.findAll(SimpleExtendedModel.class);
+        for (int i = 1; i <= 100; i++) {
+            assertTrue(cursor.hasNext());
+            SimpleExtendedModel model = cursor.next();
+            assertNotNull(model);
+            assertEquals(Long.valueOf(i), model.getId());
+        }
+    }
+
+    @Test
+    public void findAsIteratorTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 100; i++) {
+            save(new SimpleExtendedModel());
+        }
+        Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
+                "id >= ?", "50");
+        for (int i = 50; i <= 100; i++) {
+            assertTrue(cursor.hasNext());
+            SimpleExtendedModel model = cursor.next();
+            assertNotNull(model);
+            assertEquals(Long.valueOf(i), model.getId());
+        }
+    }
+
+    @Test
+    public void findWithQueryAsIteratorTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        for (int i = 1; i <= 100; i++) {
+            save(new SimpleExtendedModel());
+        }
+        Iterator<SimpleExtendedModel> cursor =
+                SugarRecord.findWithQueryAsIterator(SimpleExtendedModel.class,
+                                                    "Select * from " +
+                                                    NamingHelper.toSQLName(SimpleExtendedModel.class) +
+                                                    " where id >= ? ", "50");
+        for (int i = 50; i <= 100; i++) {
+            assertTrue(cursor.hasNext());
+            SimpleExtendedModel model = cursor.next();
+            assertNotNull(model);
+            assertEquals(Long.valueOf(i), model.getId());
+        }
+    }
+
+    @Test(expected=NoSuchElementException.class)
+    public void findAsIteratorOutOfBoundsTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
+                "id = ?", "1");
+        assertTrue(cursor.hasNext());
+        SimpleExtendedModel model = cursor.next();
+        assertNotNull(model);
+        assertEquals(Long.valueOf(1), model.getId());
+        // This should throw a NoSuchElementException
+        cursor.next();
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void disallowRemoveCursorTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        save(new SimpleExtendedModel());
+        Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
+                "id = ?", "1");
+        assertTrue(cursor.hasNext());
+        SimpleExtendedModel model = cursor.next();
+        assertNotNull(model);
+        assertEquals(Long.valueOf(1), model.getId());
+        // This should throw a UnsupportedOperationException
+        cursor.remove();
+    }
+
+    @Test
+    public void vacuumTest() throws Exception {
+        SugarContext.init(RuntimeEnvironment.application);
+        SugarRecord.executeQuery("Vacuum");
+    }
+}
