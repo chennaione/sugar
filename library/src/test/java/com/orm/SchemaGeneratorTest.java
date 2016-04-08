@@ -40,16 +40,14 @@ public class SchemaGeneratorTest {
 
         String createSQL2 = schemaGenerator.createTableSQL(StringFieldAnnotatedModel.class);
 
-        assertEquals(
-                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldAnnotatedModel.class) +
+        assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldAnnotatedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "STRING TEXT ) ",
                 createSQL2);
 
         String createSQL3 = schemaGenerator.createTableSQL(StringFieldExtendedModelAnnotatedColumn.class);
 
-        assertEquals(
-                "CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldExtendedModelAnnotatedColumn.class) +
+        assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toSQLName(StringFieldExtendedModelAnnotatedColumn.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "anyName TEXT ) ",
                 createSQL3);
