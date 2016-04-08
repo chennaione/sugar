@@ -6,6 +6,7 @@ import com.orm.SugarContext;
 import com.orm.SugarRecord;
 import com.orm.models.IntegerFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -21,15 +22,19 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk=18, application = ClientApp.class)
 public class ListAllOrderByTests {
 
+
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void listAllOrderByEmptyTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.listAll(IntegerFieldExtendedModel.class, "id").size());
     }
 
     @Test
     public void listAllOrderByIdTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         for(int i = 1; i <= 100; i++) {
             save(new IntegerFieldExtendedModel(i));
         }
@@ -44,7 +49,6 @@ public class ListAllOrderByTests {
 
     @Test
     public void listAllOrderByFieldTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         for(int i = 1; i <= 100; i++) {
             save(new IntegerFieldExtendedModel(i));
         }

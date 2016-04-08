@@ -1,10 +1,7 @@
 package com.orm;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import com.orm.dsl.BuildConfig;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
@@ -12,6 +9,9 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author jonatan.salas
@@ -31,19 +31,17 @@ public class SugarDbConfigurationTest {
 
         final SugarDbConfiguration config = SugarContext.getDbConfiguration();
 
-        Assert.assertEquals(configuration.getDatabaseLocale(), config.getDatabaseLocale());
-        Assert.assertEquals(configuration.getMaxSize(), config.getMaxSize());
-        Assert.assertEquals(configuration.getPageSize(), config.getPageSize());
+        assertEquals(configuration.getDatabaseLocale(), config.getDatabaseLocale());
+        assertEquals(configuration.getMaxSize(), config.getMaxSize());
+        assertEquals(configuration.getPageSize(), config.getPageSize());
     }
 
     @Test
     public void testNullConfiguration() {
         SugarContext.init(RuntimeEnvironment.application);
-
-        Assert.assertNull(SugarContext.getDbConfiguration());
+        assertNull(SugarContext.getDbConfiguration());
     }
 
-//TODO: check this method
 //    @Test
 //    public void testNotNullConfigurationWithSugarDb() {
 //        SugarDbConfiguration configuration = new SugarDbConfiguration()
@@ -56,8 +54,8 @@ public class SugarDbConfigurationTest {
 //        SQLiteDatabase database = SugarContext.getSugarContext().getSugarDb().getDB();
 //        SQLiteDatabase sqLiteDatabase = SugarDb.getInstance().getDB();
 //
-//        Assert.assertEquals(database.getMaximumSize(), sqLiteDatabase.getMaximumSize());
-//        Assert.assertEquals(database.getPageSize(), sqLiteDatabase.getPageSize());
+//        assertEquals(database.getMaximumSize(), sqLiteDatabase.getMaximumSize());
+//        assertEquals(database.getPageSize(), sqLiteDatabase.getPageSize());
 //
 //        if (sqLiteDatabase.isOpen()) {
 //            sqLiteDatabase.close();

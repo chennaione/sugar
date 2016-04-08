@@ -8,6 +8,7 @@ import com.orm.models.StringFieldAnnotatedModel;
 import com.orm.models.StringFieldAnnotatedNoIdModel;
 import com.orm.models.StringFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -21,9 +22,13 @@ import static org.junit.Assert.assertNull;
 @Config(sdk=18, application = ClientApp.class)
 public class MultipleSaveTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void stringMultipleSaveOriginalExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         StringFieldExtendedModel model = new StringFieldExtendedModel(string);
         long id = save(model);
@@ -40,7 +45,6 @@ public class MultipleSaveTests {
 
     @Test
     public void stringMultipleSaveQueriedExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         StringFieldExtendedModel model = new StringFieldExtendedModel(string);
         long id = save(model);
@@ -56,7 +60,6 @@ public class MultipleSaveTests {
 
     @Test
     public void stringMultipleSaveOriginalAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         StringFieldAnnotatedModel model = new StringFieldAnnotatedModel(string);
         long id = save(model);
@@ -72,7 +75,6 @@ public class MultipleSaveTests {
 
     @Test
     public void stringMultipleSaveQueriedAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         StringFieldAnnotatedModel model = new StringFieldAnnotatedModel(string);
         long id = save(model);
@@ -88,7 +90,6 @@ public class MultipleSaveTests {
 
     @Test
     public void stringMultipleSaveOriginalAnnotatedNoIdTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         StringFieldAnnotatedNoIdModel model = new StringFieldAnnotatedNoIdModel(string);
         long id = save(model);
@@ -105,7 +106,6 @@ public class MultipleSaveTests {
 
     @Test
     public void stringMultipleSaveQueriedAnnotatedNoIdTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         StringFieldAnnotatedNoIdModel model = new StringFieldAnnotatedNoIdModel(string);
         long id = save(model);

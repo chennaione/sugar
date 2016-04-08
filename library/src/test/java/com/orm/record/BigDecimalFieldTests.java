@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.BigDecimalFieldAnnotatedModel;
 import com.orm.models.BigDecimalFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -22,9 +23,13 @@ import static org.junit.Assert.assertEquals;
 @Config(sdk=18, application = ClientApp.class)
 public class BigDecimalFieldTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void nullBigDecimalExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new BigDecimalFieldExtendedModel());
         BigDecimalFieldExtendedModel model =
                 SugarRecord.findById(BigDecimalFieldExtendedModel.class, 1);
@@ -33,7 +38,6 @@ public class BigDecimalFieldTests {
 
     @Test
     public void nullBigDecimalAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new BigDecimalFieldAnnotatedModel());
         BigDecimalFieldAnnotatedModel model =
                 SugarRecord.findById(BigDecimalFieldAnnotatedModel.class, 1);
@@ -42,7 +46,6 @@ public class BigDecimalFieldTests {
 
     @Test
     public void bigDecimalExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         BigDecimal decimal = new BigDecimal(1234.5678901234567890123456789);
         save(new BigDecimalFieldExtendedModel(decimal));
         BigDecimalFieldExtendedModel model = SugarRecord.findById(BigDecimalFieldExtendedModel.class, 1);
@@ -51,7 +54,6 @@ public class BigDecimalFieldTests {
 
     @Test
     public void bigDecimalAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         BigDecimal decimal = new BigDecimal(1234.5678901234567890123456789);
         save(new BigDecimalFieldAnnotatedModel(decimal));
         BigDecimalFieldAnnotatedModel model =

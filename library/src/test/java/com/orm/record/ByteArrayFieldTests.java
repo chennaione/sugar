@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.ByteArrayAnnotatedModel;
 import com.orm.models.ByteArrayExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,9 +21,14 @@ import static org.junit.Assert.assertEquals;
 @Config(sdk=18, application = ClientApp.class)
 public class ByteArrayFieldTests {
 
+
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void nullByteArrayExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         byte[] array = "".getBytes();
         save(new ByteArrayExtendedModel());
         ByteArrayExtendedModel model = SugarRecord.findById(ByteArrayExtendedModel.class, 1);
@@ -32,7 +38,6 @@ public class ByteArrayFieldTests {
 
     @Test
     public void nullByteArrayAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         byte[] array = "".getBytes();
         save(new ByteArrayAnnotatedModel());
         ByteArrayAnnotatedModel model = SugarRecord.findById(ByteArrayAnnotatedModel.class, 1);
@@ -42,7 +47,6 @@ public class ByteArrayFieldTests {
 
     @Test
     public void byteArrayExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         byte[] array = "hello".getBytes();
         save(new ByteArrayExtendedModel(array));
         ByteArrayExtendedModel model = SugarRecord.findById(ByteArrayExtendedModel.class, 1);
@@ -52,7 +56,6 @@ public class ByteArrayFieldTests {
 
     @Test
     public void byteArrayAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         byte[] array = "hello".getBytes();
         save(new ByteArrayAnnotatedModel(array));
         ByteArrayAnnotatedModel model = SugarRecord.findById(ByteArrayAnnotatedModel.class, 1);

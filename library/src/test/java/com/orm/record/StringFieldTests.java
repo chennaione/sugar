@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.StringFieldAnnotatedModel;
 import com.orm.models.StringFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,9 +21,14 @@ import static org.junit.Assert.assertNull;
 @Config(sdk=18, application = ClientApp.class)
 public class StringFieldTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
+
     @Test
     public void nullStringExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new StringFieldExtendedModel());
         StringFieldExtendedModel model = SugarRecord.findById(StringFieldExtendedModel.class, 1);
         assertNull(model.getString());
@@ -30,7 +36,6 @@ public class StringFieldTests {
 
     @Test
     public void nullStringAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new StringFieldAnnotatedModel());
         StringFieldAnnotatedModel model = SugarRecord.findById(StringFieldAnnotatedModel.class, 1);
         assertNull(model.getString());
@@ -38,7 +43,6 @@ public class StringFieldTests {
 
     @Test
     public void stringExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         save(new StringFieldExtendedModel(string));
         StringFieldExtendedModel model = SugarRecord.findById(StringFieldExtendedModel.class, 1);
@@ -47,7 +51,6 @@ public class StringFieldTests {
 
     @Test
     public void stringAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         String string = "Test String";
         save(new StringFieldAnnotatedModel(string));
         StringFieldAnnotatedModel model = SugarRecord.findById(StringFieldAnnotatedModel.class, 1);

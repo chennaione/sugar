@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.DoubleFieldAnnotatedModel;
 import com.orm.models.DoubleFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,9 +21,13 @@ import static org.junit.Assert.assertNull;
 @Config(sdk=18, application = ClientApp.class, manifest = Config.NONE)
 public class DoubleFieldTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void nullDoubleExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new DoubleFieldExtendedModel());
         DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
         assertNull(model.getDouble());
@@ -30,7 +35,6 @@ public class DoubleFieldTests {
 
     @Test
     public void nullRawDoubleExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new DoubleFieldExtendedModel());
         DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
         assertEquals(0.0, model.getRawDouble(), 0.0000000001);
@@ -38,7 +42,6 @@ public class DoubleFieldTests {
 
     @Test
     public void nullDoubleAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new DoubleFieldAnnotatedModel());
         DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
         assertNull(model.getDouble());
@@ -46,7 +49,6 @@ public class DoubleFieldTests {
 
     @Test
     public void nullRawDoubleAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new DoubleFieldAnnotatedModel());
         DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
         assertEquals(0.0, model.getRawDouble(), 0.0000000001);
@@ -55,7 +57,6 @@ public class DoubleFieldTests {
     @Test
     @SuppressWarnings("all")
     public void objectDoubleExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Double objectDouble = Double.valueOf(25.0);
         save(new DoubleFieldExtendedModel(objectDouble));
         DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
@@ -64,7 +65,6 @@ public class DoubleFieldTests {
 
     @Test
     public void rawDoubleExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new DoubleFieldExtendedModel(25.0));
         DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
         assertEquals(25.0, model.getRawDouble(), 0.0000000001);
@@ -73,7 +73,6 @@ public class DoubleFieldTests {
     @Test
     @SuppressWarnings("all")
     public void objectDoubleAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Double objectDouble = Double.valueOf(25.0);
         save(new DoubleFieldAnnotatedModel(objectDouble));
         DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
@@ -82,7 +81,6 @@ public class DoubleFieldTests {
 
     @Test
     public void rawDoubleAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new DoubleFieldAnnotatedModel(25.0));
         DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
         assertEquals(25.0, model.getRawDouble(), 0.0000000001);

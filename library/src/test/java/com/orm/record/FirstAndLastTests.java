@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.FloatFieldAnnotatedModel;
 import com.orm.models.FloatFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,10 +21,14 @@ import static org.junit.Assert.assertNull;
 @Config(sdk=18, application = ClientApp.class)
 public class FirstAndLastTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     @SuppressWarnings("all")
     public void firstExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 25F;
         Float lastObjectFloat = 50F;
         save(new FloatFieldExtendedModel(firstObjectFloat));
@@ -37,7 +42,6 @@ public class FirstAndLastTests {
 
     @Test
     public void firstDeletedRecordExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 15F;
         Float secondObjectFloat = 25F;
         Float thirdObjectFloat = 35F;
@@ -57,7 +61,6 @@ public class FirstAndLastTests {
 
     @Test
     public void lastExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 25F;
         Float lastObjectFloat = 50F;
         save(new FloatFieldExtendedModel(firstObjectFloat));
@@ -71,7 +74,6 @@ public class FirstAndLastTests {
 
     @Test
     public void lastDeletedRecordExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 15F;
         Float secondObjectFloat = 25F;
         Float thirdObjectFloat = 35F;
@@ -91,19 +93,16 @@ public class FirstAndLastTests {
 
     @Test
     public void nullFirstExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         assertNull(SugarRecord.first(FloatFieldExtendedModel.class));
     }
 
     @Test
     public void nullLastExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         assertNull(SugarRecord.last(FloatFieldExtendedModel.class));
     }
 
     @Test
     public void oneItemExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new FloatFieldExtendedModel(25F));
         FloatFieldExtendedModel firstModel = SugarRecord.first(FloatFieldExtendedModel.class);
         FloatFieldExtendedModel lastModel = SugarRecord.last(FloatFieldExtendedModel.class);
@@ -115,7 +114,6 @@ public class FirstAndLastTests {
 
     @Test
     public void firstAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 25F;
         Float lastObjectFloat = 50F;
         save(new FloatFieldAnnotatedModel(firstObjectFloat));
@@ -129,7 +127,6 @@ public class FirstAndLastTests {
 
     @Test
     public void firstDeletedRecordAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 15F;
         Float secondObjectFloat = 25F;
         Float thirdObjectFloat = 35F;
@@ -149,7 +146,6 @@ public class FirstAndLastTests {
 
     @Test
     public void lastAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 25F;
         Float lastObjectFloat = 50F;
         save(new FloatFieldAnnotatedModel(firstObjectFloat));
@@ -163,7 +159,6 @@ public class FirstAndLastTests {
 
     @Test
     public void lastDeletedRecordAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Float firstObjectFloat = 15F;
         Float secondObjectFloat = 25F;
         Float thirdObjectFloat = 35F;
@@ -183,19 +178,16 @@ public class FirstAndLastTests {
 
     @Test
     public void nullFirstAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         assertNull(SugarRecord.first(FloatFieldAnnotatedModel.class));
     }
 
     @Test
     public void nullLastAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         assertNull(SugarRecord.last(FloatFieldAnnotatedModel.class));
     }
 
     @Test
     public void oneItemAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new FloatFieldAnnotatedModel(25F));
         FloatFieldAnnotatedModel firstModel = SugarRecord.first(FloatFieldAnnotatedModel.class);
         FloatFieldAnnotatedModel lastModel = SugarRecord.last(FloatFieldAnnotatedModel.class);

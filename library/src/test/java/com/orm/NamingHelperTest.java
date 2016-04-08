@@ -1,10 +1,9 @@
 package com.orm;
 
 import com.orm.helper.NamingHelper;
-import com.orm.query.TestRecord;
+import com.orm.models.TestRecord;
 import com.orm.util.ReflectionUtil;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -12,25 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 public class NamingHelperTest {
 
     @Test
     public void testToSQLNameFromField() {
         List<Field> fieldList = ReflectionUtil.getTableFields(TestRecord.class);
-        List<String> columnList = new ArrayList<>();
 
         if (null != fieldList && !fieldList.isEmpty()) {
+            List<String> columnList = new ArrayList<>();
+
             for(Field field: fieldList) {
                 columnList.add(NamingHelper.toSQLName(field));
             }
+
+            boolean isIdInList = inList(columnList, "ID");
+            boolean isNameInList = inList(columnList, "NAME");
+
+            assertTrue(isIdInList);
+            assertTrue(isNameInList);
         }
-
-        boolean isIdInList = inList(columnList, "ID");
-        boolean isNameInList = inList(columnList, "NAME");
-
-        Assert.assertTrue(isIdInList);
-        Assert.assertTrue(isNameInList);
     }
 
     private boolean inList(List<String> list, String searchValue) {

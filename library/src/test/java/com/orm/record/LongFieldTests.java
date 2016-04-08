@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.LongFieldAnnotatedModel;
 import com.orm.models.LongFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,9 +21,13 @@ import static org.junit.Assert.assertNull;
 @Config(sdk=18, application = ClientApp.class)
 public class LongFieldTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void nullLongExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new LongFieldExtendedModel());
         LongFieldExtendedModel model = SugarRecord.findById(LongFieldExtendedModel.class, 1);
         assertNull(model.getLong());
@@ -30,7 +35,6 @@ public class LongFieldTests {
 
     @Test
     public void nullRawLongExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new LongFieldExtendedModel());
         LongFieldExtendedModel model = SugarRecord.findById(LongFieldExtendedModel.class, 1);
         assertEquals(0L, model.getRawLong());
@@ -38,7 +42,6 @@ public class LongFieldTests {
 
     @Test
     public void nullLongAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new LongFieldAnnotatedModel());
         LongFieldAnnotatedModel model = SugarRecord.findById(LongFieldAnnotatedModel.class, 1);
         assertNull(model.getLong());
@@ -46,7 +49,6 @@ public class LongFieldTests {
 
     @Test
     public void nullRawLongAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new LongFieldAnnotatedModel());
         LongFieldAnnotatedModel model = SugarRecord.findById(LongFieldAnnotatedModel.class, 1);
         assertEquals(0L, model.getRawLong());
@@ -54,7 +56,6 @@ public class LongFieldTests {
 
     @Test
     public void objectLongExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Long objectLong = 25L;
         save(new LongFieldExtendedModel(objectLong));
         LongFieldExtendedModel model = SugarRecord.findById(LongFieldExtendedModel.class, 1);
@@ -63,7 +64,6 @@ public class LongFieldTests {
 
     @Test
     public void rawLongExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new LongFieldExtendedModel(25L));
         LongFieldExtendedModel model = SugarRecord.findById(LongFieldExtendedModel.class, 1);
         assertEquals(25L, model.getRawLong());
@@ -71,7 +71,6 @@ public class LongFieldTests {
 
     @Test
     public void objectLongAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Long objectLong = 25L;
         save(new LongFieldAnnotatedModel(objectLong));
         LongFieldAnnotatedModel model = SugarRecord.findById(LongFieldAnnotatedModel.class, 1);
@@ -80,7 +79,6 @@ public class LongFieldTests {
 
     @Test
     public void rawLongAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new LongFieldAnnotatedModel(25L));
         LongFieldAnnotatedModel model = SugarRecord.findById(LongFieldAnnotatedModel.class, 1);
         assertEquals(25L, model.getRawLong());

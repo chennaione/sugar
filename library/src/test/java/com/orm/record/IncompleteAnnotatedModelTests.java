@@ -7,6 +7,7 @@ import com.orm.RobolectricGradleTestRunner;
 import com.orm.SugarContext;
 import com.orm.models.IncompleteAnnotatedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,15 +21,18 @@ import static org.junit.Assert.assertFalse;
 @Config(sdk=18, application = ClientApp.class)
 public class IncompleteAnnotatedModelTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test(expected=SQLiteException.class)
     public void saveNoIdFieldTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new IncompleteAnnotatedModel());
     }
 
     @Test
     public void deleteNoIdFieldTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         assertFalse(delete(new IncompleteAnnotatedModel()));
     }
 }

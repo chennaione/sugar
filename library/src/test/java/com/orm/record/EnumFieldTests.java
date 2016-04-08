@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.EnumFieldAnnotatedModel;
 import com.orm.models.EnumFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -21,9 +22,13 @@ import static org.junit.Assert.assertNull;
 @Config(sdk = 18, application = ClientApp.class)
 public class EnumFieldTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void nullDefaultEnumExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldExtendedModel());
         EnumFieldExtendedModel model = SugarRecord.findById(EnumFieldExtendedModel.class, 1);
         assertNull(model.getDefaultEnum());
@@ -31,14 +36,12 @@ public class EnumFieldTests {
 
     @Test
     public void nullOverriddenEnumExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldExtendedModel());
         EnumFieldExtendedModel model = SugarRecord.findById(EnumFieldExtendedModel.class, 1);
         assertNull(model.getOverrideEnum());
     }
     @Test
     public void nullDefaultEnumAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldAnnotatedModel());
         EnumFieldAnnotatedModel model = SugarRecord.findById(EnumFieldAnnotatedModel.class, 1);
         assertNull(model.getDefaultEnum());
@@ -46,7 +49,6 @@ public class EnumFieldTests {
 
     @Test
     public void nullOverriddenEnumAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldAnnotatedModel());
         EnumFieldAnnotatedModel model = SugarRecord.findById(EnumFieldAnnotatedModel.class, 1);
         assertNull(model.getOverrideEnum());
@@ -54,7 +56,6 @@ public class EnumFieldTests {
 
     @Test
     public void defaultEnumExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldExtendedModel(EnumFieldExtendedModel.OverrideEnum.ONE,
                 EnumFieldExtendedModel.DefaultEnum.TWO));
         EnumFieldExtendedModel model = SugarRecord.findById(EnumFieldExtendedModel.class, 1);
@@ -64,7 +65,6 @@ public class EnumFieldTests {
 
     @Test
     public void overriddenEnumExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldExtendedModel(EnumFieldExtendedModel.OverrideEnum.ONE,
                 EnumFieldExtendedModel.DefaultEnum.TWO));
         EnumFieldExtendedModel model = SugarRecord.findById(EnumFieldExtendedModel.class, 1);
@@ -74,7 +74,6 @@ public class EnumFieldTests {
 
     @Test
     public void defaultEnumAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldAnnotatedModel(EnumFieldAnnotatedModel.OverrideEnum.ONE,
                 EnumFieldAnnotatedModel.DefaultEnum.TWO));
         EnumFieldAnnotatedModel model = SugarRecord.findById(EnumFieldAnnotatedModel.class, 1);
@@ -84,7 +83,6 @@ public class EnumFieldTests {
 
     @Test
     public void overriddenEnumAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new EnumFieldAnnotatedModel(EnumFieldAnnotatedModel.OverrideEnum.ONE,
                 EnumFieldAnnotatedModel.DefaultEnum.TWO));
         EnumFieldAnnotatedModel model = SugarRecord.findById(EnumFieldAnnotatedModel.class, 1);

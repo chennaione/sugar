@@ -16,6 +16,7 @@ import com.orm.models.SimpleModel;
 import com.orm.query.Select;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -29,9 +30,13 @@ import static junit.framework.Assert.assertSame;
 @Config(sdk=18, application = ClientApp.class)
 public class CursorTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void testColumnNames() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleModel());
         Cursor c = Select.from(SimpleModel.class).getCursor();
         for (String col : new String[]{"STR", "INTEGER", "BOOL", "ID"}) {
@@ -40,7 +45,6 @@ public class CursorTests {
     }
     @Test
     public void testSugarCursor() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleModel());
         Cursor cursor = Select.from(SimpleModel.class).getCursor();
         assertNotSame("No _id", -1, cursor.getColumnIndex("_id"));
@@ -49,7 +53,6 @@ public class CursorTests {
 
     @Test
     public void testNoColumn() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleModel());
         Cursor cursor = Select.from(SimpleModel.class).getCursor();
         assertSame(-1, cursor.getColumnIndex("nonexistent"));
@@ -58,7 +61,6 @@ public class CursorTests {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Test
     public void testMakeAdapter() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleModel());
         Cursor c = Select.from(SimpleModel.class).getCursor();
         CursorAdapter adapter = new CursorAdapter(RuntimeEnvironment.application, c, true) {

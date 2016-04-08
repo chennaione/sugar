@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.helper.NamingHelper;
 import com.orm.models.SimpleExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -29,22 +30,24 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk=18, application = ClientApp.class)
 public class SimpleExtendedModelTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void emptyDatabaseTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void twoSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
         assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
@@ -52,7 +55,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void manySaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
         }
@@ -61,13 +63,11 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void defaultIdTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(1L, save(new SimpleExtendedModel()));
     }
 
     @Test
     public void whereCountTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class, "id = ?", new String[]{"1"}));
@@ -75,7 +75,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void whereNoCountTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class, "id = ?", new String[]{"1"}));
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
@@ -85,7 +84,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void whereBrokenCountTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
         assertEquals(-1L, SugarRecord.count(SimpleExtendedModel.class, "di = ?", new String[]{"1"}));
@@ -93,7 +91,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void saveMethodTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel model = new SimpleExtendedModel();
         model.save();
         assertEquals(-1L, SugarRecord.count(SimpleExtendedModel.class, "di = ?", new String[]{"1"}));
@@ -101,7 +98,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void deleteTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel model = new SimpleExtendedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
@@ -111,7 +107,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void deleteUnsavedTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel model = new SimpleExtendedModel();
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
         assertFalse(SugarRecord.delete(model));
@@ -120,7 +115,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void deleteWrongTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel model = new SimpleExtendedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
@@ -133,7 +127,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void deleteAllTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         int elementNumber = 100;
         for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleExtendedModel());
@@ -145,7 +138,6 @@ public class SimpleExtendedModelTests {
     @Test
     @SuppressWarnings("all")
     public void deleteAllWhereTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         int elementNumber = 100;
         for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleExtendedModel());
@@ -158,7 +150,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void deleteInTransactionFewTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel first = new SimpleExtendedModel();
         SimpleExtendedModel second = new SimpleExtendedModel();
         SimpleExtendedModel third = new SimpleExtendedModel();
@@ -172,7 +163,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void deleteInTransactionManyTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         long elementNumber = 100;
         List<SimpleExtendedModel> models = new ArrayList<>();
         for (int i = 1; i <= elementNumber; i++) {
@@ -190,14 +180,12 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void saveInTransactionTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SugarRecord.saveInTx(new SimpleExtendedModel(), new SimpleExtendedModel());
         assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void listAllTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
         }
@@ -210,7 +198,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
         List<SimpleExtendedModel> models =
@@ -221,7 +208,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findWithQueryTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
         }
@@ -237,28 +223,24 @@ public class SimpleExtendedModelTests {
     @Test
     @SuppressWarnings("all")
     public void findByIdTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         assertEquals(Long.valueOf(1L), SugarRecord.findById(SimpleExtendedModel.class, 1L).getId());
     }
 
     @Test
     public void findByIdIntegerTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         assertEquals(Long.valueOf(1L), SugarRecord.findById(SimpleExtendedModel.class, 1).getId());
     }
 
     @Test
     public void findByIdStringsNullTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         assertEquals(0, SugarRecord.findById(SimpleExtendedModel.class, new String[]{""}).size());
     }
 
     @Test
     public void findByIdStringsOneTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         List<SimpleExtendedModel> models =
                 SugarRecord.findById(SimpleExtendedModel.class, new String[]{"1"});
@@ -268,7 +250,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findByIdStringsTwoTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
         save(new SimpleExtendedModel());
@@ -281,7 +262,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findByIdStringsManyTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 10; i++) {
             save(new SimpleExtendedModel());
         }
@@ -296,7 +276,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findByIdStringsOrderTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 10; i++) {
             save(new SimpleExtendedModel());
         }
@@ -312,14 +291,12 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findByIdNullTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         assertNull(SugarRecord.findById(SimpleExtendedModel.class, 2L));
     }
 
     @Test
     public void findAllTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
         }
@@ -334,7 +311,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findAsIteratorTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
         }
@@ -350,7 +326,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void findWithQueryAsIteratorTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleExtendedModel());
         }
@@ -359,6 +334,7 @@ public class SimpleExtendedModelTests {
                                                     "Select * from " +
                                                     NamingHelper.toSQLName(SimpleExtendedModel.class) +
                                                     " where id >= ? ", "50");
+        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 50; i <= 100; i++) {
             assertTrue(cursor.hasNext());
             SimpleExtendedModel model = cursor.next();
@@ -369,7 +345,6 @@ public class SimpleExtendedModelTests {
 
     @Test(expected=NoSuchElementException.class)
     public void findAsIteratorOutOfBoundsTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
                 "id = ?", "1");
@@ -383,7 +358,6 @@ public class SimpleExtendedModelTests {
 
     @Test(expected=UnsupportedOperationException.class)
     public void disallowRemoveCursorTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleExtendedModel());
         Iterator<SimpleExtendedModel> cursor = SugarRecord.findAsIterator(SimpleExtendedModel.class,
                 "id = ?", "1");
@@ -397,7 +371,6 @@ public class SimpleExtendedModelTests {
 
     @Test
     public void vacuumTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SugarRecord.executeQuery("Vacuum");
     }
 }

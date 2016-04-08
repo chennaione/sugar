@@ -1,5 +1,7 @@
 package com.orm.query;
 
+import com.orm.models.TestRecord;
+
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

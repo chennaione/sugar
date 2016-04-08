@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.RelationshipMixedBModel;
 import com.orm.models.SimpleExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -21,16 +22,19 @@ import static org.junit.Assert.assertEquals;
 @Config(sdk=18, application = ClientApp.class)
 public class RelationshipMixedBTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void emptyDatabaseTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(RelationshipMixedBModel.class));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         save(new RelationshipMixedBModel(simple));
@@ -40,7 +44,6 @@ public class RelationshipMixedBTests {
 
     @Test
     public void twoSameSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         save(new RelationshipMixedBModel(simple));
@@ -51,7 +54,6 @@ public class RelationshipMixedBTests {
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         SimpleExtendedModel another_simple = new SimpleExtendedModel();
@@ -64,7 +66,6 @@ public class RelationshipMixedBTests {
 
     @Test
     public void manySameSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         for (int i = 1; i <= 100; i++) {
@@ -76,7 +77,6 @@ public class RelationshipMixedBTests {
 
     @Test
     public void manyDifferentSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             SimpleExtendedModel simple = new SimpleExtendedModel();
             save(simple);
@@ -88,7 +88,6 @@ public class RelationshipMixedBTests {
 
     @Test
     public void listAllSameTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         for (int i = 1; i <= 100; i++) {

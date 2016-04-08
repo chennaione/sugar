@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.ShortFieldAnnotatedModel;
 import com.orm.models.ShortFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -20,9 +21,13 @@ import static org.junit.Assert.assertNull;
 @Config(sdk=18, application = ClientApp.class)
 public class ShortFieldTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void nullShortExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new ShortFieldExtendedModel());
         ShortFieldExtendedModel model = SugarRecord.findById(ShortFieldExtendedModel.class, 1);
         assertNull(model.getShort());
@@ -30,7 +35,6 @@ public class ShortFieldTests {
 
     @Test
     public void nullRawShortExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new ShortFieldExtendedModel());
         ShortFieldExtendedModel model = SugarRecord.findById(ShortFieldExtendedModel.class, 1);
         assertEquals((short) 0, model.getRawShort());
@@ -38,7 +42,6 @@ public class ShortFieldTests {
 
     @Test
     public void nullShortAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new ShortFieldAnnotatedModel());
         ShortFieldAnnotatedModel model = SugarRecord.findById(ShortFieldAnnotatedModel.class, 1);
         assertNull(model.getShort());
@@ -46,7 +49,6 @@ public class ShortFieldTests {
 
     @Test
     public void nullRawShortAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new ShortFieldAnnotatedModel());
         ShortFieldAnnotatedModel model = SugarRecord.findById(ShortFieldAnnotatedModel.class, 1);
         assertEquals((short) 0, model.getRawShort());
@@ -54,7 +56,6 @@ public class ShortFieldTests {
 
     @Test
     public void objectShortExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Short objectShort = 25;
         save(new ShortFieldExtendedModel(objectShort));
         ShortFieldExtendedModel model = SugarRecord.findById(ShortFieldExtendedModel.class, 1);
@@ -63,7 +64,6 @@ public class ShortFieldTests {
 
     @Test
     public void rawShortExtendedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new ShortFieldExtendedModel((short) 25));
         ShortFieldExtendedModel model = SugarRecord.findById(ShortFieldExtendedModel.class, 1);
         assertEquals((short) 25, model.getRawShort());
@@ -71,7 +71,6 @@ public class ShortFieldTests {
 
     @Test
     public void objectShortAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         Short objectShort = 25;
         save(new ShortFieldAnnotatedModel(objectShort));
         ShortFieldAnnotatedModel model = SugarRecord.findById(ShortFieldAnnotatedModel.class, 1);
@@ -80,7 +79,6 @@ public class ShortFieldTests {
 
     @Test
     public void rawShortAnnotatedTest() {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new ShortFieldAnnotatedModel((short) 25));
         ShortFieldAnnotatedModel model = SugarRecord.findById(ShortFieldAnnotatedModel.class, 1);
         assertEquals((short) 25, model.getRawShort());

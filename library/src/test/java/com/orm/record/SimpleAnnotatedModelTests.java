@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.helper.NamingHelper;
 import com.orm.models.SimpleAnnotatedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -29,22 +30,24 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk=18, application = ClientApp.class)
 public class SimpleAnnotatedModelTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void emptyDatabaseTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void twoSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
         assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
@@ -52,7 +55,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void manySaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -61,13 +63,11 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void defaultIdTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(1L, save(new SimpleAnnotatedModel()));
     }
 
     @Test
     public void whereCountTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class, "id = ?", new String[]{"1"}));
@@ -75,7 +75,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void whereNoCountTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class, "id = ?", new String[]{"1"}));
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
@@ -85,7 +84,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void whereBrokenCountTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
         assertEquals(-1L, SugarRecord.count(SimpleAnnotatedModel.class, "di = ?", new String[]{"1"}));
@@ -93,7 +91,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void deleteTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
@@ -103,7 +100,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void deleteUnsavedTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
         assertFalse(SugarRecord.delete(model));
@@ -112,7 +108,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void deleteWrongTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         save(model);
         assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
@@ -125,7 +120,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void deleteAllTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         int elementNumber = 100;
         for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleAnnotatedModel());
@@ -137,7 +131,6 @@ public class SimpleAnnotatedModelTests {
     @Test
     @SuppressWarnings("all")
     public void deleteAllWhereTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         int elementNumber = 100;
         for (int i = 1; i <= elementNumber; i++) {
             save(new SimpleAnnotatedModel());
@@ -148,7 +141,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void deleteInTransactionFewTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel first = new SimpleAnnotatedModel();
         SimpleAnnotatedModel second = new SimpleAnnotatedModel();
         SimpleAnnotatedModel third = new SimpleAnnotatedModel();
@@ -162,7 +154,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void deleteInTransactionManyTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         long elementNumber = 100;
         List<SimpleAnnotatedModel> models = new ArrayList<>();
         for (int i = 1; i <= elementNumber; i++) {
@@ -180,14 +171,12 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void saveInTransactionTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SugarRecord.saveInTx(new SimpleAnnotatedModel(), new SimpleAnnotatedModel());
         assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void listAllTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -200,7 +189,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
         List<SimpleAnnotatedModel> models =
@@ -211,7 +199,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findWithQueryTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -227,28 +214,24 @@ public class SimpleAnnotatedModelTests {
     @Test
     @SuppressWarnings("all")
     public void findByIdTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         assertEquals(1L, SugarRecord.findById(SimpleAnnotatedModel.class, 1L).getId().longValue());
     }
 
     @Test
     public void findByIdIntegerTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         assertEquals(1L, SugarRecord.findById(SimpleAnnotatedModel.class, 1).getId().longValue());
     }
 
     @Test
     public void findByIdStringsNullTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         assertEquals(0, SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{""}).size());
     }
 
     @Test
     public void findByIdStringsOneTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         List<SimpleAnnotatedModel> models =
                 SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1"});
@@ -258,7 +241,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findByIdStringsTwoTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
@@ -271,7 +253,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findByIdStringsManyTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 10; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -286,7 +267,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findByIdStringsOrderTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 10; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -302,14 +282,12 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findByIdNullTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         assertNull(SugarRecord.findById(SimpleAnnotatedModel.class, 2L));
     }
 
     @Test
     public void findAllTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -324,7 +302,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findAsIteratorTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -340,7 +317,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void findWithQueryAsIteratorTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
@@ -359,7 +335,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test(expected=NoSuchElementException.class)
     public void findAsIteratorOutOfBoundsTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         Iterator<SimpleAnnotatedModel> cursor = SugarRecord.findAsIterator(SimpleAnnotatedModel.class,
                 "id = ?", "1");
@@ -373,7 +348,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test(expected=UnsupportedOperationException.class)
     public void disallowRemoveCursorTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         save(new SimpleAnnotatedModel());
         Iterator<SimpleAnnotatedModel> cursor = SugarRecord.findAsIterator(SimpleAnnotatedModel.class,
                 "id = ?", "1");
@@ -387,7 +361,6 @@ public class SimpleAnnotatedModelTests {
 
     @Test
     public void vacuumTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SugarRecord.executeQuery("Vacuum");
     }
 }

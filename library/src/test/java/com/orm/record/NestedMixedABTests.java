@@ -8,6 +8,7 @@ import com.orm.models.NestedMixedABModel;
 import com.orm.models.RelationshipMixedBModel;
 import com.orm.models.SimpleExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -22,9 +23,13 @@ import static org.junit.Assert.assertEquals;
 @Config(sdk=18, application = ClientApp.class)
 public class NestedMixedABTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void emptyDatabaseTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(NestedMixedABModel.class));
         assertEquals(0L, SugarRecord.count(RelationshipMixedBModel.class));
         assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
@@ -32,7 +37,6 @@ public class NestedMixedABTests {
 
     @Test
     public void oneSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
@@ -45,7 +49,6 @@ public class NestedMixedABTests {
 
     @Test
     public void twoSameSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
@@ -59,7 +62,6 @@ public class NestedMixedABTests {
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         SimpleExtendedModel another_simple = new SimpleExtendedModel();
@@ -77,7 +79,6 @@ public class NestedMixedABTests {
 
     @Test
     public void manySameSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
@@ -92,7 +93,6 @@ public class NestedMixedABTests {
 
     @Test
     public void manyDifferentSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             SimpleExtendedModel simple = new SimpleExtendedModel();
             save(simple);
@@ -107,7 +107,6 @@ public class NestedMixedABTests {
 
     @Test
     public void listAllSameTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
@@ -125,7 +124,6 @@ public class NestedMixedABTests {
 
     @Test
     public void listAllDifferentTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             SimpleExtendedModel simple = new SimpleExtendedModel();
             save(simple);

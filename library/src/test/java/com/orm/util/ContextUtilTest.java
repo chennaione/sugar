@@ -2,10 +2,15 @@ package com.orm.util;
 
 import android.content.Context;
 
-import com.orm.query.DummyContext;
+import com.orm.ClientApp;
+import com.orm.RobolectricGradleTestRunner;
+import com.orm.SugarContext;
 
+import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
@@ -14,46 +19,43 @@ import static com.orm.util.ContextUtil.*;
 /**
  * @author jonatan.salas
  */
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(sdk = 18, application = ClientApp.class, manifest = Config.NONE)
 public class ContextUtilTest {
 
-    public void initContextUtil() {
-        init(new DummyContext());
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application.getApplicationContext());
     }
 
     @Test
     public void testInitContext() {
-        initContextUtil();
         assertNotNull(getContext());
     }
 
     @Test
     public void testGetAssets() {
-        initContextUtil();
-        assertNull(getAssets());
+        assertNotNull(getAssets());
     }
 
     @Test
     public void testGetPackageManager() {
-        initContextUtil();
-        assertNull(getPackageManager());
+        assertNotNull(getPackageManager());
     }
 
     @Test
     public void testGetPackageName() {
-        initContextUtil();
-        assertNull(getPackageName());
+        assertNotNull(getPackageName());
     }
 
     @Test
     public void testGetPreferences() {
-        initContextUtil();
-        assertNull(getSharedPreferences("lala", Context.MODE_PRIVATE));
+        assertNotNull(getSharedPreferences("lala", Context.MODE_PRIVATE));
     }
 
     @Test
     public void testTerminateContext() {
-        initContextUtil();
-        terminate();
+        SugarContext.terminate();
         assertNull(getContext());
     }
 }

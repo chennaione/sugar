@@ -1,4 +1,4 @@
-package com.orm.query;
+package com.orm.models;
 
 import com.orm.SugarRecord;
 

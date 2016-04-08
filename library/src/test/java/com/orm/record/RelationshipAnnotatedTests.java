@@ -7,6 +7,7 @@ import com.orm.SugarRecord;
 import com.orm.models.RelationshipAnnotatedModel;
 import com.orm.models.SimpleAnnotatedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -21,16 +22,19 @@ import static org.junit.Assert.assertEquals;
 @Config(sdk=18, application = ClientApp.class)
 public class RelationshipAnnotatedTests {
 
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
+
     @Test
     public void emptyDatabaseTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         assertEquals(0L, SugarRecord.count(RelationshipAnnotatedModel.class));
         assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
         save(new RelationshipAnnotatedModel(simple));
@@ -40,7 +44,6 @@ public class RelationshipAnnotatedTests {
 
     @Test
     public void twoSameSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
         save(new RelationshipAnnotatedModel(simple));
@@ -51,7 +54,6 @@ public class RelationshipAnnotatedTests {
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
         SimpleAnnotatedModel another_simple = new SimpleAnnotatedModel();
@@ -64,7 +66,6 @@ public class RelationshipAnnotatedTests {
 
     @Test
     public void manySameSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
         for (int i = 1; i <= 100; i++) {
@@ -76,7 +77,6 @@ public class RelationshipAnnotatedTests {
 
     @Test
     public void manyDifferentSaveTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
             save(simple);
@@ -88,7 +88,6 @@ public class RelationshipAnnotatedTests {
 
     @Test
     public void listAllSameTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
         for (int i = 1; i <= 100; i++) {
@@ -104,7 +103,6 @@ public class RelationshipAnnotatedTests {
 
     @Test
     public void listAllDifferentTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
             save(simple);

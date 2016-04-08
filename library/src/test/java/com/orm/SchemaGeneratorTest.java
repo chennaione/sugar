@@ -6,19 +6,27 @@ import com.orm.models.MultiColumnUniqueModel;
 import com.orm.models.StringFieldAnnotatedModel;
 import com.orm.models.StringFieldExtendedModel;
 import com.orm.models.StringFieldExtendedModelAnnotatedColumn;
-import com.orm.query.DummyContext;
-import com.orm.util.ContextUtil;
 import com.orm.helper.NamingHelper;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertEquals;
 
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(sdk = 18, application = ClientApp.class, manifest = Config.NONE)
 public class SchemaGeneratorTest {
+
+    @Before
+    public void setUp() {
+        SugarContext.init(RuntimeEnvironment.application);
+    }
 
     @Test
     public void testEmptyTableCreation() throws Exception {
-        ContextUtil.init(new DummyContext());
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
         assertEquals(
@@ -29,7 +37,6 @@ public class SchemaGeneratorTest {
 
     @Test
     public void testSimpleColumnTableCreation() throws Exception {
-        ContextUtil.init(new DummyContext());
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
         assertEquals(
@@ -55,7 +62,6 @@ public class SchemaGeneratorTest {
 
     @Test
     public void testUniqueTableCreation() {
-        ContextUtil.init(new DummyContext());
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
         assertEquals(
@@ -67,7 +73,6 @@ public class SchemaGeneratorTest {
 
     @Test
     public void testMultiColumnUniqueTableCreation() {
-        ContextUtil.init(new DummyContext());
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
         String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
         assertEquals(
