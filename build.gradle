@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.0.0'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
     }
 }
@@ -70,9 +70,9 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     description = 'Generates an aggregate report from all subprojects'
     dependsOn(subprojects.jacocoTestReport)
 
-    additionalSourceDirs = files('example/src/main/java') + files('library/src/main/java')
-    sourceDirectories = files('example/src/main/java') + files('library/src/main/java')
-    classDirectories = files('example/build/intermediates/classes/debug') + files('library/build/intermediates/classes/debug')
+    additionalSourceDirs = files('library/src/main/java')
+    sourceDirectories = files('library/src/main/java')
+    classDirectories = files('library/build/intermediates/classes/debug')
     executionData = files(subprojects.jacocoTestReport.executionData)
 
     reports {
