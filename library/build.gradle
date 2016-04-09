@@ -1,9 +1,7 @@
 apply plugin: 'com.android.library'
 apply from: '../maven_push.gradle'
 
-// https://docs.gradle.org/current/userguide/publishing_maven.html
-// http://www.flexlabs.org/2013/06/using-local-aar-android-library-packages-in-gradle-builds
-apply plugin: 'maven-publish'
+
 
 
 version '2.0.0-SNAPSHOT'
@@ -33,23 +31,46 @@ android {
     }
 }
 
+//task sourceJar(type: Jar) {
+//    classifier "source"
+//}
+
+afterEvaluate {
+    // See: https://groups.google.com/d/msg/adt-dev/kzbEHAGbFVg/aauPXErRDAAJ
+
+// https://docs.gradle.org/current/userguide/publishing_maven.html
+// http://www.flexlabs.org/2013/06/using-local-aar-android-library-packages-in-gradle-builds
+    apply plugin: 'maven-publish'
+
 // This configuration is used to publish the library to a local repo while a being forked and modified.
 // It should really be set up so that the version are all in line, and set to be a SNAPSHOT.
 // The version listed here is a temp hack to allow me to keep working.
-android.libraryVariants
-publishing {
-    publications {
-        maven(MavenPublication) {
+    android.libraryVariants
+// https://docs.gradle.org/current/userguide/publishing_maven.html
+    publishing {
+        publications {
+            maven(MavenPublication) {
 
-            groupId 'com.github.satyan'
-            artifactId 'sugar'
-            version '2.0.0-SNAPSHOT'
+                groupId 'com.github.satyan'
+                artifactId 'sugar'
+                version '2.0.1-SNAPSHOT'
 
-            artifact bundleRelease
+                artifact bundleRelease
+
+//                artifacts {
+//                    groupId 'com.mycompany'
+//                    artifactId 'mylibrary'
+//                    version '1.0'
+//                    artifact 'build/outputs/aar/app-release.aar'
+//                }
+
+//                artifact sourceJar {
+//                    classifier "sources"
+//                }
+            }
         }
     }
 }
-
 //publishing {
 //    publications {
 //        maven(MavenPublication) {

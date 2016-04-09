@@ -1,2 +1,2 @@
 #!/bin/sh
-gradle clean build publishToMavenLocal
+./gradlew clean build publishToMavenLocal
