@@ -6,7 +6,7 @@ import java.lang.String;
 
 import static junit.framework.Assert.assertEquals;
 
-public class MigrationFileParserTest {
+public final class MigrationFileParserTest {
 
     @Test
     public void testSingleLineStatement() {

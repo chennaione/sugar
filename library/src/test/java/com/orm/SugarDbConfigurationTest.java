@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNull;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = 16, constants = BuildConfig.class)
-public class SugarDbConfigurationTest {
+public final class SugarDbConfigurationTest {
 
     @Test
     public void testNotNullConfiguration() {

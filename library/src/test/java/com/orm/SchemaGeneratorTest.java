@@ -1,29 +1,25 @@
 package com.orm;
 
-import com.orm.models.EmptyModel;
-import com.orm.models.IntUniqueModel;
-import com.orm.models.MultiColumnUniqueModel;
-import com.orm.models.StringFieldAnnotatedModel;
-import com.orm.models.StringFieldExtendedModel;
-import com.orm.models.StringFieldExtendedModelAnnotatedColumn;
+import com.orm.app.ClientApp;
+import com.orm.dsl.BuildConfig;
+import com.orm.model.EmptyModel;
+import com.orm.model.IntUniqueModel;
+import com.orm.model.MultiColumnUniqueModel;
+import com.orm.model.StringFieldAnnotatedModel;
+import com.orm.model.StringFieldExtendedModel;
+import com.orm.model.StringFieldExtendedModelAnnotatedColumn;
 import com.orm.helper.NamingHelper;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RuntimeEnvironment;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk = 18, application = ClientApp.class, manifest = Config.NONE)
-public class SchemaGeneratorTest {
-
-    @Before
-    public void setUp() {
-        SugarContext.init(RuntimeEnvironment.application);
-    }
+@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
+public final class SchemaGeneratorTest {
 
     @Test
     public void testEmptyTableCreation() throws Exception {

@@ -7,7 +7,7 @@ import static junit.framework.Assert.assertEquals;
 /**
  * @author jonatan.salas
  */
-public class KeyWordUtilTest {
+public final class KeyWordUtilTest {
 
     @Test
     public void testKeyWord() {

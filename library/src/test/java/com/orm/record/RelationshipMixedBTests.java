@@ -1,16 +1,14 @@
 package com.orm.record;
 
-import com.orm.ClientApp;
-import com.orm.RobolectricGradleTestRunner;
-import com.orm.SugarContext;
+import com.orm.app.ClientApp;
 import com.orm.SugarRecord;
-import com.orm.models.RelationshipMixedBModel;
-import com.orm.models.SimpleExtendedModel;
+import com.orm.dsl.BuildConfig;
+import com.orm.model.RelationshipMixedBModel;
+import com.orm.model.SimpleExtendedModel;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RuntimeEnvironment;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
@@ -19,13 +17,8 @@ import static com.orm.SugarRecord.save;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk=18, application = ClientApp.class)
+@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
 public class RelationshipMixedBTests {
-
-    @Before
-    public void setUp() {
-        SugarContext.init(RuntimeEnvironment.application);
-    }
 
     @Test
     public void emptyDatabaseTest() throws Exception {
@@ -103,7 +96,6 @@ public class RelationshipMixedBTests {
 
     @Test
     public void listAllDifferentTest() throws Exception {
-        SugarContext.init(RuntimeEnvironment.application);
         for (int i = 1; i <= 100; i++) {
             SimpleExtendedModel simple = new SimpleExtendedModel();
             save(simple);

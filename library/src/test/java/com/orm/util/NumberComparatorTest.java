@@ -1,20 +1,14 @@
 package com.orm.util;
 
-import com.orm.RobolectricGradleTestRunner;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author jonatan.salas
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk = 18)
-public class NumberComparatorTest {
+public final class NumberComparatorTest {
     private NumberComparator comparator;
 
     @Before

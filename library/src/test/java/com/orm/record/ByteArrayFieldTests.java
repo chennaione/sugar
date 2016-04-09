@@ -1,16 +1,14 @@
 package com.orm.record;
 
-import com.orm.ClientApp;
-import com.orm.RobolectricGradleTestRunner;
-import com.orm.SugarContext;
+import com.orm.app.ClientApp;
 import com.orm.SugarRecord;
-import com.orm.models.ByteArrayAnnotatedModel;
-import com.orm.models.ByteArrayExtendedModel;
+import com.orm.dsl.BuildConfig;
+import com.orm.model.ByteArrayAnnotatedModel;
+import com.orm.model.ByteArrayExtendedModel;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RuntimeEnvironment;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
@@ -18,14 +16,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk=18, application = ClientApp.class)
-public class ByteArrayFieldTests {
-
-
-    @Before
-    public void setUp() {
-        SugarContext.init(RuntimeEnvironment.application);
-    }
+@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
+public final class ByteArrayFieldTests {
 
     @Test
     public void nullByteArrayExtendedTest() {

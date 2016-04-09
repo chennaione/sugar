@@ -1,16 +1,14 @@
 package com.orm.record;
 
-import com.orm.ClientApp;
-import com.orm.RobolectricGradleTestRunner;
-import com.orm.SugarContext;
+import com.orm.app.ClientApp;
 import com.orm.SugarRecord;
-import com.orm.models.IntegerFieldAnnotatedModel;
-import com.orm.models.IntegerFieldExtendedModel;
+import com.orm.dsl.BuildConfig;
+import com.orm.model.IntegerFieldAnnotatedModel;
+import com.orm.model.IntegerFieldExtendedModel;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RuntimeEnvironment;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
@@ -18,13 +16,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk=18, application = ClientApp.class)
+@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
 public class IntegerFieldTests {
-
-    @Before
-    public void setUp() {
-        SugarContext.init(RuntimeEnvironment.application);
-    }
 
     @Test
     public void nullIntegerExtendedTest() {
