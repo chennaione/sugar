@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.StringFieldAnnotatedModel;
 import com.orm.model.StringFieldAnnotatedNoIdModel;
@@ -13,103 +12,100 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.findById;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
-public class MultipleSaveTests {
+public final class MultipleSaveTests {
+    private String testString = "Test String";
+    private String anotherString = "Another test";
 
     @Test
     public void stringMultipleSaveOriginalExtendedTest() {
-        String string = "Test String";
-        StringFieldExtendedModel model = new StringFieldExtendedModel(string);
+        StringFieldExtendedModel model = new StringFieldExtendedModel(testString);
         long id = save(model);
-        StringFieldExtendedModel query = SugarRecord.findById(StringFieldExtendedModel.class, id);
+        StringFieldExtendedModel query = findById(StringFieldExtendedModel.class, id);
 
         if (null != query) {
-            assertEquals(string, query.getString());
+            assertEquals(testString, query.getString());
         }
 
-        model.setString("Another test");
+        model.setString(anotherString);
+
         assertEquals(id, save(model));
-        assertNull(SugarRecord.findById(StringFieldExtendedModel.class, 2));
+        assertNull(findById(StringFieldExtendedModel.class, 2));
     }
 
     @Test
     public void stringMultipleSaveQueriedExtendedTest() {
-        String string = "Test String";
-        StringFieldExtendedModel model = new StringFieldExtendedModel(string);
+        StringFieldExtendedModel model = new StringFieldExtendedModel(testString);
         long id = save(model);
-        StringFieldExtendedModel query = SugarRecord.findById(StringFieldExtendedModel.class, id);
+        StringFieldExtendedModel query = findById(StringFieldExtendedModel.class, id);
 
         if (null != query) {
-            assertEquals(string, query.getString());
-            query.setString("Another test");
+            assertEquals(testString, query.getString());
+            query.setString(anotherString);
             assertEquals(id, save(query));
-            assertNull(SugarRecord.findById(StringFieldExtendedModel.class, 2));
+            assertNull(findById(StringFieldExtendedModel.class, 2));
         }
     }
 
     @Test
     public void stringMultipleSaveOriginalAnnotatedTest() {
-        String string = "Test String";
-        StringFieldAnnotatedModel model = new StringFieldAnnotatedModel(string);
+        StringFieldAnnotatedModel model = new StringFieldAnnotatedModel(testString);
         long id = save(model);
-        StringFieldAnnotatedModel query = SugarRecord.findById(StringFieldAnnotatedModel.class, id);
+        StringFieldAnnotatedModel query = findById(StringFieldAnnotatedModel.class, id);
 
         if (null != query) {
-            assertEquals(string, query.getString());
-            model.setString("Another test");
+            assertEquals(testString, query.getString());
+            model.setString(anotherString);
             assertEquals(id, save(model));
-            assertNull(SugarRecord.findById(StringFieldAnnotatedModel.class, 2));
+            assertNull(findById(StringFieldAnnotatedModel.class, 2));
         }
     }
 
     @Test
     public void stringMultipleSaveQueriedAnnotatedTest() {
-        String string = "Test String";
-        StringFieldAnnotatedModel model = new StringFieldAnnotatedModel(string);
+        StringFieldAnnotatedModel model = new StringFieldAnnotatedModel(testString);
         long id = save(model);
-        StringFieldAnnotatedModel query = SugarRecord.findById(StringFieldAnnotatedModel.class, id);
+        StringFieldAnnotatedModel query = findById(StringFieldAnnotatedModel.class, id);
 
         if (null != query) {
-            assertEquals(string, query.getString());
-            query.setString("Another test");
+            assertEquals(testString, query.getString());
+            query.setString(anotherString);
             assertEquals(id, save(query));
-            assertNull(SugarRecord.findById(StringFieldAnnotatedModel.class, 2));
+            assertNull(findById(StringFieldAnnotatedModel.class, 2));
         }
     }
 
     @Test
     public void stringMultipleSaveOriginalAnnotatedNoIdTest() {
-        String string = "Test String";
-        StringFieldAnnotatedNoIdModel model = new StringFieldAnnotatedNoIdModel(string);
+        StringFieldAnnotatedNoIdModel model = new StringFieldAnnotatedNoIdModel(testString);
         long id = save(model);
-        StringFieldAnnotatedNoIdModel query =
-                SugarRecord.findById(StringFieldAnnotatedNoIdModel.class, id);
+        StringFieldAnnotatedNoIdModel query = findById(StringFieldAnnotatedNoIdModel.class, id);
 
         if (null != query) {
-            assertEquals(string, query.getString());
-            model.setString("Another test");
+            assertEquals(testString, query.getString());
+            model.setString(anotherString);
             assertEquals(id, save(model));
-            assertNull(SugarRecord.findById(StringFieldAnnotatedNoIdModel.class, 2));
+            assertNull(findById(StringFieldAnnotatedNoIdModel.class, 2));
         }
     }
 
     @Test
     public void stringMultipleSaveQueriedAnnotatedNoIdTest() {
-        String string = "Test String";
-        StringFieldAnnotatedNoIdModel model = new StringFieldAnnotatedNoIdModel(string);
+        StringFieldAnnotatedNoIdModel model = new StringFieldAnnotatedNoIdModel(testString);
         long id = save(model);
-        StringFieldAnnotatedNoIdModel query =
-                SugarRecord.findById(StringFieldAnnotatedNoIdModel.class, id);
+        StringFieldAnnotatedNoIdModel query = findById(StringFieldAnnotatedNoIdModel.class, id);
 
         if (null != query) {
-            assertEquals(string, query.getString());
-            query.setString("Another test");
+            assertEquals(testString, query.getString());
+            query.setString(anotherString);
             assertEquals(id, save(query));
-            assertNull(SugarRecord.findById(StringFieldAnnotatedNoIdModel.class, 2));
+            assertNull(findById(StringFieldAnnotatedNoIdModel.class, 2));
         }
     }
 }

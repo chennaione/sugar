@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.helper.NamingHelper;
 import com.orm.model.SimpleAnnotatedModel;
@@ -18,6 +17,20 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.deleteAll;
+import static com.orm.SugarRecord.delete;
+import static com.orm.SugarRecord.deleteInTx;
+import static com.orm.SugarRecord.listAll;
+import static com.orm.SugarRecord.findById;
+import static com.orm.SugarRecord.saveInTx;
+import static com.orm.SugarRecord.find;
+import static com.orm.SugarRecord.findAsIterator;
+import static com.orm.SugarRecord.findWithQuery;
+import static com.orm.SugarRecord.findAll;
+import static com.orm.SugarRecord.findWithQueryAsIterator;
+import static com.orm.SugarRecord.executeQuery;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,20 +43,20 @@ public final class SimpleAnnotatedModelTests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void twoSaveTest() throws Exception {
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
-        assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(2L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
@@ -51,7 +64,7 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        assertEquals(100L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(100L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
@@ -63,73 +76,75 @@ public final class SimpleAnnotatedModelTests {
     public void whereCountTest() throws Exception {
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class, "id = ?", new String[]{"1"}));
+        assertEquals(1L, count(SimpleAnnotatedModel.class, "id = ?", new String[]{"1"}));
     }
 
     @Test
     public void whereNoCountTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class, "id = ?", new String[]{"1"}));
+        assertEquals(0L, count(SimpleAnnotatedModel.class, "id = ?", new String[]{"1"}));
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class, "id = ?", new String[]{"3"}));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class, "id = ?", new String[]{"a"}));
+        assertEquals(0L, count(SimpleAnnotatedModel.class, "id = ?", new String[]{"3"}));
+        assertEquals(0L, count(SimpleAnnotatedModel.class, "id = ?", new String[]{"a"}));
     }
 
     @Test
     public void whereBrokenCountTest() throws Exception {
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
-        assertEquals(-1L, SugarRecord.count(SimpleAnnotatedModel.class, "di = ?", new String[]{"1"}));
+        assertEquals(-1L, count(SimpleAnnotatedModel.class, "di = ?", new String[]{"1"}));
     }
 
     @Test
     public void deleteTest() throws Exception {
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         save(model);
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertTrue(SugarRecord.delete(model));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertTrue(delete(model));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteUnsavedTest() throws Exception {
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertFalse(SugarRecord.delete(model));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
+        assertFalse(delete(model));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteWrongTest() throws Exception {
         SimpleAnnotatedModel model = new SimpleAnnotatedModel();
         save(model);
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+
         Field idField = model.getClass().getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(model, Long.MAX_VALUE);
-        assertFalse(SugarRecord.delete(model));
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+
+        assertFalse(delete(model));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteAllTest() throws Exception {
-        int elementNumber = 100;
-        for (int i = 1; i <= elementNumber; i++) {
+        for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        assertEquals(elementNumber, SugarRecord.deleteAll(SimpleAnnotatedModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+
+        assertEquals(100, deleteAll(SimpleAnnotatedModel.class));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     @SuppressWarnings("all")
     public void deleteAllWhereTest() throws Exception {
-        int elementNumber = 100;
-        for (int i = 1; i <= elementNumber; i++) {
+        for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        assertEquals(elementNumber - 1, SugarRecord.deleteAll(SimpleAnnotatedModel.class, "id > ?", new String[]{"1"}));
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
+
+        assertEquals(99, deleteAll(SimpleAnnotatedModel.class, "id > ?", new String[]{"1"}));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
@@ -140,32 +155,33 @@ public final class SimpleAnnotatedModelTests {
         save(first);
         save(second);
         // Not saving last model
-        assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(2, SugarRecord.deleteInTx(first, second, third));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(2L, count(SimpleAnnotatedModel.class));
+        assertEquals(2, deleteInTx(first, second, third));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void deleteInTransactionManyTest() throws Exception {
-        long elementNumber = 100;
         List<SimpleAnnotatedModel> models = new ArrayList<>();
-        for (int i = 1; i <= elementNumber; i++) {
+
+        for (int i = 1; i <= 100; i++) {
             SimpleAnnotatedModel model = new SimpleAnnotatedModel();
             models.add(model);
             // Not saving last model
-            if (i < elementNumber) {
+            if (i < 100) {
                 save(model);
             }
         }
-        assertEquals(elementNumber - 1, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(elementNumber - 1, SugarRecord.deleteInTx(models));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+
+        assertEquals(99, count(SimpleAnnotatedModel.class));
+        assertEquals(99, deleteInTx(models));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
     public void saveInTransactionTest() throws Exception {
-        SugarRecord.saveInTx(new SimpleAnnotatedModel(), new SimpleAnnotatedModel());
-        assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
+        saveInTx(new SimpleAnnotatedModel(), new SimpleAnnotatedModel());
+        assertEquals(2L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
@@ -173,8 +189,10 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        List<SimpleAnnotatedModel> models = SugarRecord.listAll(SimpleAnnotatedModel.class);
+
+        List<SimpleAnnotatedModel> models = listAll(SimpleAnnotatedModel.class);
         assertEquals(100, models.size());
+
         for (long i = 1; i <= 100; i++) {
             assertEquals(Long.valueOf(i), models.get((int) i - 1).getId());
         }
@@ -184,8 +202,9 @@ public final class SimpleAnnotatedModelTests {
     public void findTest() throws Exception {
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
-        List<SimpleAnnotatedModel> models =
-                SugarRecord.find(SimpleAnnotatedModel.class, "id = ?", "2");
+
+        List<SimpleAnnotatedModel> models = find(SimpleAnnotatedModel.class, "id = ?", "2");
+
         assertEquals(1, models.size());
         assertEquals(2L, models.get(0).getId().longValue());
     }
@@ -195,10 +214,11 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        List<SimpleAnnotatedModel> models =
-                SugarRecord.findWithQuery(SimpleAnnotatedModel.class, "Select * from " +
+
+        List<SimpleAnnotatedModel> models = findWithQuery(SimpleAnnotatedModel.class, "Select * from " +
                         NamingHelper.toTableName(SimpleAnnotatedModel.class) +
                         " where id >= ? ", "50");
+
         for (SimpleAnnotatedModel model : models) {
             assertEquals(75L, model.getId(), 25L);
         }
@@ -208,26 +228,25 @@ public final class SimpleAnnotatedModelTests {
     @SuppressWarnings("all")
     public void findByIdTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        assertEquals(1L, SugarRecord.findById(SimpleAnnotatedModel.class, 1L).getId().longValue());
+        assertEquals(1L, findById(SimpleAnnotatedModel.class, 1L).getId().longValue());
     }
 
     @Test
     public void findByIdIntegerTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        assertEquals(1L, SugarRecord.findById(SimpleAnnotatedModel.class, 1).getId().longValue());
+        assertEquals(1L, findById(SimpleAnnotatedModel.class, 1).getId().longValue());
     }
 
     @Test
     public void findByIdStringsNullTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        assertEquals(0, SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{""}).size());
+        assertEquals(0, findById(SimpleAnnotatedModel.class, new String[]{""}).size());
     }
 
     @Test
     public void findByIdStringsOneTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        List<SimpleAnnotatedModel> models =
-                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1"});
+        List<SimpleAnnotatedModel> models = findById(SimpleAnnotatedModel.class, new String[]{"1"});
         assertEquals(1, models.size());
         assertEquals(1L, models.get(0).getId().longValue());
     }
@@ -237,8 +256,7 @@ public final class SimpleAnnotatedModelTests {
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
         save(new SimpleAnnotatedModel());
-        List<SimpleAnnotatedModel> models =
-                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1", "3"});
+        List<SimpleAnnotatedModel> models = findById(SimpleAnnotatedModel.class, new String[]{"1", "3"});
         assertEquals(2, models.size());
         assertEquals(Long.valueOf(1L), models.get(0).getId());
         assertEquals(Long.valueOf(3L), models.get(1).getId());
@@ -249,8 +267,7 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 10; i++) {
             save(new SimpleAnnotatedModel());
         }
-        List<SimpleAnnotatedModel> models =
-                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"1", "3", "6", "10"});
+        List<SimpleAnnotatedModel> models = findById(SimpleAnnotatedModel.class, new String[]{"1", "3", "6", "10"});
         assertEquals(4, models.size());
         assertEquals(Long.valueOf(1L), models.get(0).getId());
         assertEquals(Long.valueOf(3L), models.get(1).getId());
@@ -263,8 +280,7 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 10; i++) {
             save(new SimpleAnnotatedModel());
         }
-        List<SimpleAnnotatedModel> models =
-                SugarRecord.findById(SimpleAnnotatedModel.class, new String[]{"10", "6", "3", "1"});
+        List<SimpleAnnotatedModel> models = findById(SimpleAnnotatedModel.class, new String[]{"10", "6", "3", "1"});
         assertEquals(4, models.size());
         // The order of the query doesn't matter
         assertEquals(Long.valueOf(1L), models.get(0).getId());
@@ -276,7 +292,7 @@ public final class SimpleAnnotatedModelTests {
     @Test
     public void findByIdNullTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        assertNull(SugarRecord.findById(SimpleAnnotatedModel.class, 2L));
+        assertNull(findById(SimpleAnnotatedModel.class, 2L));
     }
 
     @Test
@@ -284,7 +300,7 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        Iterator<SimpleAnnotatedModel> cursor = SugarRecord.findAll(SimpleAnnotatedModel.class);
+        Iterator<SimpleAnnotatedModel> cursor = findAll(SimpleAnnotatedModel.class);
         for (int i = 1; i <= 100; i++) {
             assertTrue(cursor.hasNext());
             SimpleAnnotatedModel model = cursor.next();
@@ -298,7 +314,7 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        Iterator<SimpleAnnotatedModel> cursor = SugarRecord.findAsIterator(SimpleAnnotatedModel.class,
+        Iterator<SimpleAnnotatedModel> cursor = findAsIterator(SimpleAnnotatedModel.class,
                 "id >= ?", "50");
         for (int i = 50; i <= 100; i++) {
             assertTrue(cursor.hasNext());
@@ -313,8 +329,7 @@ public final class SimpleAnnotatedModelTests {
         for (int i = 1; i <= 100; i++) {
             save(new SimpleAnnotatedModel());
         }
-        Iterator<SimpleAnnotatedModel> cursor =
-                SugarRecord.findWithQueryAsIterator(SimpleAnnotatedModel.class,
+        Iterator<SimpleAnnotatedModel> cursor = findWithQueryAsIterator(SimpleAnnotatedModel.class,
                         "Select * from " +
                                 NamingHelper.toTableName(SimpleAnnotatedModel.class) +
                                 " where id >= ? ", "50");
@@ -329,7 +344,7 @@ public final class SimpleAnnotatedModelTests {
     @Test(expected=NoSuchElementException.class)
     public void findAsIteratorOutOfBoundsTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        Iterator<SimpleAnnotatedModel> cursor = SugarRecord.findAsIterator(SimpleAnnotatedModel.class,
+        Iterator<SimpleAnnotatedModel> cursor = findAsIterator(SimpleAnnotatedModel.class,
                 "id = ?", "1");
         assertTrue(cursor.hasNext());
         SimpleAnnotatedModel model = cursor.next();
@@ -342,8 +357,7 @@ public final class SimpleAnnotatedModelTests {
     @Test(expected=UnsupportedOperationException.class)
     public void disallowRemoveCursorTest() throws Exception {
         save(new SimpleAnnotatedModel());
-        Iterator<SimpleAnnotatedModel> cursor = SugarRecord.findAsIterator(SimpleAnnotatedModel.class,
-                "id = ?", "1");
+        Iterator<SimpleAnnotatedModel> cursor = findAsIterator(SimpleAnnotatedModel.class, "id = ?", "1");
         assertTrue(cursor.hasNext());
         SimpleAnnotatedModel model = cursor.next();
         assertNotNull(model);
@@ -354,6 +368,6 @@ public final class SimpleAnnotatedModelTests {
 
     @Test
     public void vacuumTest() throws Exception {
-        SugarRecord.executeQuery("Vacuum");
+        executeQuery("Vacuum");
     }
 }

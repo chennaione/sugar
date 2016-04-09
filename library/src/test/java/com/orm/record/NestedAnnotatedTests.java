@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.NestedAnnotatedModel;
 import com.orm.model.RelationshipAnnotatedModel;
@@ -15,6 +14,9 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.listAll;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -23,9 +25,9 @@ public final class NestedAnnotatedTests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(NestedAnnotatedModel.class));
-        assertEquals(0L, SugarRecord.count(RelationshipAnnotatedModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(0L, count(NestedAnnotatedModel.class));
+        assertEquals(0L, count(RelationshipAnnotatedModel.class));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
@@ -35,9 +37,9 @@ public final class NestedAnnotatedTests {
         RelationshipAnnotatedModel nested = new RelationshipAnnotatedModel(simple);
         save(nested);
         save(new NestedAnnotatedModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(NestedAnnotatedModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(RelationshipAnnotatedModel.class));
+        assertEquals(1L, count(NestedAnnotatedModel.class));
     }
 
     @Test
@@ -48,26 +50,27 @@ public final class NestedAnnotatedTests {
         save(nested);
         save(new NestedAnnotatedModel(nested));
         save(new NestedAnnotatedModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipAnnotatedModel.class));
-        assertEquals(2L, SugarRecord.count(NestedAnnotatedModel.class));
+
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(RelationshipAnnotatedModel.class));
+        assertEquals(2L, count(NestedAnnotatedModel.class));
     }
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
-        SimpleAnnotatedModel another_simple = new SimpleAnnotatedModel();
-        save(another_simple);
+        SimpleAnnotatedModel anotherSimple = new SimpleAnnotatedModel();
+        save(anotherSimple);
         RelationshipAnnotatedModel nested = new RelationshipAnnotatedModel(simple);
         save(nested);
-        RelationshipAnnotatedModel another_nested = new RelationshipAnnotatedModel(another_simple);
-        save(another_nested);
+        RelationshipAnnotatedModel anotherNested = new RelationshipAnnotatedModel(anotherSimple);
+        save(anotherNested);
         save(new NestedAnnotatedModel(nested));
-        save(new NestedAnnotatedModel(another_nested));
-        assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipAnnotatedModel.class));
-        assertEquals(2L, SugarRecord.count(NestedAnnotatedModel.class));
+        save(new NestedAnnotatedModel(anotherNested));
+        assertEquals(2L, count(SimpleAnnotatedModel.class));
+        assertEquals(2L, count(RelationshipAnnotatedModel.class));
+        assertEquals(2L, count(NestedAnnotatedModel.class));
     }
 
     @Test
@@ -79,9 +82,9 @@ public final class NestedAnnotatedTests {
         for (int i = 1; i <= 100; i++) {
             save(new NestedAnnotatedModel(nested));
         }
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipAnnotatedModel.class));
-        assertEquals(100L, SugarRecord.count(NestedAnnotatedModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(RelationshipAnnotatedModel.class));
+        assertEquals(100L, count(NestedAnnotatedModel.class));
     }
 
     @Test
@@ -93,9 +96,9 @@ public final class NestedAnnotatedTests {
             save(nested);
             save(new NestedAnnotatedModel(nested));
         }
-        assertEquals(100L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipAnnotatedModel.class));
-        assertEquals(100L, SugarRecord.count(NestedAnnotatedModel.class));
+        assertEquals(100L, count(SimpleAnnotatedModel.class));
+        assertEquals(100L, count(RelationshipAnnotatedModel.class));
+        assertEquals(100L, count(NestedAnnotatedModel.class));
     }
 
     @Test
@@ -104,11 +107,14 @@ public final class NestedAnnotatedTests {
         save(simple);
         RelationshipAnnotatedModel nested = new RelationshipAnnotatedModel(simple);
         save(nested);
+
         for (int i = 1; i <= 100; i++) {
             save(new NestedAnnotatedModel(nested));
         }
-        List<NestedAnnotatedModel> models = SugarRecord.listAll(NestedAnnotatedModel.class);
+
+        List<NestedAnnotatedModel> models = listAll(NestedAnnotatedModel.class);
         assertEquals(100, models.size());
+
         for (NestedAnnotatedModel model : models) {
             assertEquals(nested.getId(), model.getNested().getId());
             assertEquals(simple.getId(), model.getNested().getSimple().getId());
@@ -124,8 +130,10 @@ public final class NestedAnnotatedTests {
             save(nested);
             save(new NestedAnnotatedModel(nested));
         }
-        List<NestedAnnotatedModel> models = SugarRecord.listAll(NestedAnnotatedModel.class);
+
+        List<NestedAnnotatedModel> models = listAll(NestedAnnotatedModel.class);
         assertEquals(100, models.size());
+
         for (NestedAnnotatedModel model : models) {
             assertEquals(model.getId(), model.getNested().getId());
             assertEquals(model.getId(), model.getNested().getSimple().getId());

@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.FloatFieldAnnotatedModel;
 import com.orm.model.FloatFieldExtendedModel;
@@ -12,6 +11,11 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.first;
+import static com.orm.SugarRecord.delete;
+import static com.orm.SugarRecord.findById;
+import static com.orm.SugarRecord.last;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -26,7 +30,7 @@ public class FirstAndLastTests {
         Float lastObjectFloat = 50F;
         save(new FloatFieldExtendedModel(firstObjectFloat));
         save(new FloatFieldExtendedModel(lastObjectFloat));
-        FloatFieldExtendedModel model = SugarRecord.first(FloatFieldExtendedModel.class);
+        FloatFieldExtendedModel model = first(FloatFieldExtendedModel.class);
 
         if (null != model) {
             assertEquals(firstObjectFloat, model.getFloat());
@@ -35,70 +39,70 @@ public class FirstAndLastTests {
 
     @Test
     public void firstDeletedRecordExtendedTest() {
-        Float firstObjectFloat = 15F;
-        Float secondObjectFloat = 25F;
-        Float thirdObjectFloat = 35F;
-        Float fourthObjectFloat = 45F;
-        save(new FloatFieldExtendedModel(firstObjectFloat));
-        save(new FloatFieldExtendedModel(secondObjectFloat));
-        save(new FloatFieldExtendedModel(thirdObjectFloat));
-        save(new FloatFieldExtendedModel(fourthObjectFloat));
-        FloatFieldExtendedModel firstRecord = SugarRecord.findById(FloatFieldExtendedModel.class, 1);
-        firstRecord.delete();
-        FloatFieldExtendedModel model = SugarRecord.first(FloatFieldExtendedModel.class);
+        Float second = 25F;
+
+        save(new FloatFieldExtendedModel(15F));
+        save(new FloatFieldExtendedModel(second));
+        save(new FloatFieldExtendedModel(35F));
+        save(new FloatFieldExtendedModel(45F));
+
+        FloatFieldExtendedModel firstRecord = findById(FloatFieldExtendedModel.class, 1);
+        delete(firstRecord);
+        FloatFieldExtendedModel model = first(FloatFieldExtendedModel.class);
 
         if (null != model) {
-            assertEquals(secondObjectFloat, model.getFloat());
+            assertEquals(second, model.getFloat());
         }
     }
 
     @Test
     public void lastExtendedTest() {
-        Float firstObjectFloat = 25F;
-        Float lastObjectFloat = 50F;
-        save(new FloatFieldExtendedModel(firstObjectFloat));
-        save(new FloatFieldExtendedModel(lastObjectFloat));
-        FloatFieldExtendedModel model = SugarRecord.last(FloatFieldExtendedModel.class);
+        Float last = 50F;
+
+        save(new FloatFieldExtendedModel(25F));
+        save(new FloatFieldExtendedModel(last));
+
+        FloatFieldExtendedModel model = last(FloatFieldExtendedModel.class);
 
         if (null != model) {
-            assertEquals(lastObjectFloat, model.getFloat());
+            assertEquals(last, model.getFloat());
         }
     }
 
     @Test
     public void lastDeletedRecordExtendedTest() {
-        Float firstObjectFloat = 15F;
-        Float secondObjectFloat = 25F;
-        Float thirdObjectFloat = 35F;
-        Float fourthObjectFloat = 45F;
-        save(new FloatFieldExtendedModel(firstObjectFloat));
-        save(new FloatFieldExtendedModel(secondObjectFloat));
-        save(new FloatFieldExtendedModel(thirdObjectFloat));
-        save(new FloatFieldExtendedModel(fourthObjectFloat));
-        FloatFieldExtendedModel lastRecord = SugarRecord.findById(FloatFieldExtendedModel.class, 4);
-        lastRecord.delete();
-        FloatFieldExtendedModel model = SugarRecord.last(FloatFieldExtendedModel.class);
+        Float third = 35F;
+
+        save(new FloatFieldExtendedModel(15F));
+        save(new FloatFieldExtendedModel(25F));
+        save(new FloatFieldExtendedModel(third));
+        save(new FloatFieldExtendedModel(45F));
+
+        FloatFieldExtendedModel lastRecord = findById(FloatFieldExtendedModel.class, 4);
+        delete(lastRecord);
+        FloatFieldExtendedModel model = last(FloatFieldExtendedModel.class);
 
         if (null != model) {
-            assertEquals(thirdObjectFloat, model.getFloat());
+            assertEquals(third, model.getFloat());
         }
     }
 
     @Test
     public void nullFirstExtendedTest() {
-        assertNull(SugarRecord.first(FloatFieldExtendedModel.class));
+        assertNull(first(FloatFieldExtendedModel.class));
     }
 
     @Test
     public void nullLastExtendedTest() {
-        assertNull(SugarRecord.last(FloatFieldExtendedModel.class));
+        assertNull(last(FloatFieldExtendedModel.class));
     }
 
     @Test
     public void oneItemExtendedTest() {
         save(new FloatFieldExtendedModel(25F));
-        FloatFieldExtendedModel firstModel = SugarRecord.first(FloatFieldExtendedModel.class);
-        FloatFieldExtendedModel lastModel = SugarRecord.last(FloatFieldExtendedModel.class);
+
+        FloatFieldExtendedModel firstModel = first(FloatFieldExtendedModel.class);
+        FloatFieldExtendedModel lastModel = last(FloatFieldExtendedModel.class);
 
         if (null != firstModel && null != lastModel) {
             assertEquals(firstModel.getFloat(), lastModel.getFloat());
@@ -107,86 +111,89 @@ public class FirstAndLastTests {
 
     @Test
     public void firstAnnotatedTest() {
-        Float firstObjectFloat = 25F;
-        Float lastObjectFloat = 50F;
-        save(new FloatFieldAnnotatedModel(firstObjectFloat));
-        save(new FloatFieldAnnotatedModel(lastObjectFloat));
-        FloatFieldAnnotatedModel model = SugarRecord.first(FloatFieldAnnotatedModel.class);
+        Float first = 25F;
+
+        save(new FloatFieldAnnotatedModel(first));
+        save(new FloatFieldAnnotatedModel(50F));
+
+        FloatFieldAnnotatedModel model = first(FloatFieldAnnotatedModel.class);
 
         if (null != model) {
-            assertEquals(firstObjectFloat, model.getFloat());
+            assertEquals(first, model.getFloat());
         }
     }
 
     @Test
     public void firstDeletedRecordAnnotatedTest() {
-        Float firstObjectFloat = 15F;
-        Float secondObjectFloat = 25F;
-        Float thirdObjectFloat = 35F;
-        Float fourthObjectFloat = 45F;
-        save(new FloatFieldAnnotatedModel(firstObjectFloat));
-        save(new FloatFieldAnnotatedModel(secondObjectFloat));
-        save(new FloatFieldAnnotatedModel(thirdObjectFloat));
-        save(new FloatFieldAnnotatedModel(fourthObjectFloat));
-        FloatFieldAnnotatedModel firstRecord = SugarRecord.findById(FloatFieldAnnotatedModel.class, 1);
-        SugarRecord.delete(firstRecord);
-        FloatFieldAnnotatedModel model = SugarRecord.first(FloatFieldAnnotatedModel.class);
+        Float second = 25F;
+
+        save(new FloatFieldAnnotatedModel(15F));
+        save(new FloatFieldAnnotatedModel(second));
+        save(new FloatFieldAnnotatedModel(35F));
+        save(new FloatFieldAnnotatedModel(45F));
+
+        FloatFieldAnnotatedModel firstRecord = findById(FloatFieldAnnotatedModel.class, 1);
+
+        delete(firstRecord);
+
+        FloatFieldAnnotatedModel model = first(FloatFieldAnnotatedModel.class);
 
         if (null != model) {
-            assertEquals(secondObjectFloat, model.getFloat());
+            assertEquals(second, model.getFloat());
         }
     }
 
     @Test
     public void lastAnnotatedTest() {
-        Float firstObjectFloat = 25F;
-        Float lastObjectFloat = 50F;
-        save(new FloatFieldAnnotatedModel(firstObjectFloat));
-        save(new FloatFieldAnnotatedModel(lastObjectFloat));
-        FloatFieldAnnotatedModel model = SugarRecord.last(FloatFieldAnnotatedModel.class);
+        Float last = 50F;
+
+        save(new FloatFieldAnnotatedModel(25F));
+        save(new FloatFieldAnnotatedModel(last));
+
+        FloatFieldAnnotatedModel model = last(FloatFieldAnnotatedModel.class);
 
         if (null != model) {
-            assertEquals(lastObjectFloat, model.getFloat());
+            assertEquals(last, model.getFloat());
         }
     }
 
     @Test
     public void lastDeletedRecordAnnotatedTest() {
-        Float firstObjectFloat = 15F;
-        Float secondObjectFloat = 25F;
-        Float thirdObjectFloat = 35F;
-        Float fourthObjectFloat = 45F;
-        save(new FloatFieldAnnotatedModel(firstObjectFloat));
-        save(new FloatFieldAnnotatedModel(secondObjectFloat));
-        save(new FloatFieldAnnotatedModel(thirdObjectFloat));
-        save(new FloatFieldAnnotatedModel(fourthObjectFloat));
-        FloatFieldAnnotatedModel lastRecord = SugarRecord.findById(FloatFieldAnnotatedModel.class, 4);
-        SugarRecord.delete(lastRecord);
-        FloatFieldAnnotatedModel model = SugarRecord.last(FloatFieldAnnotatedModel.class);
+        Float third = 35F;
+
+        save(new FloatFieldAnnotatedModel(15F));
+        save(new FloatFieldAnnotatedModel(25F));
+        save(new FloatFieldAnnotatedModel(third));
+        save(new FloatFieldAnnotatedModel(45F));
+
+        FloatFieldAnnotatedModel lastRecord = findById(FloatFieldAnnotatedModel.class, 4);
+        delete(lastRecord);
+        FloatFieldAnnotatedModel model = last(FloatFieldAnnotatedModel.class);
 
         if (null != model) {
-            assertEquals(thirdObjectFloat, model.getFloat());
+            assertEquals(third, model.getFloat());
         }
     }
 
     @Test
     public void nullFirstAnnotatedTest() {
-        assertNull(SugarRecord.first(FloatFieldAnnotatedModel.class));
+        assertNull(first(FloatFieldAnnotatedModel.class));
     }
 
     @Test
     public void nullLastAnnotatedTest() {
-        assertNull(SugarRecord.last(FloatFieldAnnotatedModel.class));
+        assertNull(last(FloatFieldAnnotatedModel.class));
     }
 
     @Test
     public void oneItemAnnotatedTest() {
         save(new FloatFieldAnnotatedModel(25F));
-        FloatFieldAnnotatedModel firstModel = SugarRecord.first(FloatFieldAnnotatedModel.class);
-        FloatFieldAnnotatedModel lastModel = SugarRecord.last(FloatFieldAnnotatedModel.class);
 
-        if (null != firstModel && null != lastModel) {
-            assertEquals(firstModel.getFloat(), lastModel.getFloat());
+        FloatFieldAnnotatedModel first = first(FloatFieldAnnotatedModel.class);
+        FloatFieldAnnotatedModel last = last(FloatFieldAnnotatedModel.class);
+
+        if (null != first && null != last) {
+            assertEquals(first.getFloat(), last.getFloat());
         }
     }
 }

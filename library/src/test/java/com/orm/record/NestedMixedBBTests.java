@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.NestedMixedBBModel;
 import com.orm.model.RelationshipMixedBModel;
@@ -15,6 +14,9 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.listAll;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -23,21 +25,23 @@ public class NestedMixedBBTests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(NestedMixedBBModel.class));
-        assertEquals(0L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(0L, count(NestedMixedBBModel.class));
+        assertEquals(0L, count(RelationshipMixedBModel.class));
+        assertEquals(0L, count(SimpleExtendedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
-         SimpleExtendedModel simple = new SimpleExtendedModel();
+        SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
+
         save(nested);
         save(new NestedMixedBBModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(1L, SugarRecord.count(NestedMixedBBModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipMixedBModel.class));
+        assertEquals(1L, count(NestedMixedBBModel.class));
     }
 
     @Test
@@ -45,29 +49,33 @@ public class NestedMixedBBTests {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
+
         save(nested);
         save(new NestedMixedBBModel(nested));
         save(new NestedMixedBBModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(2L, SugarRecord.count(NestedMixedBBModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipMixedBModel.class));
+        assertEquals(2L, count(NestedMixedBBModel.class));
     }
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
-        SimpleExtendedModel another_simple = new SimpleExtendedModel();
-        save(another_simple);
+        SimpleExtendedModel anotherSimple = new SimpleExtendedModel();
+        save(anotherSimple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
         save(nested);
-        RelationshipMixedBModel another_nested = new RelationshipMixedBModel(another_simple);
-        save(another_nested);
+        RelationshipMixedBModel anotherNested = new RelationshipMixedBModel(anotherSimple);
+
+        save(anotherNested);
         save(new NestedMixedBBModel(nested));
-        save(new NestedMixedBBModel(another_nested));
-        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(2L, SugarRecord.count(NestedMixedBBModel.class));
+        save(new NestedMixedBBModel(anotherNested));
+
+        assertEquals(2L, count(SimpleExtendedModel.class));
+        assertEquals(2L, count(RelationshipMixedBModel.class));
+        assertEquals(2L, count(NestedMixedBBModel.class));
     }
 
     @Test
@@ -76,12 +84,14 @@ public class NestedMixedBBTests {
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
         save(nested);
+
         for (int i = 1; i <= 100; i++) {
             save(new NestedMixedBBModel(nested));
         }
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(100L, SugarRecord.count(NestedMixedBBModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipMixedBModel.class));
+        assertEquals(100L, count(NestedMixedBBModel.class));
     }
 
     @Test
@@ -93,9 +103,10 @@ public class NestedMixedBBTests {
             save(nested);
             save(new NestedMixedBBModel(nested));
         }
-        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(100L, SugarRecord.count(NestedMixedBBModel.class));
+
+        assertEquals(100L, count(SimpleExtendedModel.class));
+        assertEquals(100L, count(RelationshipMixedBModel.class));
+        assertEquals(100L, count(NestedMixedBBModel.class));
     }
 
     @Test
@@ -104,11 +115,14 @@ public class NestedMixedBBTests {
         save(simple);
         RelationshipMixedBModel nested = new RelationshipMixedBModel(simple);
         save(nested);
+
         for (int i = 1; i <= 100; i++) {
             save(new NestedMixedBBModel(nested));
         }
-        List<NestedMixedBBModel> models = SugarRecord.listAll(NestedMixedBBModel.class);
+
+        List<NestedMixedBBModel> models = listAll(NestedMixedBBModel.class);
         assertEquals(100, models.size());
+
         for (NestedMixedBBModel model : models) {
             assertEquals(nested.getId(), model.getNested().getId());
             assertEquals(simple.getId(), model.getNested().getSimple().getId());
@@ -124,8 +138,10 @@ public class NestedMixedBBTests {
             save(nested);
             save(new NestedMixedBBModel(nested));
         }
-        List<NestedMixedBBModel> models = SugarRecord.listAll(NestedMixedBBModel.class);
+
+        List<NestedMixedBBModel> models = listAll(NestedMixedBBModel.class);
         assertEquals(100, models.size());
+
         for (NestedMixedBBModel model : models) {
             assertEquals(model.getId(), model.getNested().getId());
             assertEquals(model.getId(), model.getNested().getSimple().getId());

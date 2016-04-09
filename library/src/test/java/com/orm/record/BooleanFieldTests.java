@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.BooleanFieldAnnotatedModel;
 import com.orm.model.BooleanFieldExtendedModel;
@@ -12,6 +11,8 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.findById;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -22,28 +23,28 @@ public final class BooleanFieldTests {
     @Test
     public void nullBooleanExtendedTest() {
         save(new BooleanFieldExtendedModel());
-        BooleanFieldExtendedModel model = SugarRecord.findById(BooleanFieldExtendedModel.class, 1);
+        BooleanFieldExtendedModel model = findById(BooleanFieldExtendedModel.class, 1);
         assertNull(model.getBoolean());
     }
 
     @Test
     public void nullRawBooleanExtendedTest() {
         save(new BooleanFieldExtendedModel());
-        BooleanFieldExtendedModel model = SugarRecord.findById(BooleanFieldExtendedModel.class, 1);
+        BooleanFieldExtendedModel model = findById(BooleanFieldExtendedModel.class, 1);
         assertEquals(false, model.getRawBoolean());
     }
 
     @Test
     public void nullBooleanAnnotatedTest() {
         save(new BooleanFieldAnnotatedModel());
-        BooleanFieldAnnotatedModel model = SugarRecord.findById(BooleanFieldAnnotatedModel.class, 1);
+        BooleanFieldAnnotatedModel model = findById(BooleanFieldAnnotatedModel.class, 1);
         assertNull(model.getBoolean());
     }
 
     @Test
     public void nullRawBooleanAnnotatedTest() {
         save(new BooleanFieldAnnotatedModel());
-        BooleanFieldAnnotatedModel model = SugarRecord.findById(BooleanFieldAnnotatedModel.class, 1);
+        BooleanFieldAnnotatedModel model = findById(BooleanFieldAnnotatedModel.class, 1);
         assertEquals(false, model.getRawBoolean());
     }
 
@@ -58,7 +59,7 @@ public final class BooleanFieldTests {
     @Test
     public void rawBooleanExtendedTest() {
         save(new BooleanFieldExtendedModel(true));
-        BooleanFieldExtendedModel model = SugarRecord.findById(BooleanFieldExtendedModel.class, 1);
+        BooleanFieldExtendedModel model = findById(BooleanFieldExtendedModel.class, 1);
         assertEquals(true, model.getRawBoolean());
     }
 
@@ -76,7 +77,7 @@ public final class BooleanFieldTests {
     @Test
     public void rawBooleanAnnotatedTest() {
         save(new BooleanFieldAnnotatedModel(true));
-        BooleanFieldAnnotatedModel model = SugarRecord.findById(BooleanFieldAnnotatedModel.class, 1);
+        BooleanFieldAnnotatedModel model = findById(BooleanFieldAnnotatedModel.class, 1);
         assertEquals(true, model.getRawBoolean());
     }
 }

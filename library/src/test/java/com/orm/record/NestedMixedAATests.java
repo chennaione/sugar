@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.NestedMixedAAModel;
 import com.orm.model.RelationshipMixedAModel;
@@ -15,6 +14,9 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.listAll;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -23,9 +25,9 @@ public final class NestedMixedAATests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(NestedMixedAAModel.class));
-        assertEquals(0L, SugarRecord.count(RelationshipMixedAModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleAnnotatedModel.class));
+        assertEquals(0L, count(NestedMixedAAModel.class));
+        assertEquals(0L, count(RelationshipMixedAModel.class));
+        assertEquals(0L, count(SimpleAnnotatedModel.class));
     }
 
     @Test
@@ -35,9 +37,9 @@ public final class NestedMixedAATests {
         RelationshipMixedAModel nested = new RelationshipMixedAModel(simple);
         save(nested);
         save(new NestedMixedAAModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedAModel.class));
-        assertEquals(1L, SugarRecord.count(NestedMixedAAModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(RelationshipMixedAModel.class));
+        assertEquals(1L, count(NestedMixedAAModel.class));
     }
 
     @Test
@@ -48,26 +50,26 @@ public final class NestedMixedAATests {
         save(nested);
         save(new NestedMixedAAModel(nested));
         save(new NestedMixedAAModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedAModel.class));
-        assertEquals(2L, SugarRecord.count(NestedMixedAAModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(RelationshipMixedAModel.class));
+        assertEquals(2L, count(NestedMixedAAModel.class));
     }
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
         SimpleAnnotatedModel simple = new SimpleAnnotatedModel();
         save(simple);
-        SimpleAnnotatedModel another_simple = new SimpleAnnotatedModel();
-        save(another_simple);
+        SimpleAnnotatedModel anotherSimple = new SimpleAnnotatedModel();
+        save(anotherSimple);
         RelationshipMixedAModel nested = new RelationshipMixedAModel(simple);
         save(nested);
-        RelationshipMixedAModel another_nested = new RelationshipMixedAModel(another_simple);
-        save(another_nested);
+        RelationshipMixedAModel anotherNested = new RelationshipMixedAModel(anotherSimple);
+        save(anotherNested);
         save(new NestedMixedAAModel(nested));
-        save(new NestedMixedAAModel(another_nested));
-        assertEquals(2L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipMixedAModel.class));
-        assertEquals(2L, SugarRecord.count(NestedMixedAAModel.class));
+        save(new NestedMixedAAModel(anotherNested));
+        assertEquals(2L, count(SimpleAnnotatedModel.class));
+        assertEquals(2L, count(RelationshipMixedAModel.class));
+        assertEquals(2L, count(NestedMixedAAModel.class));
     }
 
     @Test
@@ -79,9 +81,9 @@ public final class NestedMixedAATests {
         for (int i = 1; i <= 100; i++) {
             save(new NestedMixedAAModel(nested));
         }
-        assertEquals(1L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedAModel.class));
-        assertEquals(100L, SugarRecord.count(NestedMixedAAModel.class));
+        assertEquals(1L, count(SimpleAnnotatedModel.class));
+        assertEquals(1L, count(RelationshipMixedAModel.class));
+        assertEquals(100L, count(NestedMixedAAModel.class));
     }
 
     @Test
@@ -93,9 +95,9 @@ public final class NestedMixedAATests {
             save(nested);
             save(new NestedMixedAAModel(nested));
         }
-        assertEquals(100L, SugarRecord.count(SimpleAnnotatedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipMixedAModel.class));
-        assertEquals(100L, SugarRecord.count(NestedMixedAAModel.class));
+        assertEquals(100L, count(SimpleAnnotatedModel.class));
+        assertEquals(100L, count(RelationshipMixedAModel.class));
+        assertEquals(100L, count(NestedMixedAAModel.class));
     }
 
     @Test
@@ -104,11 +106,14 @@ public final class NestedMixedAATests {
         save(simple);
         RelationshipMixedAModel nested = new RelationshipMixedAModel(simple);
         save(nested);
+
         for (int i = 1; i <= 100; i++) {
             save(new NestedMixedAAModel(nested));
         }
-        List<NestedMixedAAModel> models = SugarRecord.listAll(NestedMixedAAModel.class);
+
+        List<NestedMixedAAModel> models = listAll(NestedMixedAAModel.class);
         assertEquals(100, models.size());
+
         for (NestedMixedAAModel model : models) {
             assertEquals(nested.getId(), model.getNested().getId());
             assertEquals(simple.getId(), model.getNested().getSimple().getId());
@@ -124,8 +129,10 @@ public final class NestedMixedAATests {
             save(nested);
             save(new NestedMixedAAModel(nested));
         }
-        List<NestedMixedAAModel> models = SugarRecord.listAll(NestedMixedAAModel.class);
+
+        List<NestedMixedAAModel> models = listAll(NestedMixedAAModel.class);
         assertEquals(100, models.size());
+
         for (NestedMixedAAModel model : models) {
             assertEquals(model.getId(), model.getNested().getId());
             assertEquals(model.getId(), model.getNested().getSimple().getId());

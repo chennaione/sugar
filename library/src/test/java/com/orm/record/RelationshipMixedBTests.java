@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.RelationshipMixedBModel;
 import com.orm.model.SimpleExtendedModel;
@@ -14,6 +13,9 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.listAll;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -22,50 +24,58 @@ public class RelationshipMixedBTests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(RelationshipMixedBModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(0L, count(RelationshipMixedBModel.class));
+        assertEquals(0L, count(SimpleExtendedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
+
         save(simple);
         save(new RelationshipMixedBModel(simple));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipMixedBModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipMixedBModel.class));
     }
 
     @Test
     public void twoSameSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
+
         save(simple);
         save(new RelationshipMixedBModel(simple));
         save(new RelationshipMixedBModel(simple));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipMixedBModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(2L, count(RelationshipMixedBModel.class));
     }
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
-        SimpleExtendedModel another_simple = new SimpleExtendedModel();
-        save(another_simple);
+        SimpleExtendedModel anotherSimple = new SimpleExtendedModel();
+
+        save(anotherSimple);
         save(new RelationshipMixedBModel(simple));
-        save(new RelationshipMixedBModel(another_simple));
-        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipMixedBModel.class));
+        save(new RelationshipMixedBModel(anotherSimple));
+
+        assertEquals(2L, count(SimpleExtendedModel.class));
+        assertEquals(2L, count(RelationshipMixedBModel.class));
     }
 
     @Test
     public void manySameSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
+
         for (int i = 1; i <= 100; i++) {
             save(new RelationshipMixedBModel(simple));
         }
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipMixedBModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(100L, count(RelationshipMixedBModel.class));
     }
 
     @Test
@@ -75,8 +85,9 @@ public class RelationshipMixedBTests {
             save(simple);
             save(new RelationshipMixedBModel(simple));
         }
-        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipMixedBModel.class));
+
+        assertEquals(100L, count(SimpleExtendedModel.class));
+        assertEquals(100L, count(RelationshipMixedBModel.class));
     }
 
     @Test
@@ -86,8 +97,7 @@ public class RelationshipMixedBTests {
         for (int i = 1; i <= 100; i++) {
             save(new RelationshipMixedBModel(simple));
         }
-        List<RelationshipMixedBModel> models =
-                SugarRecord.listAll(RelationshipMixedBModel.class);
+        List<RelationshipMixedBModel> models = listAll(RelationshipMixedBModel.class);
         assertEquals(100, models.size());
         for (RelationshipMixedBModel model : models) {
             assertEquals(simple.getId(), model.getSimple().getId());
@@ -101,8 +111,7 @@ public class RelationshipMixedBTests {
             save(simple);
             save(new RelationshipMixedBModel(simple));
         }
-        List<RelationshipMixedBModel> models =
-                SugarRecord.listAll(RelationshipMixedBModel.class);
+        List<RelationshipMixedBModel> models = listAll(RelationshipMixedBModel.class);
         assertEquals(100, models.size());
         for (RelationshipMixedBModel model : models) {
             assertEquals(model.getId(), model.getSimple().getId());

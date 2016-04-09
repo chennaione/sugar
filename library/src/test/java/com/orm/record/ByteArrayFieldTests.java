@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.ByteArrayAnnotatedModel;
 import com.orm.model.ByteArrayExtendedModel;
@@ -12,6 +11,8 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.findById;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +24,7 @@ public final class ByteArrayFieldTests {
     public void nullByteArrayExtendedTest() {
         byte[] array = "".getBytes();
         save(new ByteArrayExtendedModel());
-        ByteArrayExtendedModel model = SugarRecord.findById(ByteArrayExtendedModel.class, 1);
+        ByteArrayExtendedModel model = findById(ByteArrayExtendedModel.class, 1);
         assertEquals(new String(array), new String(model.getByteArray()));
         assertArrayEquals(array, model.getByteArray());
     }
@@ -32,7 +33,7 @@ public final class ByteArrayFieldTests {
     public void nullByteArrayAnnotatedTest() {
         byte[] array = "".getBytes();
         save(new ByteArrayAnnotatedModel());
-        ByteArrayAnnotatedModel model = SugarRecord.findById(ByteArrayAnnotatedModel.class, 1);
+        ByteArrayAnnotatedModel model = findById(ByteArrayAnnotatedModel.class, 1);
         assertEquals(new String(array), new String(model.getByteArray()));
         assertArrayEquals(array, model.getByteArray());
     }
@@ -41,7 +42,7 @@ public final class ByteArrayFieldTests {
     public void byteArrayExtendedTest() {
         byte[] array = "hello".getBytes();
         save(new ByteArrayExtendedModel(array));
-        ByteArrayExtendedModel model = SugarRecord.findById(ByteArrayExtendedModel.class, 1);
+        ByteArrayExtendedModel model = findById(ByteArrayExtendedModel.class, 1);
         assertEquals(new String(array), new String(model.getByteArray()));
         assertArrayEquals(array, model.getByteArray());
     }
@@ -50,7 +51,7 @@ public final class ByteArrayFieldTests {
     public void byteArrayAnnotatedTest() {
         byte[] array = "hello".getBytes();
         save(new ByteArrayAnnotatedModel(array));
-        ByteArrayAnnotatedModel model = SugarRecord.findById(ByteArrayAnnotatedModel.class, 1);
+        ByteArrayAnnotatedModel model = findById(ByteArrayAnnotatedModel.class, 1);
         assertEquals(new String(array), new String(model.getByteArray()));
         assertArrayEquals(array, model.getByteArray());
     }

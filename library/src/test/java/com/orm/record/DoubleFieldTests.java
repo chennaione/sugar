@@ -12,6 +12,8 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.findById;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -22,28 +24,28 @@ public final class DoubleFieldTests {
     @Test
     public void nullDoubleExtendedTest() {
         save(new DoubleFieldExtendedModel());
-        DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
+        DoubleFieldExtendedModel model = findById(DoubleFieldExtendedModel.class, 1);
         assertNull(model.getDouble());
     }
 
     @Test
     public void nullRawDoubleExtendedTest() {
         save(new DoubleFieldExtendedModel());
-        DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
+        DoubleFieldExtendedModel model = findById(DoubleFieldExtendedModel.class, 1);
         assertEquals(0.0, model.getRawDouble(), 0.0000000001);
     }
 
     @Test
     public void nullDoubleAnnotatedTest() {
         save(new DoubleFieldAnnotatedModel());
-        DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
+        DoubleFieldAnnotatedModel model = findById(DoubleFieldAnnotatedModel.class, 1);
         assertNull(model.getDouble());
     }
 
     @Test
     public void nullRawDoubleAnnotatedTest() {
         save(new DoubleFieldAnnotatedModel());
-        DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
+        DoubleFieldAnnotatedModel model = findById(DoubleFieldAnnotatedModel.class, 1);
         assertEquals(0.0, model.getRawDouble(), 0.0000000001);
     }
 
@@ -52,14 +54,14 @@ public final class DoubleFieldTests {
     public void objectDoubleExtendedTest() {
         Double objectDouble = Double.valueOf(25.0);
         save(new DoubleFieldExtendedModel(objectDouble));
-        DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
+        DoubleFieldExtendedModel model = findById(DoubleFieldExtendedModel.class, 1);
         assertEquals(objectDouble, model.getDouble());
     }
 
     @Test
     public void rawDoubleExtendedTest() {
         save(new DoubleFieldExtendedModel(25.0));
-        DoubleFieldExtendedModel model = SugarRecord.findById(DoubleFieldExtendedModel.class, 1);
+        DoubleFieldExtendedModel model = findById(DoubleFieldExtendedModel.class, 1);
         assertEquals(25.0, model.getRawDouble(), 0.0000000001);
     }
 
@@ -68,14 +70,14 @@ public final class DoubleFieldTests {
     public void objectDoubleAnnotatedTest() {
         Double objectDouble = Double.valueOf(25.0);
         save(new DoubleFieldAnnotatedModel(objectDouble));
-        DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
+        DoubleFieldAnnotatedModel model = findById(DoubleFieldAnnotatedModel.class, 1);
         assertEquals(objectDouble, model.getDouble());
     }
 
     @Test
     public void rawDoubleAnnotatedTest() {
         save(new DoubleFieldAnnotatedModel(25.0));
-        DoubleFieldAnnotatedModel model = SugarRecord.findById(DoubleFieldAnnotatedModel.class, 1);
+        DoubleFieldAnnotatedModel model = findById(DoubleFieldAnnotatedModel.class, 1);
         assertEquals(25.0, model.getRawDouble(), 0.0000000001);
     }
 }

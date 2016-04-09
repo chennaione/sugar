@@ -13,6 +13,7 @@ import org.robolectric.annotation.Config;
 
 import static com.orm.SugarRecord.delete;
 import static com.orm.SugarRecord.save;
+
 import static org.junit.Assert.assertFalse;
 
 @RunWith(RobolectricGradleTestRunner.class)

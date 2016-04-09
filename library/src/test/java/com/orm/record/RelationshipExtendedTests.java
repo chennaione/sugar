@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.RelationshipExtendedModel;
 import com.orm.model.SimpleExtendedModel;
@@ -14,6 +13,9 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.listAll;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -22,50 +24,58 @@ public class RelationshipExtendedTests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(0L, count(RelationshipExtendedModel.class));
+        assertEquals(0L, count(SimpleExtendedModel.class));
     }
 
     @Test
     public void oneSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
+
         save(simple);
         save(new RelationshipExtendedModel(simple));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipExtendedModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipExtendedModel.class));
     }
 
     @Test
     public void twoSameSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
+
         save(simple);
         save(new RelationshipExtendedModel(simple));
         save(new RelationshipExtendedModel(simple));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipExtendedModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(2L, count(RelationshipExtendedModel.class));
     }
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
-        SimpleExtendedModel another_simple = new SimpleExtendedModel();
-        save(another_simple);
+        SimpleExtendedModel anotherSimple = new SimpleExtendedModel();
+
+        save(anotherSimple);
         save(new RelationshipExtendedModel(simple));
-        save(new RelationshipExtendedModel(another_simple));
-        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipExtendedModel.class));
+        save(new RelationshipExtendedModel(anotherSimple));
+
+        assertEquals(2L, count(SimpleExtendedModel.class));
+        assertEquals(2L, count(RelationshipExtendedModel.class));
     }
 
     @Test
     public void manySameSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
+
         for (int i = 1; i <= 100; i++) {
             save(new RelationshipExtendedModel(simple));
         }
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipExtendedModel.class));
+
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(100L, count(RelationshipExtendedModel.class));
     }
 
     @Test
@@ -75,20 +85,23 @@ public class RelationshipExtendedTests {
             save(simple);
             save(new RelationshipExtendedModel(simple));
         }
-        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipExtendedModel.class));
+
+        assertEquals(100L, count(SimpleExtendedModel.class));
+        assertEquals(100L, count(RelationshipExtendedModel.class));
     }
 
     @Test
     public void listAllSameTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
+
         for (int i = 1; i <= 100; i++) {
             save(new RelationshipExtendedModel(simple));
         }
-        List<RelationshipExtendedModel> models =
-                SugarRecord.listAll(RelationshipExtendedModel.class);
+
+        List<RelationshipExtendedModel> models = listAll(RelationshipExtendedModel.class);
         assertEquals(100, models.size());
+
         for (RelationshipExtendedModel model : models) {
             assertEquals(simple.getId(), model.getSimple().getId());
         }
@@ -101,9 +114,10 @@ public class RelationshipExtendedTests {
             save(simple);
             save(new RelationshipExtendedModel(simple));
         }
-        List<RelationshipExtendedModel> models =
-                SugarRecord.listAll(RelationshipExtendedModel.class);
+
+        List<RelationshipExtendedModel> models = listAll(RelationshipExtendedModel.class);
         assertEquals(100, models.size());
+
         for (RelationshipExtendedModel model : models) {
             assertEquals(model.getId(), model.getSimple().getId());
         }

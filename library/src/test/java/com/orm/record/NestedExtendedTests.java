@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.NestedExtendedModel;
 import com.orm.model.RelationshipExtendedModel;
@@ -15,6 +14,9 @@ import org.robolectric.annotation.Config;
 import java.util.List;
 
 import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.count;
+import static com.orm.SugarRecord.listAll;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -23,9 +25,9 @@ public final class NestedExtendedTests {
 
     @Test
     public void emptyDatabaseTest() throws Exception {
-        assertEquals(0L, SugarRecord.count(NestedExtendedModel.class));
-        assertEquals(0L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(0L, SugarRecord.count(SimpleExtendedModel.class));
+        assertEquals(0L, count(NestedExtendedModel.class));
+        assertEquals(0L, count(RelationshipExtendedModel.class));
+        assertEquals(0L, count(SimpleExtendedModel.class));
     }
 
     @Test
@@ -35,9 +37,9 @@ public final class NestedExtendedTests {
         RelationshipExtendedModel nested = new RelationshipExtendedModel(simple);
         save(nested);
         save(new NestedExtendedModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(NestedExtendedModel.class));
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipExtendedModel.class));
+        assertEquals(1L, count(NestedExtendedModel.class));
     }
 
     @Test
@@ -48,26 +50,26 @@ public final class NestedExtendedTests {
         save(nested);
         save(new NestedExtendedModel(nested));
         save(new NestedExtendedModel(nested));
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(NestedExtendedModel.class));
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipExtendedModel.class));
+        assertEquals(2L, count(NestedExtendedModel.class));
     }
 
     @Test
     public void twoDifferentSaveTest() throws Exception {
         SimpleExtendedModel simple = new SimpleExtendedModel();
         save(simple);
-        SimpleExtendedModel another_simple = new SimpleExtendedModel();
-        save(another_simple);
+        SimpleExtendedModel anotherSimple = new SimpleExtendedModel();
+        save(anotherSimple);
         RelationshipExtendedModel nested = new RelationshipExtendedModel(simple);
         save(nested);
-        RelationshipExtendedModel another_nested = new RelationshipExtendedModel(another_simple);
-        save(another_nested);
+        RelationshipExtendedModel anotherNested = new RelationshipExtendedModel(anotherSimple);
+        save(anotherNested);
         save(new NestedExtendedModel(nested));
-        save(new NestedExtendedModel(another_nested));
-        assertEquals(2L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(2L, SugarRecord.count(NestedExtendedModel.class));
+        save(new NestedExtendedModel(anotherNested));
+        assertEquals(2L, count(SimpleExtendedModel.class));
+        assertEquals(2L, count(RelationshipExtendedModel.class));
+        assertEquals(2L, count(NestedExtendedModel.class));
     }
 
     @Test
@@ -79,9 +81,9 @@ public final class NestedExtendedTests {
         for (int i = 1; i <= 100; i++) {
             save(new NestedExtendedModel(nested));
         }
-        assertEquals(1L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(1L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(NestedExtendedModel.class));
+        assertEquals(1L, count(SimpleExtendedModel.class));
+        assertEquals(1L, count(RelationshipExtendedModel.class));
+        assertEquals(100L, count(NestedExtendedModel.class));
     }
 
     @Test
@@ -93,9 +95,9 @@ public final class NestedExtendedTests {
             save(nested);
             save(new NestedExtendedModel(nested));
         }
-        assertEquals(100L, SugarRecord.count(SimpleExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(RelationshipExtendedModel.class));
-        assertEquals(100L, SugarRecord.count(NestedExtendedModel.class));
+        assertEquals(100L, count(SimpleExtendedModel.class));
+        assertEquals(100L, count(RelationshipExtendedModel.class));
+        assertEquals(100L, count(NestedExtendedModel.class));
     }
 
     @Test
@@ -107,8 +109,10 @@ public final class NestedExtendedTests {
         for (int i = 1; i <= 100; i++) {
             save(new NestedExtendedModel(nested));
         }
-        List<NestedExtendedModel> models = SugarRecord.listAll(NestedExtendedModel.class);
+
+        List<NestedExtendedModel> models = listAll(NestedExtendedModel.class);
         assertEquals(100, models.size());
+
         for (NestedExtendedModel model : models) {
             assertEquals(nested.getId(), model.getNested().getId());
             assertEquals(simple.getId(), model.getNested().getSimple().getId());
@@ -124,8 +128,10 @@ public final class NestedExtendedTests {
             save(nested);
             save(new NestedExtendedModel(nested));
         }
-        List<NestedExtendedModel> models = SugarRecord.listAll(NestedExtendedModel.class);
+
+        List<NestedExtendedModel> models = listAll(NestedExtendedModel.class);
         assertEquals(100, models.size());
+
         for (NestedExtendedModel model : models) {
             assertEquals(model.getId(), model.getNested().getId());
             assertEquals(model.getId(), model.getNested().getSimple().getId());
