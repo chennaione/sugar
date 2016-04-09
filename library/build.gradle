@@ -9,17 +9,14 @@ android {
         minSdkVersion 9
         targetSdkVersion 23
     }
-
     buildTypes {
         release {
             minifyEnabled false
         }
     }
-
     testOptions{
         unitTests.returnDefaultValues = true
     }
-
     lintOptions{
         abortOnError false
     }

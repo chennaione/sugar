@@ -33,6 +33,7 @@ public final class MultiDexHelper {
     //Prevent instantiation..
     private MultiDexHelper() { }
 
+    @SuppressWarnings("all")
     private static SharedPreferences getMultiDexPreferences() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             return getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
