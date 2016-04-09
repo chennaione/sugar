@@ -80,6 +80,10 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
         xml.enabled = true
     }
 
+    onlyIf = {
+        true
+    }
+
     doFirst {
         executionData = files(executionData.findAll { it.exists() })
     }
