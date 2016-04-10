@@ -2,13 +2,9 @@ package com.orm.util;
 
 import com.orm.model.TestRecord;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author jonatan.salas
@@ -27,4 +23,14 @@ public final class ReflectionUtilTest {
 //        assertEquals(true, strings.contains("id"));
 //        assertEquals(true, strings.contains("name"));
 //    }
+
+    @Test
+    public void testSetFieldValueForId() {
+        TestRecord record = new TestRecord();
+        record.setName("Bla bla");
+
+        ReflectionUtil.setFieldValueForId(record, 1L);
+        Assert.assertEquals(1L, record.getId().longValue());
+    }
+
 }
