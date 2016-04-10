@@ -24,4 +24,10 @@ public final class SugarConfigTest {
 
         Assert.assertEquals(fieldList, SugarConfig.getFields(TestRecord.class));
     }
+
+    @Test
+    public void testClearCache() {
+        SugarConfig.clearCache();
+        Assert.assertEquals(true, SugarConfig.fields.isEmpty());
+    }
 }
