@@ -22,6 +22,13 @@ import static com.orm.util.ContextUtil.*;
 @Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
 public final class ContextUtilTest {
 
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        ContextUtil contextUtil = ContextUtil.class.getDeclaredConstructor().newInstance();
+        assertNull(contextUtil);
+    }
+
+
     @Test
     public void testInitContext() {
         assertNotNull(getContext());

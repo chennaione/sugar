@@ -1,5 +1,8 @@
 package com.orm;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.EmptyModel;
@@ -9,6 +12,9 @@ import com.orm.model.StringFieldAnnotatedModel;
 import com.orm.model.StringFieldExtendedModel;
 import com.orm.model.StringFieldExtendedModelAnnotatedColumn;
 import com.orm.helper.NamingHelper;
+import com.orm.model.TestRecord;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,5 +83,65 @@ public final class SchemaGeneratorTest {
                         "A INTEGER, B INTEGER, " +
                         "UNIQUE(A, B) ON CONFLICT REPLACE ) ",
                 createSQL);
+    }
+
+    @Test
+    public void testTableCreation() {
+        SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
+        schemaGenerator.createTable(TestRecord.class, sqLiteDatabase);
+        String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
+
+        String tableName = NamingHelper.toTableName(TestRecord.class);
+        Cursor c = sqLiteDatabase.rawQuery(String.format(sql, tableName), null);
+
+        if (c.moveToFirst()) {
+            Assert.assertEquals(1, c.getInt(0));
+        }
+
+        if (!c.isClosed()) {
+            c.close();
+        }
+    }
+
+    @Test
+    public void testAllTableCreation() {
+        SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
+
+        schemaGenerator.createDatabase(sqLiteDatabase);
+        String sql = "select count(*) from sqlite_master where type='table';";
+
+        Cursor c = sqLiteDatabase.rawQuery(sql, null);
+
+        if (c.moveToFirst()) {
+            Assert.assertEquals(42, c.getInt(0));
+        }
+
+        if (!c.isClosed()) {
+            c.close();
+        }
+    }
+
+    @Test
+    public void testDeleteAllTables() {
+        SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
+
+        schemaGenerator.createDatabase(sqLiteDatabase);
+        schemaGenerator.deleteTables(sqLiteDatabase);
+
+        String sql = "select count(*) from sqlite_master where type='table';";
+
+        Cursor c = sqLiteDatabase.rawQuery(sql, null);
+
+        if (c.moveToFirst()) {
+            //Two tables are by default created by SQLite
+            Assert.assertEquals(2, c.getInt(0));
+        }
+
+        if (!c.isClosed()) {
+            c.close();
+        }
     }
 }

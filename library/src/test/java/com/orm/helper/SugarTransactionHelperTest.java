@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
  * @author jonatan.salas
@@ -45,6 +46,12 @@ public final class SugarTransactionHelperTest {
         recordList.add(record1);
         recordList.add(record2);
         recordList.add(record3);
+    }
+
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        SugarTransactionHelper helper = SugarTransactionHelper.class.getDeclaredConstructor().newInstance();
+        assertNull(helper);
     }
 
     @Test

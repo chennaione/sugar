@@ -1,11 +1,13 @@
 package com.orm.util;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.orm.SugarContext;
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.TestRecord;
+import com.orm.query.Select;
 
 import junit.framework.Assert;
 
@@ -24,6 +26,12 @@ import java.util.List;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
 public final class ReflectionUtilTest {
+
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        ReflectionUtil reflectionUtil = ReflectionUtil.class.getDeclaredConstructor().newInstance();
+        Assert.assertNull(reflectionUtil);
+    }
 
     @Test
     public void testGetTableFields() {
@@ -65,5 +73,19 @@ public final class ReflectionUtilTest {
     public void testGetAllClasses() {
         List<Class> classes = ReflectionUtil.getDomainClasses();
         Assert.assertEquals(40, classes.size());
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void testSetFieldValueFromCursor() throws NoSuchFieldException {
+        final TestRecord record = new TestRecord().setName("bla bla");
+        Long id = record.save();
+        record.setId(id);
+
+        Cursor cursor = Select.from(TestRecord.class).getCursor();
+
+        TestRecord testRecord = new TestRecord();
+        Field field = TestRecord.class.getField("name");
+
+        ReflectionUtil.setFieldValueFromCursor(cursor, field, testRecord);
     }
 }

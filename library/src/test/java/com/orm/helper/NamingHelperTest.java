@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 import static com.orm.helper.NamingHelper.toColumnName;
@@ -17,6 +18,12 @@ import static com.orm.helper.NamingHelper.toTableName;
 import static com.orm.helper.NamingHelper.toSQLNameDefault;
 
 public final class NamingHelperTest {
+
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        NamingHelper helper = NamingHelper.class.getDeclaredConstructor().newInstance();
+        assertNull(helper);
+    }
 
     @Test
     public void testToSQLNameFromField() {

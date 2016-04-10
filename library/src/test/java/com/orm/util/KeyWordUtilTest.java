@@ -12,7 +12,7 @@ public final class KeyWordUtilTest {
 
     @Test(expected = IllegalAccessException.class)
     public void testPrivateConstructor() throws Exception {
-        KeyWordUtil keyWordUtil = (KeyWordUtil) Class.forName(KeyWordUtil.class.getName()).getDeclaredConstructor().newInstance();
+        KeyWordUtil keyWordUtil = KeyWordUtil.class.getDeclaredConstructor().newInstance();
         assertNull(keyWordUtil);
     }
 

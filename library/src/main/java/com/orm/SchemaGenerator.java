@@ -255,7 +255,7 @@ public class SchemaGenerator {
         return sb.toString();
     }
 
-    private void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
+    protected void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
         String createSQL = createTableSQL(table);
 
         if (!createSQL.isEmpty()) {
