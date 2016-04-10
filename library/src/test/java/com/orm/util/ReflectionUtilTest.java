@@ -1,5 +1,8 @@
 package com.orm.util;
 
+import android.content.ContentValues;
+
+import com.orm.SugarContext;
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.TestRecord;
@@ -33,6 +36,20 @@ public final class ReflectionUtilTest {
 
         Assert.assertEquals(true, strings.contains("id"));
         Assert.assertEquals(true, strings.contains("name"));
+    }
+
+    @Test(expected = NoSuchFieldException.class)
+    public void testAddFieldValueToColumn() throws NoSuchFieldException {
+        SugarContext context = SugarContext.getSugarContext();
+        TestRecord record = new TestRecord();
+        record.setName("lala");
+
+        Field column = TestRecord.class.getField("name");
+        ContentValues values = new ContentValues();
+
+        ReflectionUtil.addFieldValueToColumn(values, column, record, context.getEntitiesMap());
+
+        Assert.assertEquals(record.getName(), values.getAsString("NAME"));
     }
 
     @Test

@@ -67,7 +67,7 @@ public class SugarContext {
         return sugarDb;
     }
 
-    Map<Object, Long> getEntitiesMap() {
+    public Map<Object, Long> getEntitiesMap() {
         return entitiesMap;
     }
 }
