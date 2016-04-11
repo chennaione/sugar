@@ -3,7 +3,7 @@ package com.orm.query;
 import android.database.Cursor;
 
 import com.orm.SugarRecord;
-import com.orm.util.NamingHelper;
+import com.orm.helper.NamingHelper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -157,7 +157,7 @@ public class Select<T> implements Iterable {
     
     String toSql() {
         StringBuilder sql = new StringBuilder();
-        sql.append(SELECT_FROM).append(NamingHelper.toSQLName(this.record)).append(SPACE);
+        sql.append(SELECT_FROM).append(NamingHelper.toTableName(this.record)).append(SPACE);
 
         if (!whereClause.isEmpty()) {
             sql.append(WHERE).append(whereClause).append(SPACE);

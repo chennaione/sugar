@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
-public class QueryBuilderTests {
+public final class QueryBuilderTests {
 
     @Test(expected=RuntimeException.class)
     public void noArgumentsTest() {

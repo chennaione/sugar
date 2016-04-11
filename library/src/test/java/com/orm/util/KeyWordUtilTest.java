@@ -3,11 +3,18 @@ package com.orm.util;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
  * @author jonatan.salas
  */
-public class KeyWordUtilTest {
+public final class KeyWordUtilTest {
+
+    @Test(expected = IllegalAccessException.class)
+    public void testPrivateConstructor() throws Exception {
+        KeyWordUtil keyWordUtil = KeyWordUtil.class.getDeclaredConstructor().newInstance();
+        assertNull(keyWordUtil);
+    }
 
     @Test
     public void testKeyWord() {

@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 
 public class SugarContext {
 
+    private static SugarDbConfiguration dbConfiguration = null;
     private static SugarContext instance = null;
     private SugarDb sugarDb;
     private Map<Object, Long> entitiesMap;
@@ -29,7 +30,14 @@ public class SugarContext {
     public static void init(Context context) {
         ContextUtil.init(context);
         instance = new SugarContext();
+        dbConfiguration = null;
     }
+
+    public static void init(Context context, SugarDbConfiguration configuration) {
+        init(context);
+        dbConfiguration = configuration;
+    }
+
 
     public static void terminate() {
         if (instance == null) {
@@ -51,11 +59,15 @@ public class SugarContext {
         }
     }
 
+    public static SugarDbConfiguration getDbConfiguration() {
+        return dbConfiguration;
+    }
+
     public SugarDb getSugarDb() {
         return sugarDb;
     }
 
-    Map<Object, Long> getEntitiesMap() {
+    public Map<Object, Long> getEntitiesMap() {
         return entitiesMap;
     }
 }

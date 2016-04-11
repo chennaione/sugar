@@ -1,14 +1,16 @@
 package com.orm.util;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.Log;
 
 import com.orm.SugarRecord;
-import com.orm.dsl.Ignore;
-import com.orm.dsl.Table;
+import com.orm.annotation.Ignore;
+import com.orm.annotation.Table;
+import com.orm.helper.ManifestHelper;
+import com.orm.helper.MultiDexHelper;
+import com.orm.helper.NamingHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +28,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-import static com.orm.util.ContextUtil.getContext;
+public final class ReflectionUtil {
 
-public class ReflectionUtil {
+    //Prevent instantiation..
+    private ReflectionUtil() { }
 
     public static List<Field> getTableFields(Class table) {
         List<Field> fieldList = SugarConfig.getFields(table);
@@ -65,7 +68,7 @@ public class ReflectionUtil {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
-            String columnName = NamingHelper.toSQLName(column);
+            String columnName = NamingHelper.toColumnName(column);
             Object columnValue = column.get(object);
 
             if (columnType.isAnnotationPresent(Table.class)) {
@@ -149,7 +152,7 @@ public class ReflectionUtil {
         field.setAccessible(true);
         try {
             Class fieldType = field.getType();
-            String colName = NamingHelper.toSQLName(field);
+            String colName = NamingHelper.toColumnName(field);
 
             int columnIndex = cursor.getColumnIndex(colName);
 
@@ -341,7 +344,7 @@ public class ReflectionUtil {
         }
     }
 
-    private static String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
-        return context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).sourceDir;
+    private static String getSourcePath() throws PackageManager.NameNotFoundException {
+        return ContextUtil.getPackageManager().getApplicationInfo(ContextUtil.getPackageName(), 0).sourceDir;
     }
 }
