@@ -13,7 +13,7 @@ public class SugarContext {
 	
 	private static final String TAG = "SugarContext";
 	private static SugarContext instance = null;
-	private final Configuration configuration;
+	private final SugarConfiguration configuration;
 	private SugarDb sugarDb;
 	private Map<Object, Long> entitiesMap;
 
@@ -22,7 +22,7 @@ public class SugarContext {
 	//    this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
 	//}
 
-	private SugarContext(Configuration configuration) {
+	private SugarContext(SugarConfiguration configuration) {
 		this.configuration = configuration;
 		this.sugarDb = new SugarDb(configuration);
 		this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
@@ -30,20 +30,20 @@ public class SugarContext {
 
 	public static SugarContext getSugarContext() {
 		if (instance == null) {
-			throw new NullPointerException("SugarContext has not been initialized properly. Call SugarContext.init(Context) of SugarContext.init(Configuration) in your Application.onCreate() method and SugarContext.terminate() in your Application.onTerminate() method.");
+			throw new NullPointerException("SugarContext has not been initialized properly. Call SugarContext.init(Context) of SugarContext.init(SugarConfiguration) in your Application.onCreate() method and SugarContext.terminate() in your Application.onTerminate() method.");
 		}
 		return instance;
 	}
 
 	public static void init(Context context) {
-		instance = new SugarContext(Configuration.manifest(context));
+		instance = new SugarContext(ClassicConfiguration.manifest(context));
 	}
 
-	public static void init(Configuration configuration) {
+	public static void init(SugarConfiguration configuration) {
 		instance = new SugarContext(configuration);
 	}
 
-	//public static void initMaybe(Configuration configuration) {
+	//public static void initMaybe(SugarConfiguration configuration) {
 	//	instance = new SugarContext(configuration);
 	//}
 
@@ -78,7 +78,7 @@ public class SugarContext {
 		return entitiesMap;
 	}
 
-	public Configuration getConfiguration() {
+	public SugarConfiguration getConfiguration() {
 		return configuration;
 	}
 
@@ -98,7 +98,7 @@ public class SugarContext {
 			configuration.getContext().getApplicationContext().getContentResolver()
 						 .notifyChange(uri, observer, syncToNetwork);
 		} else {
-			Log.w(TAG, "Configuration not set. Unable to notify of data change: " + uri);
+			Log.w(TAG, "SugarConfiguration not set. Unable to notify of data change: " + uri);
 		}
 	}
 

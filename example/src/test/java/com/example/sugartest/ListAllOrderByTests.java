@@ -1,10 +1,9 @@
 package com.example.sugartest;
 
 
-import android.provider.BaseColumns;
-
+import com.example.SugarTestConfig;
 import com.example.models.IntegerFieldExtendedModel;
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.SugarRecord;
 
 import org.junit.Before;
@@ -24,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk = 18)
 public class ListAllOrderByTests {
 
-	private Configuration config = Configuration.get(null);
+	private SugarConfiguration config = new SugarTestConfig(null);
 
 	@Before
 	public void setUp() throws Exception {

@@ -13,7 +13,7 @@ public class SugarDb extends SQLiteOpenHelper {
 	private SQLiteDatabase sqLiteDatabase;
 	private int openedConnections = 0;
 
-	public SugarDb(Configuration configuration) {
+	public SugarDb(SugarConfiguration configuration) {
 		super(configuration.getContext(), configuration.getDatabaseName(),
 				new SugarCursorFactory(configuration.isDebug()), configuration
 				.getDatabaseVersion());

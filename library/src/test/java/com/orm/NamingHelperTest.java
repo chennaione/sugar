@@ -8,7 +8,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class NamingHelperTest {
-	private static Configuration config = Configuration
+	private static SugarConfiguration config = SugarConfiguration
 			.manifest(new DummyContext());
 
 	@Test

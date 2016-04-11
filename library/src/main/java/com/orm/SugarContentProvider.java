@@ -5,6 +5,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.orm.util.NamingHelper;
@@ -19,6 +20,9 @@ import java.util.List;
  * Created by bpappin on 16-03-29.
  */
 public class SugarContentProvider extends android.content.ContentProvider {
+	private static final String TAG = "SugarContentProvider";
+	private static boolean DEBUG;
+
 	private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 	private static final SparseArray<Class<?>> typeCodes = new SparseArray<Class<?>>();
 	private static SparseArray<String> mimeTypeCache = new SparseArray<String>();
@@ -27,32 +31,55 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public boolean onCreate() {
 
 		// XXX This must always happen first.
-		SugarContext.init(Configuration.manifest(getContext()));
+		SugarContext.init(SugarConfiguration.manifest(getContext()));
 
-		final String authority = getConfiguration()
+		final SugarConfiguration configuration = SugarContext.getSugarContext().getConfiguration();
+		DEBUG = configuration.isDebug();
+
+		Log.d(TAG, "Debug mode enalbed: " + DEBUG);
+
+		final String authority = configuration
 				.getAuthority();
 
-		List<Class> classList = ReflectionUtil
-				.getDomainClasses(getConfiguration());
+		if(DEBUG) {
+			Log.d(TAG, "Content provider authority: " + authority);
+		}
 
+		List<Class> classList = ReflectionUtil
+				.getDomainClasses(configuration);
+
+		if(DEBUG) {
+			Log.d(TAG, "Domain classes found: " + classList.size());
+		}
 
 		final int size = classList.size();
 		for (int i = 0; i < size; i++) {
 			Class<?> tableClass = classList.get(i);
+			if (DEBUG) {
+				Log.d(TAG, "Registering table for: " + tableClass.getSimpleName());
+			}
 			final int tableKey = (i * 2) + 1;
 			final int itemKey = (i * 2) + 2;
 
 			// content://<authority>/<table>
 			uriMatcher
-					.addURI(authority, NamingHelper.toSQLName(getConfiguration(), tableClass)
+					.addURI(authority, NamingHelper.toSQLName(configuration, tableClass)
 												   .toLowerCase(), tableKey);
 			typeCodes.put(tableKey, tableClass);
+			if (DEBUG) {
+				Log.d(TAG, "Registering table key: " + tableKey + " for class " +
+						   tableClass.getSimpleName());
+			}
 
 			// content://<authority>/<table>/<id>
 			uriMatcher.addURI(authority,
-					NamingHelper.toSQLName(getConfiguration(), tableClass).toLowerCase() +
+					NamingHelper.toSQLName(configuration, tableClass).toLowerCase() +
 					"/#", itemKey);
 			typeCodes.put(itemKey, tableClass);
+			if (DEBUG) {
+				Log.d(TAG, "Registering item key: " + itemKey + " for class " +
+						   tableClass.getSimpleName());
+			}
 		}
 
 		return true;
@@ -135,6 +162,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+
 		final Class<?> type = getModelType(uri);
 		final Cursor cursor = getDatabase().query(
 				NamingHelper.toSQLName(getConfiguration(), type),
@@ -154,7 +182,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 	public static Uri createUri(Class<?> type, Long id) {
 		final StringBuilder uri = new StringBuilder();
 		uri.append("content://");
-		final Configuration configuration = SugarContext.getSugarContext().getConfiguration();
+		final SugarConfiguration configuration = SugarContext.getSugarContext().getConfiguration();
 		uri.append(configuration.getAuthority());
 		uri.append("/");
 		uri.append(NamingHelper.toSQLName(configuration, type).toLowerCase());
@@ -169,11 +197,22 @@ public class SugarContentProvider extends android.content.ContentProvider {
 
 
 	private Class<?> getModelType(Uri uri) {
+		if (getConfiguration().isDebug()) {
+			Log.d(TAG, "Getting model type for URI: " + uri);
+		}
 		final int code = uriMatcher.match(uri);
+		if (getConfiguration().isDebug()) {
+			Log.d(TAG, "\tGot matcher type code: " + code);
+		}
 		if (code != UriMatcher.NO_MATCH) {
+			if (getConfiguration().isDebug()) {
+				Log.d(TAG, "\tType code found...");
+			}
 			return typeCodes.get(code);
 		}
-
+		if (getConfiguration().isDebug()) {
+			Log.d(TAG, "\tType code NO_MATCH.");
+		}
 		return null;
 	}
 
@@ -186,7 +225,7 @@ public class SugarContentProvider extends android.content.ContentProvider {
 		return SugarContext.getSugarContext().getSugarDb().getDB();
 	}
 	
-	public Configuration getConfiguration() {
+	public SugarConfiguration getConfiguration() {
 		return SugarContext.getSugarContext().getConfiguration();
 	}
 }

@@ -3,21 +3,21 @@ package com.orm.helper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 
 /**
  * Created by bpappin on 16-03-29.
  */
 public abstract class SugarDatabaseHelper {
-	private Configuration configuration;
+	private SugarConfiguration configuration;
 
-	public SugarDatabaseHelper(Configuration configuration) {
+	public SugarDatabaseHelper(SugarConfiguration configuration) {
 		super();
 		setConfiguration(configuration);
 	}
 
 	/**
-	 * If this constructor is used, you *must* call setConfiguration(Configuration) before any
+	 * If this constructor is used, you *must* call setConfiguration(SugarConfiguration) before any
 	 * other
 	 * operations is performed.
 	 */
@@ -25,11 +25,11 @@ public abstract class SugarDatabaseHelper {
 		this(null);
 	}
 
-	public void setConfiguration(Configuration configuration) {
+	public void setConfiguration(SugarConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
-	public Configuration getConfiguration() {
+	public SugarConfiguration getConfiguration() {
 		return configuration;
 	}
 

@@ -35,7 +35,7 @@ public class SugarRecord {
 	//@Column(name = BaseColumns._ID)
 	private Long id = null;
 
-	private static Configuration getConfiguration() {
+	private static SugarConfiguration getConfiguration() {
 		return getSugarContext()
 				.getConfiguration();
 	}

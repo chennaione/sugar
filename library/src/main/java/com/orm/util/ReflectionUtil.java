@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Table;
@@ -66,7 +66,7 @@ public class ReflectionUtil {
 		return fields;
 	}
 
-	public static void addFieldValueToColumn(Configuration config, ContentValues values, Field column, Object object,
+	public static void addFieldValueToColumn(SugarConfiguration config, ContentValues values, Field column, Object object,
 											 Map<Object, Long> entitiesMap) {
 		column.setAccessible(true);
 		Class<?> columnType = column.getType();
@@ -153,7 +153,7 @@ public class ReflectionUtil {
 		}
 	}
 
-	public static void setFieldValueFromCursor(Configuration config, Cursor cursor, Field field, Object object) {
+	public static void setFieldValueFromCursor(SugarConfiguration config, Cursor cursor, Field field, Object object) {
 		field.setAccessible(true);
 		try {
 			Class fieldType = field.getType();
@@ -266,19 +266,35 @@ public class ReflectionUtil {
 		}
 	}
 
-	public static List<Class> getDomainClasses(Configuration configuration) {
+	public static List<Class> getDomainClasses(SugarConfiguration configuration) {
+		Log.d(TAG, "Loading domain classes.");
 		List<Class> domainClasses = new ArrayList<Class>();
 		try {
-			for (String className : getAllClasses(configuration)) {
+			final List<String> allClasses = getAllClasses(configuration);
+			Log.d(TAG, "Found domain classes: " + allClasses.size());
+			for (String className : allClasses) {
 				Class domainClass = getDomainClass(className, configuration.getContext());
 				if (domainClass != null) {
 					domainClasses.add(domainClass);
 				}
 			}
 		} catch (IOException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Can't find classes.", e);
 		} catch (PackageManager.NameNotFoundException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Name not found.", e);
+		}
+
+
+		// When using gradle build 1.4 or greater, the dex system has changed and breaks the
+		// finding of classes in the domain package. As a result, you *must* regiter your
+		// model classes for inclusion. This may be fixed later, but for now, this is a quick fix.
+		Log.d(TAG, "Loading model classes from configuration.");
+		Class<?>[] models = configuration.getModelClasses();
+		Log.d(TAG, "Found model classes: " + models.length);
+		for (Class<?> model : models) {
+			if (!domainClasses.contains(model)) {
+				domainClasses.add(model);
+			}
 		}
 
 		return domainClasses;
@@ -301,7 +317,7 @@ public class ReflectionUtil {
 			 discoveredClass.isAnnotationPresent(Table.class)) &&
 			!Modifier.isAbstract(discoveredClass.getModifiers())) {
 
-			if(DEBUG_DOMAIN) {
+			if (DEBUG_DOMAIN) {
 				Log.d(TAG, "domain class : " + discoveredClass.getSimpleName());
 			}
 			return discoveredClass;
@@ -312,9 +328,9 @@ public class ReflectionUtil {
 	}
 
 
-	private static List<String> getAllClasses(Configuration configuration) throws
-																		   PackageManager.NameNotFoundException,
-																		   IOException {
+	private static List<String> getAllClasses(SugarConfiguration configuration) throws
+																				PackageManager.NameNotFoundException,
+																				IOException {
 		String packageName = configuration
 				.getDomain(); // ManifestHelper.getDomainPackageName(context);
 		List<String> classNames = new ArrayList<String>();

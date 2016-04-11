@@ -1,10 +1,10 @@
 package com.example.sugartest;
 
-import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 
+import com.example.SugarTestConfig;
 import com.example.models.SimpleExtendedModel;
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 @Config(sdk = 18)
 public class SimpleExtendedModelTests {
 
-	private Configuration config = Configuration.get(null);
+	private SugarConfiguration config =  new SugarTestConfig(null);
 
 	private String idName() {
 		return config.getIdColumnName();

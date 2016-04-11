@@ -2,7 +2,7 @@ package com.orm.query;
 
 import android.database.Cursor;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.SugarRecord;
 import com.orm.util.NamingHelper;
 
@@ -157,7 +157,7 @@ public class Select<T> implements Iterable {
 		return list.size() > 0 ? list.get(0) : null;
 	}
 
-	String toSql(Configuration configuration) {
+	String toSql(SugarConfiguration configuration) {
 		StringBuilder sql = new StringBuilder();
 		sql.append(SELECT_FROM).append(NamingHelper.toSQLName(configuration, this.record))
 		   .append(SPACE);

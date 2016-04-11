@@ -1,6 +1,6 @@
 package com.orm.helper;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.models.EmptyModel;
 import com.orm.models.IntUniqueModel;
 import com.orm.models.MultiColumnUniqueModel;
@@ -15,7 +15,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 
 public class SchemaGeneratorTest {
-	private Configuration config = Configuration
+	private SugarConfiguration config = SugarConfiguration
 			.manifest(new DummyContext());
 
 	@Test
@@ -34,7 +34,7 @@ public class SchemaGeneratorTest {
 	
 	@Test
 	public void testSimpleColumnTableCreation() throws Exception {
-		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
+		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(SugarConfiguration
 				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
 		assertEquals(
@@ -66,7 +66,7 @@ public class SchemaGeneratorTest {
 
 	@Test
 	public void testUniqueTableCreation() {
-		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
+		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(SugarConfiguration
 				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
 		assertEquals(
@@ -79,7 +79,7 @@ public class SchemaGeneratorTest {
 
 	@Test
 	public void testMultiColumnUniqueTableCreation() {
-		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(Configuration
+		ClassicSchemaGenerator schemaGenerator = new ClassicSchemaGenerator(SugarConfiguration
 				.manifest(new DummyContext()));
 		String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
 		assertEquals(

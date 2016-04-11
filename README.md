@@ -179,28 +179,34 @@ SugarRecord.saveInTx(books);
 
 Content providers are vital when using CursorLoaders and SyncAdapters, this modification adds a ContentProvider to work with those systems.
 
+###Create a configuration object
+
+Extend the configuration object ```com.orm.SugarConfiguration``` in your project and have it return the desired values.
+
+Note: There are two included schema generation strategies, ```com.orm.helper.DropTableSchemaGenerator``` and ```com.orm.helper.ClassicSchemaGenerator```, or create your own by extending ```com.orm.helper.SugarSchemaGenerator```.
+
+```java
+	...
+	
+	@Override
+	public SugarDatabaseHelper getDatabaseHelper() {
+		return new DropTableSchemaGenerator(this);
+	}
+	
+	...
+```
+
 ###Modify the manifest
 
 The names of the manifest meta properties have change in this version to avoid conflicts with other libraries.
 
+
+
 ```xml
 <application ...>
-	
-<meta-data android:name="SUGAR_DATABASE" android:value="sugar.db"/>
-<meta-data android:name="SUGAR_VERSION" android:value="114"/>
-<meta-data android:name="SUGAR_QUERY_LOG" android:value="true"/>
-<meta-data android:name="SUGAR_DOMAIN_PACKAGE_NAME" android:value="my.model.package"/>
 
-<!-- Enable this for legacy compatibility with Sugar 1.5 or earlier. -->
-<!-- <meta-data android:name="SUGAR_ID_COLUMN_NAME" android:value="id"/> -->
-
-<!-- the name of the authority should be the same as the one use in the provider definition. -->
-<meta-data android:name="SUGAR_AUTHORITY" android:value="my.content.authority"/> 
-<!-- This changes the behaviour of the schema generator. If removed, the legacy behaviour will be used. -->
-<!-- This version drops all tables and recreates them during a database version upgrade or downgrade.
-	Most applicaitons that use sync adapters and/or store their data in the cloud, do not need the 
-	complexity of migration. -->
-<meta-data android:name="SUGAR_SCHEMA_HELPER_CLASS" android:value="com.orm.helper.DropTableSchemaGenerator"/>
+<meta-data android:name="SUGAR_CONFIG_CLASS_NAME"
+           android:value="my.content.MySugarConfig"/>
 
 <!-- the authirity listed for the content provider should match the one set inthe meta configuration tag. -->
 <provider

@@ -1,13 +1,13 @@
 package com.orm.query;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
 public class SelectTest {
-	private Configuration config = Configuration
+	private SugarConfiguration config = SugarConfiguration
 			.manifest(new DummyContext());
 
 	@Test

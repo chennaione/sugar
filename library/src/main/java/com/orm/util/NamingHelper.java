@@ -1,6 +1,6 @@
 package com.orm.util;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.dsl.Column;
 import com.orm.dsl.Table;
 
@@ -16,7 +16,7 @@ public class NamingHelper {
 	 * @return the equivalent string converted to UPPER_CASE_UNDER_SCORE unless camelCased equals
 	 * "_id" (not case sensitive) in which case "_id" is returned
 	 */
-	public static String toSQLNameDefault(Configuration config, String camelCased) {
+	public static String toSQLNameDefault(SugarConfiguration config, String camelCased) {
 		if (camelCased.equalsIgnoreCase("_id") || camelCased.equalsIgnoreCase("id")) {
 			return config.getIdColumnName();
 		}
@@ -60,7 +60,7 @@ public class NamingHelper {
 	 * returned. Else, the Field's {@link java.lang.reflect.Field#getName()} will be
 	 * converted from CamelCase to UNDER_SCORE notation
 	 */
-	public static String toSQLName(Configuration config, Field field) {
+	public static String toSQLName(SugarConfiguration config, Field field) {
 		if (field.isAnnotationPresent(Column.class)) {
 			Column annotation = field.getAnnotation(Column.class);
 			return annotation.name();
@@ -78,7 +78,7 @@ public class NamingHelper {
 	 * {@link com.orm.dsl.Table#name()} will be returned. Else, the class' simple name will
 	 * be converted from CamelCase to UNDER_SCORE notation
 	 */
-	public static String toSQLName(Configuration config, Class<?> table) {
+	public static String toSQLName(SugarConfiguration config, Class<?> table) {
 		if (table.isAnnotationPresent(Table.class)) {
 			Table annotation = table.getAnnotation(Table.class);
 			if ("".equals(annotation.name())) {

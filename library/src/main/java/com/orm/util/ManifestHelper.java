@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.orm.ClassicConfiguration;
 import com.orm.helper.ClassicSchemaGenerator;
 import com.orm.helper.SugarDatabaseHelper;
 
@@ -14,6 +15,7 @@ import com.orm.helper.SugarDatabaseHelper;
  */
 public class ManifestHelper {
 
+	private static final String TAG = "ManifestHelper";
 	/**
 	 * Key for the database name meta data.
 	 */
@@ -27,6 +29,9 @@ public class ManifestHelper {
 	public final static String METADATA_QUERY_LOG = "SUGAR_QUERY_LOG";
 	private static final String METADATA_HELPER_CLASS = "SUGAR_SCHEMA_HELPER_CLASS";
 	private static final String METADATA_ID_COLUMN_NAME = "SUGAR_ID_COLUMN_NAME";
+	@Deprecated
+	private static final String METADATA_SUGAR_MODEL_RESOURCE = "METADATA_SUGAR_MODEL_RESOURCE";
+	private static final String METADATA_CONFIG_CLASS_NAME = "SUGAR_CONFIG_CLASS_NAME";
 	/**
 	 * The default name for the database unless specified in the AndroidManifest.
 	 */
@@ -114,6 +119,23 @@ public class ManifestHelper {
 		return getMetaDataBoolean(context, METADATA_QUERY_LOG);
 	}
 
+
+	//private static String[] getMetaDataStringArray(Context context, String name) {
+	//	String[] value = null;
+	//
+	//	PackageManager pm = context.getPackageManager();
+	//	try {
+	//		ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(),
+	//				PackageManager.GET_META_DATA);
+	//		value = ai.metaData.getStringArray(name);
+	//
+	//	} catch (Exception e) {
+	//		Log.d("sugar", "Couldn't find config value: " + name);
+	//	}
+	//
+	//	return value;
+	//}
+
 	private static String getMetaDataString(Context context, String name) {
 		String value = null;
 
@@ -182,5 +204,60 @@ public class ManifestHelper {
 		}
 
 		return idColName;
+	}
+
+	@Deprecated
+	public static Class<?>[] getModels(Context context) {
+		boolean debug = getDebugEnabled(context);
+
+
+		Integer resId = getMetaDataInteger(context, METADATA_SUGAR_MODEL_RESOURCE);
+		if (debug) {
+			Log.d(TAG, "Model data resource id: " + resId);
+		}
+
+		if (resId == null || resId == 0) {
+			return new Class<?>[0];
+		}
+
+		String[] classNames = context.getResources().getStringArray(resId);
+
+
+		if (classNames == null) {
+			if (debug) {
+				Log.d(TAG, "Model resource array not found, creating zero length array.");
+			}
+			classNames = new String[0];
+		}
+
+		if (debug) {
+			Log.d(TAG, "Model resource array length: " + classNames.length);
+		}
+
+		Class<?>[] modelTypes = new Class<?>[classNames.length];
+		for (int i = 0; i < classNames.length; i++) {
+			if (debug) {
+				Log.d(TAG, "Model resource processing: " + classNames[i]);
+			}
+			try {
+				modelTypes[i] = Class
+						.forName(classNames[i], true, context.getClass().getClassLoader());
+			} catch (Throwable e) {
+				Log.e(TAG, "Can't create class: " + classNames[i], e);
+			}
+		}
+
+		return modelTypes;
+	}
+	
+	public static String getConfigurationClassName(Context context) {
+		String className = getMetaDataString(context, METADATA_CONFIG_CLASS_NAME);
+
+		if (className == null) {
+			className = ClassicConfiguration.class.getName();
+		}
+
+		return className;
+
 	}
 }

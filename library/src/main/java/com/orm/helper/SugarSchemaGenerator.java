@@ -3,10 +3,9 @@ package com.orm.helper;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.KeyWords;
 import com.orm.dsl.Column;
 import com.orm.dsl.MultiUnique;
@@ -39,12 +38,12 @@ public abstract class SugarSchemaGenerator extends SugarDatabaseHelper {
 	public static final String UNIQUE = " UNIQUE";
 	public static final String SUGAR = "Sugar";
 
-	public SugarSchemaGenerator(Configuration configuration) {
+	public SugarSchemaGenerator(SugarConfiguration configuration) {
 		super(configuration);
 	}
 
 	/**
-	 * If this constructor is used, you *must* call setConfiguration(Configuration) before any
+	 * If this constructor is used, you *must* call setConfiguration(SugarConfiguration) before any
 	 * other
 	 * operations is performed.
 	 */

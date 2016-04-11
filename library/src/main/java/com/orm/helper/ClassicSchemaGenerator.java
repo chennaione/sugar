@@ -3,7 +3,7 @@ package com.orm.helper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.util.NamingHelper;
 
 import java.util.List;
@@ -17,10 +17,10 @@ public class ClassicSchemaGenerator extends SugarSchemaGenerator {
 
 
 	/**
-	 * If this constructor is used, you *must* call setConfiguration(Configuration) before any
+	 * If this constructor is used, you *must* call setConfiguration(SugarConfiguration) before any
 	 * other operations is performed.
 	 * <p>
-	 * This is done automatically if passed to a Configuration object.
+	 * This is done automatically if passed to a SugarConfiguration object.
 	 */
 	public ClassicSchemaGenerator() {
 		super();
@@ -29,7 +29,7 @@ public class ClassicSchemaGenerator extends SugarSchemaGenerator {
 	/**
 	 * @param configuration
 	 */
-	public ClassicSchemaGenerator(Configuration configuration) {
+	public ClassicSchemaGenerator(SugarConfiguration configuration) {
 		super(configuration);
 	}
 

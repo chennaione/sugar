@@ -3,7 +3,7 @@ package com.orm.helper;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.orm.Configuration;
+import com.orm.SugarConfiguration;
 import com.orm.util.NamingHelper;
 
 import java.util.List;
@@ -23,15 +23,15 @@ public class DropTableSchemaGenerator extends SugarSchemaGenerator {
 	/**
 	 * @param configuration
 	 */
-	public DropTableSchemaGenerator(Configuration configuration) {
+	public DropTableSchemaGenerator(SugarConfiguration configuration) {
 		super(configuration);
 	}
 
 	/**
-	 * If this constructor is used, you *must* call setConfiguration(Configuration) before any
+	 * If this constructor is used, you *must* call setConfiguration(SugarConfiguration) before any
 	 * other operations is performed.
 	 * <p>
-	 * This is done automatically if passed to a Configuration object.
+	 * This is done automatically if passed to a SugarConfiguration object.
 	 */
 	public DropTableSchemaGenerator() {
 		super();
