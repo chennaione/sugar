@@ -65,7 +65,7 @@ public class SchemaGenerator {
         executeSugarUpgrade(sqLiteDatabase, oldVersion, newVersion);
     }
 
-    private ArrayList<String> getColumnNames(SQLiteDatabase sqLiteDatabase, String tableName) {
+    protected ArrayList<String> getColumnNames(SQLiteDatabase sqLiteDatabase, String tableName) {
         Cursor resultsQuery = sqLiteDatabase.query(tableName, null, null, null, null, null, null);
         //Check if columns match vs the one on the domain class
         ArrayList<String> columnNames = new ArrayList<>();

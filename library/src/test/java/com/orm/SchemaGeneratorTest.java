@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
+import com.orm.model.AllAnotatedModel;
 import com.orm.model.EmptyModel;
 import com.orm.model.IntUniqueModel;
 import com.orm.model.MultiColumnUniqueModel;
@@ -20,6 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
+
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -105,6 +108,25 @@ public final class SchemaGeneratorTest {
     }
 
     @Test
+    public void testAnnotatedModelTableCreation() {
+        SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
+        schemaGenerator.createTable(AllAnotatedModel.class, sqLiteDatabase);
+        String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
+
+        String tableName = NamingHelper.toTableName(AllAnotatedModel.class);
+        Cursor c = sqLiteDatabase.rawQuery(String.format(sql, tableName), null);
+
+        if (c.moveToFirst()) {
+            Assert.assertEquals(1, c.getInt(0));
+        }
+
+        if (!c.isClosed()) {
+            c.close();
+        }
+    }
+
+    @Test
     public void testAllTableCreation() {
         SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
@@ -115,7 +137,7 @@ public final class SchemaGeneratorTest {
         Cursor c = sqLiteDatabase.rawQuery(sql, null);
 
         if (c.moveToFirst()) {
-            Assert.assertEquals(42, c.getInt(0));
+            Assert.assertEquals(43, c.getInt(0));
         }
 
         if (!c.isClosed()) {
@@ -143,5 +165,15 @@ public final class SchemaGeneratorTest {
         if (!c.isClosed()) {
             c.close();
         }
+    }
+
+    @Test
+    public void testGetColumnNames() {
+        SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
+        SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
+        schemaGenerator.createTable(TestRecord.class, sqLiteDatabase);
+
+        List<String> columnNames = schemaGenerator.getColumnNames(sqLiteDatabase, NamingHelper.toTableName(TestRecord.class));
+        Assert.assertEquals(2, columnNames.size());
     }
 }
