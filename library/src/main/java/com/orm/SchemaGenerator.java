@@ -46,7 +46,13 @@ public class SchemaGenerator {
         List<Class> domainClasses = getDomainClasses();
         for (Class domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
+            afterTableCreated(domain,sqLiteDatabase);
         }
+
+    }
+
+    public void afterTableCreated(Class<?> table, SQLiteDatabase sqLiteDatabase) {
+        executeScript(sqLiteDatabase, table.getSimpleName() + ".sql");
     }
 
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
