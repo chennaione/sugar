@@ -12,6 +12,7 @@ import static com.orm.util.ThreadUtil.*;
  *
  * @author jonatan.salas
  */
+@SuppressWarnings("all")
 public final class SugarDataSource<T> {
     private final Class<T> sClass;
 
@@ -40,14 +41,13 @@ public final class SugarDataSource<T> {
     /**
      *
      * @param object
-     * @param success
-     * @param error
+     * @param successCallback
+     * @param errorCallback
      */
-    @SuppressWarnings("all")
-    public void insert(final T object, final SuccessCallback<Long> success, final ErrorCallback error) {
-        checkNotNull(success);
+    public void insert(final T object, final SuccessCallback<Long> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
         checkNotNull(object);
-        checkNotNull(error);
 
         final Callable<Long> call = () -> { return SugarRecord.save(object); };
         final Future<Long> future = doInBackground(call);
@@ -59,27 +59,26 @@ public final class SugarDataSource<T> {
                 id = future.get();
             }
 
-            if (null == object) {
-                error.onError(new Exception("Error when performing insert of " + object.toString()));
+            if (null == id) {
+                errorCallback.onError(new Exception("Error when performing insert of " + object.toString()));
             } else {
-                success.onSuccess(id);
+                successCallback.onSuccess(id);
             }
 
         } catch (Exception e) {
-            error.onError(e);
+            errorCallback.onError(e);
         }
     }
 
     /**
      *
      * @param id
-     * @param success
-     * @param error
+     * @param successCallback
+     * @param errorCallback
      */
-    @SuppressWarnings("all")
-    public void findById(final Long id, final SuccessCallback<T> success, final ErrorCallback error) {
-        checkNotNull(success);
-        checkNotNull(error);
+    public void findById(final Long id, final SuccessCallback<T> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
         checkNotNull(id);
 
         final Callable<T> call = () -> { return SugarRecord.findById(getSugarClass(), id); };
@@ -93,26 +92,25 @@ public final class SugarDataSource<T> {
             }
 
             if (null == object) {
-                error.onError(new Exception("The object with " + id.toString() + "doesn't exist in database"));
+                errorCallback.onError(new Exception("The object with " + id.toString() + "doesn't exist in database"));
             } else {
-                success.onSuccess(object);
+                successCallback.onSuccess(object);
             }
 
         } catch (Exception e) {
-            error.onError(e);
+            errorCallback.onError(e);
         }
     }
 
     /**
      *
      * @param orderBy
-     * @param success
-     * @param error
+     * @param successCallback
+     * @param errorCallback
      */
-    @SuppressWarnings("all")
-    public void listAll(final String orderBy, final SuccessCallback<List<T>> success, final ErrorCallback error) {
-        checkNotNull(success);
-        checkNotNull(error);
+    public void listAll(final String orderBy, final SuccessCallback<List<T>> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
 
         final Callable<List<T>> call = () -> { return SugarRecord.listAll(getSugarClass(), orderBy); };
         final Future<List<T>> future = doInBackground(call);
@@ -125,13 +123,13 @@ public final class SugarDataSource<T> {
             }
 
             if (null == objects || objects.isEmpty()) {
-                error.onError(new Exception("There are no objects in the database"));
+                errorCallback.onError(new Exception("There are no objects in the database"));
             } else {
-                success.onSuccess(objects);
+                successCallback.onSuccess(objects);
             }
 
         } catch (Exception e) {
-            error.onError(e);
+            errorCallback.onError(e);
         }
     }
 
@@ -139,14 +137,13 @@ public final class SugarDataSource<T> {
     /**
      *
      * @param object
-     * @param success
-     * @param error
+     * @param successCallback
+     * @param errorCallback
      */
-    @SuppressWarnings("all")
-    public void update(final T object, final SuccessCallback<Long> success, final ErrorCallback error) {
-        checkNotNull(success);
+    public void update(final T object, final SuccessCallback<Long> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
         checkNotNull(object);
-        checkNotNull(error);
 
         final Callable<Long> call = () -> { return SugarRecord.update(object); };
         final Future<Long> future = doInBackground(call);
@@ -158,47 +155,117 @@ public final class SugarDataSource<T> {
                 id = future.get();
             }
 
-            if (null == object) {
-                error.onError(new Exception("Error when performing update of " + object.toString()));
+            if (null == id) {
+                errorCallback.onError(new Exception("Error when performing update of " + object.toString()));
             } else {
-                success.onSuccess(id);
+                successCallback.onSuccess(id);
             }
 
         } catch (Exception e) {
-            error.onError(e);
+            errorCallback.onError(e);
         }
     }
 
     /**
      *
      * @param object
-     * @param success
-     * @param error
+     * @param successCallback
+     * @param errorCallback
      */
-    @SuppressWarnings("all")
-    public void delete(final T object, final SuccessCallback<Boolean> success, final ErrorCallback error) {
-        checkNotNull(success);
+    public void delete(final T object, final SuccessCallback<Boolean> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
         checkNotNull(object);
-        checkNotNull(error);
 
         final Callable<Boolean> call = () -> { return SugarRecord.delete(object); };
         final Future<Boolean> future = doInBackground(call);
 
-        Boolean deleted = null;
+        Boolean isDeleted = null;
 
         try {
             if (future.isDone()) {
-                deleted = future.get();
+                isDeleted = future.get();
             }
 
-            if (null == object) {
-                error.onError(new Exception("Error when performing delete of " + object.toString()));
+            if (null == isDeleted || !isDeleted) {
+                errorCallback.onError(new Exception("Error when performing delete of " + object.toString()));
             } else {
-                success.onSuccess(deleted);
+                successCallback.onSuccess(isDeleted);
             }
 
         } catch (Exception e) {
-            error.onError(e);
+            errorCallback.onError(e);
+        }
+    }
+
+    /**
+     *
+     * @param whereClause
+     * @param whereArgs
+     * @param successCallback
+     * @param errorCallback
+     */
+    public void delete(String whereClause, String[] whereArgs, final SuccessCallback<Integer> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
+
+        final Callable<Integer> call = () -> { return SugarRecord.deleteAll(getSugarClass(), whereClause, whereArgs); };
+        final Future<Integer> future = doInBackground(call);
+
+        Integer count = null;
+
+        try {
+            if (future.isDone()) {
+                count = future.get();
+            }
+
+            if (null == count || count == 0) {
+                errorCallback.onError(new Exception("Error when performing deleete of all elements"));
+            } else {
+                successCallback.onSuccess(count);
+            }
+
+        } catch (Exception e) {
+            errorCallback.onError(e);
+        }
+    }
+
+    /**
+     *
+     * @param successCallback
+     * @param errorCallback
+     */
+    public void deleteAll(final SuccessCallback<Integer> successCallback, final ErrorCallback errorCallback) {
+        delete(null, null, successCallback, errorCallback);
+    }
+
+    /**
+     *
+     * @param successCallback
+     * @param errorCallback
+     */
+    public void count(final SuccessCallback<Long> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
+
+        final Callable<Long> call = () -> { return SugarRecord.count(getSugarClass()); };
+        final Future<Long> future = doInBackground(call);
+
+        Long count = null;
+
+        try {
+            if (future.isDone()) {
+                count = future.get();
+            }
+
+            if (null == count) {
+                errorCallback.onError(new Exception("Error when trying to get count"));
+            } else {
+                successCallback.onSuccess(count);
+            }
+
+        } catch (Exception e) {
+            errorCallback.onError(e);
         }
     }
 
