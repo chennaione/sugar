@@ -2,6 +2,7 @@ package com.orm;
 
 import android.database.Cursor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -69,6 +70,49 @@ public final class SugarDataSource<T> {
                 errorCallback.onError(new Exception("Error when performing insert of " + object.toString()));
             } else {
                 successCallback.onSuccess(id);
+            }
+
+        } catch (Exception e) {
+            errorCallback.onError(e);
+        }
+    }
+
+    /**
+     *
+     * @param objects
+     * @param successCallback
+     * @param errorCallback
+     */
+    public void bulkInsert(final List<T> objects, final SuccessCallback<List<Long>> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
+        checkNotNull(objects);
+
+        final Callable<List<Long>> call = new Callable<List<Long>>() {
+            @Override
+            public List<Long> call() throws Exception {
+                List<Long> ids = new ArrayList<>(objects.size());
+
+                for (int i = 0; i < objects.size(); i++) {
+                    Long id = SugarRecord.save(objects.get(i));
+                    ids.add(i, id);
+                }
+
+                return ids;
+            }
+        };
+
+        final Future<List<Long>> future = doInBackground(call);
+
+        List<Long> ids = null;
+
+        try {
+            ids = future.get();
+
+            if (null == ids || ids.isEmpty()) {
+                errorCallback.onError(new Exception("Error when performing bulk insert"));
+            } else {
+                successCallback.onSuccess(ids);
             }
 
         } catch (Exception e) {
@@ -285,7 +329,7 @@ public final class SugarDataSource<T> {
             count = future.get();
 
             if (null == count || count == 0) {
-                errorCallback.onError(new Exception("Error when performing deleete of all elements"));
+                errorCallback.onError(new Exception("Error when performing delete of all elements"));
             } else {
                 successCallback.onSuccess(count);
             }

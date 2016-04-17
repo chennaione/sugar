@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -433,5 +434,108 @@ public final class SugarDataSourceTest {
                     }
                 }
         );
+    }
+
+    @Test
+    public void bulkInsertAndListAllTest() {
+        final TestRecord record = new TestRecord();
+        record.setName("lalala");
+
+        final TestRecord record1 = new TestRecord();
+        record1.setName("fulano");
+
+        final TestRecord record2 = new TestRecord();
+        record2.setName("mengano");
+
+        final List<TestRecord> list = new ArrayList<>();
+        list.add(record);
+        list.add(record1);
+        list.add(record2);
+
+        recordSugarDataSource.bulkInsert(
+                list,
+                new SugarDataSource.SuccessCallback<List<Long>>() {
+                    @Override
+                    public void onSuccess(List<Long> ids) {
+                        for (int i = 0; i < list.size(); i++) {
+                            list.get(i).setId(ids.get(i));
+                        }
+                    }
+                },
+                new SugarDataSource.ErrorCallback() {
+                    @Override
+                    public void onError(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+
+        recordSugarDataSource.listAll(
+                null,
+                new SugarDataSource.SuccessCallback<List<TestRecord>>() {
+                    @Override
+                    public void onSuccess(List<TestRecord> testRecords) {
+                        for (int i = 0; i < list.size(); i++) {
+                            TestRecord record1 = list.get(i);
+                            TestRecord record2 = testRecords.get(i);
+
+                            Assert.assertEquals(record1.getId(), record2.getId());
+                            Assert.assertEquals(record1.getName(), record2.getName());
+                        }
+                    }
+                },
+                new SugarDataSource.ErrorCallback() {
+                    @Override
+                    public void onError(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    @Test
+    public void nullFindById() {
+        TestRecord record = new TestRecord();
+        record.setId(0L);
+
+        recordSugarDataSource.findById(
+                record.getId(),
+                new SugarDataSource.SuccessCallback<TestRecord>() {
+                    @Override
+                    public void onSuccess(TestRecord object) {
+                        Assert.assertNull(object);
+                    }
+                },
+                new SugarDataSource.ErrorCallback() {
+                    @Override
+                    public void onError(Exception e) {
+                        Assert.assertNotNull(e.getMessage());
+                    }
+                }
+        );
+    }
+
+    @Test
+    public void nullListAll() {
+        recordSugarDataSource.listAll(
+                null,
+                new SugarDataSource.SuccessCallback<List<TestRecord>>() {
+                    @Override
+                    public void onSuccess(List<TestRecord> object) {
+                        Assert.assertNull(object);
+                    }
+                },
+                new SugarDataSource.ErrorCallback() {
+                    @Override
+                    public void onError(Exception e) {
+                        Assert.assertNotNull(e.getMessage());
+                    }
+                }
+        );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullConstructor() {
+        SugarDataSource<TestRecord> dataSource = SugarDataSource.getInstance(null);
     }
 }
