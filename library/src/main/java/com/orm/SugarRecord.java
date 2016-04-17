@@ -260,6 +260,13 @@ public class SugarRecord {
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
+            if (column.getType().isAssignableFrom(SugarRecord.class) || column.getType().isAnnotationPresent(Table.class)) {
+                try {
+                    save(column.get(object));
+                } catch (IllegalAccessException e) {
+                    Log.e("Sugar", "Unable to access objects child (field): " + column.getName(), e);
+                }
+            }
             EntitySerializerManager serializerManager = getSugarContext().getEntitySerializerManager();
             ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap, serializerManager);
             if (column.getName().equals("id")) {
