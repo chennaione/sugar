@@ -407,7 +407,7 @@ public final class SugarDataSource<T> {
      *
      * @param object the object to be checked
      */
-    private void checkNotNull(Object object) {
+    protected void checkNotNull(Object object) {
         if (null == object) {
             throw new IllegalArgumentException("object shouldn't be null");
         }
