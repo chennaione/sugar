@@ -20,8 +20,9 @@ public final class SugarDataSource<T> {
     private final Class<T> sClass;
 
     /**
+     * SugarDataSource constructor with params
      *
-     * @param tClass
+     * @param tClass class argument used then to run SugarRecord class queries
      */
     private SugarDataSource(Class<T> tClass) {
         if (null == tClass) {
@@ -32,20 +33,23 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * SugarDataSource static method to construct an Instance of this class.
      *
-     * @param sClass
-     * @param <T>
-     * @return
+     * @param sClass class argument used then to run SugarRecord class queries
+     * @param <T> generic argument that must be a SugarRecord extended class or @Table annotated class
+     * @return an instance of SugarDataSource
      */
     public static <T> SugarDataSource<T> getInstance(Class<T> sClass) {
         return new SugarDataSource<>(sClass);
     }
 
     /**
+     * Method used to perform an Asynchronous insert. It works on top of SugarRecord class, executes the
+     * insert query using Futures.
      *
-     * @param object
-     * @param successCallback
-     * @param errorCallback
+     * @param object the object you want to insert. It must be a SugarRecord extended class or @Table annotated class
+     * @param successCallback the callback for a successful insert operation
+     * @param errorCallback the callback for an error in insert operation
      */
     public void insert(final T object, final SuccessCallback<Long> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -78,10 +82,12 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that performs a bulk insert. It works on top of SugarRecord class, and executes the query
+     * asynchronously using Futures.
      *
-     * @param objects
-     * @param successCallback
-     * @param errorCallback
+     * @param objects the list of objects that you want to insert. They must be SugarRecord extended objects or @Table annotatd objects.
+     * @param successCallback the callback for successful bulk insert operation
+     * @param errorCallback the callback for an error in bulk insert operation
      */
     public void bulkInsert(final List<T> objects, final SuccessCallback<List<Long>> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -121,10 +127,12 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that performs a findById, It works on top of SugarRecord class providing asynchronous
+     * execution with the use of Futures.
      *
-     * @param id
-     * @param successCallback
-     * @param errorCallback
+     * @param id the id of the object you want to retrieve
+     * @param successCallback the callback to execute when the operation is successful
+     * @param errorCallback the callback to execute when the operation has a trouble
      */
     public void findById(final Long id, final SuccessCallback<T> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -157,14 +165,16 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that provides you the ability of perform a custom query and retrieve a cursor. It works on top of SugarRecord class,
+     * All the code is executed asynchronously with the usage of Futures and callbacks.
      *
-     * @param whereClause
-     * @param whereArgs
-     * @param groupBy
-     * @param orderBy
-     * @param limit
-     * @param successCallback
-     * @param errorCallback
+     * @param whereClause the clause of the search
+     * @param whereArgs the arguments for the search
+     * @param groupBy the form that you want to group them
+     * @param orderBy the form that you want to order
+     * @param limit the limit of objects to want
+     * @param successCallback the callback to be executed if the operation is successful
+     * @param errorCallback the callback to be executed if the operation has an error
      */
     public void query(final String whereClause, final String[] whereArgs, final String groupBy, final String orderBy, final String limit, final SuccessCallback<Cursor> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -196,10 +206,12 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that list all elements. It run a SugarRecord.listAll but it's code is performed asynchronously
+     * with the usage of Futures and callbacks.
      *
-     * @param orderBy
-     * @param successCallback
-     * @param errorCallback
+     * @param orderBy the way you want to order the objects you get
+     * @param successCallback the callback that is performed if the operation is successful
+     * @param errorCallback the callback that is performed if your code has an error
      */
     public void listAll(final String orderBy, final SuccessCallback<List<T>> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -232,10 +244,12 @@ public final class SugarDataSource<T> {
 
 
     /**
+     * Method that works on top of SugarRecord.update and runs the code asynchronously via Futures
+     * and callbacks.
      *
-     * @param object
-     * @param successCallback
-     * @param errorCallback
+     * @param object the object you want to update
+     * @param successCallback the callback that will be performed if the update is successful
+     * @param errorCallback the callback that will be performed if the update has an error
      */
     public void update(final T object, final SuccessCallback<Long> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -268,10 +282,12 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * This method works on top of SugarRecord and provides asynchronous code execution via the usage of
+     * Futures and callbacks to handle success result and error.
      *
-     * @param object
-     * @param successCallback
-     * @param errorCallback
+     * @param object the object you want to delete
+     * @param successCallback the callback to be performed when the operation is successful
+     * @param errorCallback the callback to be performed when the operation has an error
      */
     public void delete(final T object, final SuccessCallback<Boolean> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -304,11 +320,13 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that performs a selective delete. The code is executed asynchronously via the usage of Futures
+     * and result callbacks
      *
-     * @param whereClause
-     * @param whereArgs
-     * @param successCallback
-     * @param errorCallback
+     * @param whereClause the clause for the search
+     * @param whereArgs the values
+     * @param successCallback the callback to be executed if there is no trouble
+     * @param errorCallback the callback to be executed if there is an error
      */
     public void delete(final String whereClause, final String[] whereArgs, final SuccessCallback<Integer> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -340,18 +358,20 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that deletes all data in a SQLite table.
      *
-     * @param successCallback
-     * @param errorCallback
+     * @param successCallback the callback that is executed if the operation is succesful
+     * @param errorCallback the callback that is executed if there is an error
      */
     public void deleteAll(final SuccessCallback<Integer> successCallback, final ErrorCallback errorCallback) {
         delete(null, null, successCallback, errorCallback);
     }
 
     /**
+     * Method that performs a count
      *
-     * @param successCallback
-     * @param errorCallback
+     * @param successCallback the callback that is executed if this is successful
+     * @param errorCallback the callback that is executed if there is an error
      */
     public void count(final SuccessCallback<Long> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
@@ -383,8 +403,9 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * Method that checks an object to be not null
      *
-     * @param object
+     * @param object the object to be checked
      */
     private void checkNotNull(Object object) {
         if (null == object) {
