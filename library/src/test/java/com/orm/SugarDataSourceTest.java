@@ -100,7 +100,7 @@ public final class SugarDataSourceTest {
         );
 
         record.setName("fulano");
-        recordSugarDataSource.insert(
+        recordSugarDataSource.update(
                 record,
                 id -> {
                     Assert.assertEquals(record.getId(), id);
@@ -115,6 +115,190 @@ public final class SugarDataSourceTest {
                 result -> {
                     Assert.assertEquals(record.getId(), result.getId());
                     Assert.assertEquals("fulano", result.getName());
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+    }
+
+    @Test
+    @SuppressWarnings("all")
+    public void testInsertAndListAll() {
+        TestRecord record = new TestRecord();
+        record.setName("lalala");
+
+        recordSugarDataSource.insert(
+                record,
+                id -> {
+                    record.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        TestRecord record1 = new TestRecord();
+        record1.setName("fulano");
+
+        recordSugarDataSource.insert(
+                record1,
+                id -> {
+                    record1.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+
+        TestRecord record2 = new TestRecord();
+        record2.setName("mengano");
+
+        recordSugarDataSource.insert(
+                record2,
+                id -> {
+                    record2.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        recordSugarDataSource.listAll(
+                null,
+                list -> {
+                    Assert.assertEquals(3, list.size());
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        recordSugarDataSource.deleteAll(
+                count -> {
+                    Assert.assertEquals(3, count.longValue());
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+    }
+
+    @Test
+    @SuppressWarnings("all")
+    public void testInsertAndCount() {
+        TestRecord record = new TestRecord();
+        record.setName("lalala");
+
+        recordSugarDataSource.insert(
+                record,
+                id -> {
+                    record.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        TestRecord record1 = new TestRecord();
+        record1.setName("fulano");
+
+        recordSugarDataSource.insert(
+                record1,
+                id -> {
+                    record1.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+
+        TestRecord record2 = new TestRecord();
+        record2.setName("mengano");
+
+        recordSugarDataSource.insert(
+                record2,
+                id -> {
+                    record2.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        recordSugarDataSource.count(
+                count -> {
+                    Assert.assertEquals(3, count.longValue());
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+    }
+
+    @Test
+    @SuppressWarnings("all")
+    public void testInsertAndGetCursor() {
+        TestRecord record = new TestRecord();
+        record.setName("lalala");
+
+        recordSugarDataSource.insert(
+                record,
+                id -> {
+                    record.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        TestRecord record1 = new TestRecord();
+        record1.setName("fulano");
+
+        recordSugarDataSource.insert(
+                record1,
+                id -> {
+                    record1.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+
+        TestRecord record2 = new TestRecord();
+        record2.setName("mengano");
+
+        recordSugarDataSource.insert(
+                record2,
+                id -> {
+                    record2.setId(id);
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        recordSugarDataSource.listAll(
+                null,
+                list -> {
+                    Assert.assertEquals(3, list.size());
+                },
+                e -> {
+                    e.printStackTrace();
+                }
+        );
+
+        recordSugarDataSource.query(
+                null,
+                null,
+                null,
+                null,
+                null,
+                cursor -> {
+                    Assert.assertNotNull(cursor);
                 },
                 e -> {
                     e.printStackTrace();
