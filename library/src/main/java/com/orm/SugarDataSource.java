@@ -1,5 +1,7 @@
 package com.orm;
 
+import android.database.Cursor;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -55,9 +57,7 @@ public final class SugarDataSource<T> {
         Long id = null;
 
         try {
-            if (future.isDone()) {
-                id = future.get();
-            }
+            id = future.get();
 
             if (null == id) {
                 errorCallback.onError(new Exception("Error when performing insert of " + object.toString()));
@@ -87,14 +87,45 @@ public final class SugarDataSource<T> {
         T object = null;
 
         try {
-            if (future.isDone()) {
-                object = future.get();
-            }
+            object = future.get();
 
             if (null == object) {
                 errorCallback.onError(new Exception("The object with " + id.toString() + "doesn't exist in database"));
             } else {
                 successCallback.onSuccess(object);
+            }
+
+        } catch (Exception e) {
+            errorCallback.onError(e);
+        }
+    }
+
+    /**
+     *
+     * @param whereClause
+     * @param whereArgs
+     * @param groupBy
+     * @param orderBy
+     * @param limit
+     * @param successCallback
+     * @param errorCallback
+     */
+    public void query(String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit, final SuccessCallback<Cursor> successCallback, final ErrorCallback errorCallback) {
+        checkNotNull(successCallback);
+        checkNotNull(errorCallback);
+
+        final Callable<Cursor> call = () -> { return SugarRecord.getCursor(getSugarClass(), whereClause, whereArgs, groupBy, orderBy, limit); };
+        final Future<Cursor> future = doInBackground(call);
+
+        Cursor cursor = null;
+
+        try {
+            cursor = future.get();
+
+            if (null == cursor) {
+                errorCallback.onError(new Exception("Problem when trying to get the cursor"));
+            } else {
+                successCallback.onSuccess(cursor);
             }
 
         } catch (Exception e) {
@@ -118,9 +149,7 @@ public final class SugarDataSource<T> {
         List<T> objects = null;
 
         try {
-            if (future.isDone()) {
-                objects = future.get();
-            }
+            objects = future.get();
 
             if (null == objects || objects.isEmpty()) {
                 errorCallback.onError(new Exception("There are no objects in the database"));
@@ -151,9 +180,7 @@ public final class SugarDataSource<T> {
         Long id = null;
 
         try {
-            if (future.isDone()) {
-                id = future.get();
-            }
+            id = future.get();
 
             if (null == id) {
                 errorCallback.onError(new Exception("Error when performing update of " + object.toString()));
@@ -183,9 +210,7 @@ public final class SugarDataSource<T> {
         Boolean isDeleted = null;
 
         try {
-            if (future.isDone()) {
-                isDeleted = future.get();
-            }
+            isDeleted = future.get();
 
             if (null == isDeleted || !isDeleted) {
                 errorCallback.onError(new Exception("Error when performing delete of " + object.toString()));
@@ -215,9 +240,7 @@ public final class SugarDataSource<T> {
         Integer count = null;
 
         try {
-            if (future.isDone()) {
-                count = future.get();
-            }
+            count = future.get();
 
             if (null == count || count == 0) {
                 errorCallback.onError(new Exception("Error when performing deleete of all elements"));
@@ -254,9 +277,7 @@ public final class SugarDataSource<T> {
         Long count = null;
 
         try {
-            if (future.isDone()) {
-                count = future.get();
-            }
+            count = future.get();
 
             if (null == count) {
                 errorCallback.onError(new Exception("Error when trying to get count"));
