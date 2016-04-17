@@ -418,26 +418,32 @@ public final class SugarDataSource<T> {
     }
 
     /**
+     * The callback to be executed when some SugarDataSource operation is successful.
+     *
      * @author jonatan.salas
-     * @param <S>
+     * @param <S> the parameter of the result that is passed to onSuccess method
      */
     public interface SuccessCallback<S> {
 
         /**
+         * This code is executed if there is no trouble on any SugarDataSource operation.
          *
-         * @param object
+         * @param result the result of some SugarDatasource operation
          */
-        void onSuccess(final S object);
+        void onSuccess(final S result);
     }
 
     /**
+     * The callback to be executed when some SugarDataSource operation has an error.
+     *
      * @author jonatan.salas
      */
     public interface ErrorCallback {
 
         /**
+         * This method is executed if some trouble is detected when using some SugarDataSource method.
          *
-         * @param e
+         * @param e the exception thrown by the method of SugarDataSource you have invoked
          */
         void onError(final Exception e);
     }
