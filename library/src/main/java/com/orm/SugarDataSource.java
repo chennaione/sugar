@@ -346,7 +346,7 @@ public final class SugarDataSource<T> {
         try {
             count = future.get();
 
-            if (null == count || count == 0) {
+            if (null == count) {
                 errorCallback.onError(new Exception("Error when performing delete of all elements"));
             } else {
                 successCallback.onSuccess(count);
