@@ -64,8 +64,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<Long> future = doInBackground(call);
-
-        Long id = null;
+        Long id;
 
         try {
             id = future.get();
@@ -109,8 +108,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<List<Long>> future = doInBackground(call);
-
-        List<Long> ids = null;
+        List<Long> ids;
 
         try {
             ids = future.get();
@@ -147,8 +145,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<T> future = doInBackground(call);
-
-        T object = null;
+        T object;
 
         try {
             object = future.get();
@@ -188,8 +185,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<Cursor> future = doInBackground(call);
-
-        Cursor cursor = null;
+        Cursor cursor;
 
         try {
             cursor = future.get();
@@ -225,8 +221,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<List<T>> future = doInBackground(call);
-
-        List<T> objects = null;
+        List<T> objects;
 
         try {
             objects = future.get();
@@ -264,8 +259,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<Long> future = doInBackground(call);
-
-        Long id = null;
+        Long id;
 
         try {
             id = future.get();
@@ -302,8 +296,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<Boolean> future = doInBackground(call);
-
-        Boolean isDeleted = null;
+        Boolean isDeleted;
 
         try {
             isDeleted = future.get();
@@ -340,8 +333,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<Integer> future = doInBackground(call);
-
-        Integer count = null;
+        Integer count;
 
         try {
             count = future.get();
@@ -385,8 +377,7 @@ public final class SugarDataSource<T> {
         };
 
         final Future<Long> future = doInBackground(call);
-
-        Long count = null;
+        Long count;
 
         try {
             count = future.get();
