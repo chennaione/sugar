@@ -51,7 +51,13 @@ public final class SugarDataSource<T> {
         checkNotNull(errorCallback);
         checkNotNull(object);
 
-        final Callable<Long> call = () -> { return SugarRecord.save(object); };
+        final Callable<Long> call = new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return SugarRecord.save(object);
+            }
+        };
+
         final Future<Long> future = doInBackground(call);
 
         Long id = null;
@@ -81,7 +87,13 @@ public final class SugarDataSource<T> {
         checkNotNull(errorCallback);
         checkNotNull(id);
 
-        final Callable<T> call = () -> { return SugarRecord.findById(getSugarClass(), id); };
+        final Callable<T> call = new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                return SugarRecord.findById(getSugarClass(), id);
+            }
+        };
+
         final Future<T> future = doInBackground(call);
 
         T object = null;
@@ -110,11 +122,17 @@ public final class SugarDataSource<T> {
      * @param successCallback
      * @param errorCallback
      */
-    public void query(String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit, final SuccessCallback<Cursor> successCallback, final ErrorCallback errorCallback) {
+    public void query(final String whereClause, final String[] whereArgs, final String groupBy, final String orderBy, final String limit, final SuccessCallback<Cursor> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
         checkNotNull(errorCallback);
 
-        final Callable<Cursor> call = () -> { return SugarRecord.getCursor(getSugarClass(), whereClause, whereArgs, groupBy, orderBy, limit); };
+        final Callable<Cursor> call = new Callable<Cursor>() {
+            @Override
+            public Cursor call() throws Exception {
+                return SugarRecord.getCursor(getSugarClass(), whereClause, whereArgs, groupBy, orderBy, limit);
+            }
+        };
+
         final Future<Cursor> future = doInBackground(call);
 
         Cursor cursor = null;
@@ -143,7 +161,13 @@ public final class SugarDataSource<T> {
         checkNotNull(successCallback);
         checkNotNull(errorCallback);
 
-        final Callable<List<T>> call = () -> { return SugarRecord.listAll(getSugarClass(), orderBy); };
+        final Callable<List<T>> call = new Callable<List<T>>() {
+            @Override
+            public List<T> call() throws Exception {
+                return SugarRecord.listAll(getSugarClass(), orderBy);
+            }
+        };
+
         final Future<List<T>> future = doInBackground(call);
 
         List<T> objects = null;
@@ -174,7 +198,13 @@ public final class SugarDataSource<T> {
         checkNotNull(errorCallback);
         checkNotNull(object);
 
-        final Callable<Long> call = () -> { return SugarRecord.update(object); };
+        final Callable<Long> call = new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return SugarRecord.update(object);
+            }
+        };
+
         final Future<Long> future = doInBackground(call);
 
         Long id = null;
@@ -204,7 +234,13 @@ public final class SugarDataSource<T> {
         checkNotNull(errorCallback);
         checkNotNull(object);
 
-        final Callable<Boolean> call = () -> { return SugarRecord.delete(object); };
+        final Callable<Boolean> call = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return SugarRecord.delete(object);
+            }
+        };
+
         final Future<Boolean> future = doInBackground(call);
 
         Boolean isDeleted = null;
@@ -230,11 +266,17 @@ public final class SugarDataSource<T> {
      * @param successCallback
      * @param errorCallback
      */
-    public void delete(String whereClause, String[] whereArgs, final SuccessCallback<Integer> successCallback, final ErrorCallback errorCallback) {
+    public void delete(final String whereClause, final String[] whereArgs, final SuccessCallback<Integer> successCallback, final ErrorCallback errorCallback) {
         checkNotNull(successCallback);
         checkNotNull(errorCallback);
 
-        final Callable<Integer> call = () -> { return SugarRecord.deleteAll(getSugarClass(), whereClause, whereArgs); };
+        final Callable<Integer> call = new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return SugarRecord.deleteAll(getSugarClass(), whereClause, whereArgs);
+            }
+        };
+
         final Future<Integer> future = doInBackground(call);
 
         Integer count = null;
@@ -271,7 +313,13 @@ public final class SugarDataSource<T> {
         checkNotNull(successCallback);
         checkNotNull(errorCallback);
 
-        final Callable<Long> call = () -> { return SugarRecord.count(getSugarClass()); };
+        final Callable<Long> call = new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return SugarRecord.count(getSugarClass());
+            }
+        };
+
         final Future<Long> future = doInBackground(call);
 
         Long count = null;
