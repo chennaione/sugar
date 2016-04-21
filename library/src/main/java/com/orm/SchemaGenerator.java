@@ -46,7 +46,15 @@ public class SchemaGenerator {
         List<Class> domainClasses = getDomainClasses();
         for (Class domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
+            afterTableCreated(domain,sqLiteDatabase);
         }
+
+    }
+
+    public void afterTableCreated(Class<?> table, SQLiteDatabase sqLiteDatabase) {
+        String fileName = table.getSimpleName() + ".sql";
+        executeScript(sqLiteDatabase,"sugar_after_create/" ,fileName);
+
     }
 
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
@@ -98,7 +106,7 @@ public class SchemaGenerator {
                     int version = Integer.valueOf(file.replace(".sql", ""));
 
                     if ((version > oldVersion) && (version <= newVersion)) {
-                        executeScript(db, file);
+                        executeScript(db,"sugar_upgrades/" ,file);
                         isSuccess = true;
                     }
                 } catch (NumberFormatException e) {
@@ -113,9 +121,9 @@ public class SchemaGenerator {
         return isSuccess;
     }
 
-    private void executeScript(SQLiteDatabase db, String file) {
+    private void executeScript(SQLiteDatabase db,String path ,String file) {
         try {
-            InputStream is = getAssets().open("sugar_upgrades/" + file);
+            InputStream is = getAssets().open(path + file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder sb = new StringBuilder();
             String line;
