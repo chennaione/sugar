@@ -82,6 +82,11 @@ dependencies {
 }
 ```
 
+You should also comment this line just comment this line (library/build.gradle): https://github.com/satyan/sugar/blob/master/library%2Fbuild.gradle#L2
+
+```gradle
+// apply from: '../maven_push.gradle'
+```
 ===================
 
 After installing, check out how to set up your first database and models [here](http://satyan.github.io/sugar/getting-started.html) **Outdated**. Check examples of 1.4 and master below: 
