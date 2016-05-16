@@ -10,9 +10,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
-import static com.orm.SugarRecord.save;
 import static com.orm.SugarRecord.findById;
-
+import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.sum;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -75,5 +75,33 @@ public final class IntegerFieldTests {
         save(new IntegerFieldAnnotatedModel(integer.intValue()));
         IntegerFieldAnnotatedModel model = findById(IntegerFieldAnnotatedModel.class, 1);
         assertEquals(integer.intValue(), model.getInt());
+    }
+
+
+    @Test
+    public void sumTest() {
+        save(new IntegerFieldAnnotatedModel(integer.intValue()));
+        save(new IntegerFieldAnnotatedModel(integer.intValue()));
+        assertEquals(2 * integer, sum(IntegerFieldAnnotatedModel.class, "raw_integer"));
+    }
+
+    @Test
+    public void whereSumTest() {
+        save(new IntegerFieldAnnotatedModel(integer.intValue()));
+        save(new IntegerFieldAnnotatedModel(integer.intValue()));
+        assertEquals((long) integer, sum(IntegerFieldAnnotatedModel.class,
+                "raw_integer", "id = ?", new String[]{"1"}));
+    }
+
+    @Test
+    public void noSumTest() {
+        assertEquals(0, sum(IntegerFieldAnnotatedModel.class, "raw_integer"));
+    }
+
+    @Test
+    public void brokenSumTest() {
+        save(new IntegerFieldAnnotatedModel(integer.intValue()));
+        save(new IntegerFieldAnnotatedModel(integer.intValue()));
+        assertEquals(-1, sum(IntegerFieldAnnotatedModel.class, "wrongfield"));
     }
 }
