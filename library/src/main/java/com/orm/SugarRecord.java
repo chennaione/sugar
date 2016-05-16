@@ -265,7 +265,7 @@ public class SugarRecord {
         return sum(type, field, null, null);
     }
 
-    public static <T> long sum(Class<T> type, String field, String whereClause, String[] whereArgs) {
+    public static <T> long sum(Class<T> type, String field, String whereClause, String... whereArgs) {
         long result = -1;
         String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
         SQLiteStatement sqLiteStatement;

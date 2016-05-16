@@ -90,7 +90,7 @@ public final class IntegerFieldTests {
         save(new IntegerFieldAnnotatedModel(integer.intValue()));
         save(new IntegerFieldAnnotatedModel(integer.intValue()));
         assertEquals((long) integer, sum(IntegerFieldAnnotatedModel.class,
-                "raw_integer", "id = ?", new String[]{"1"}));
+                "raw_integer", "id = ?", "1"));
     }
 
     @Test
