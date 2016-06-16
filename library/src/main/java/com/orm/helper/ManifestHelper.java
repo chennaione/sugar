@@ -50,7 +50,7 @@ public final class ManifestHelper {
     }
 
     /**
-     * Grabs the domain name of the model classes from the manifest. 
+     * Grabs the domain name of the model classes from the manifest.
      *
      * @return the package String that Sugar uses to search for model classes
      */
@@ -101,7 +101,9 @@ public final class ManifestHelper {
             ApplicationInfo ai = pm.getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
             value = ai.metaData.getString(name);
         } catch (Exception e) {
-            Log.d(LOG_TAG, "Couldn't find config value: " + name);
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.d(LOG_TAG, "Couldn't find config value: " + name);
+            }
         }
 
         return value;
@@ -115,7 +117,9 @@ public final class ManifestHelper {
             ApplicationInfo ai = pm.getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
             value = ai.metaData.getInt(name);
         } catch (Exception e) {
-            Log.d(LOG_TAG, "Couldn't find config value: " + name);
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.d(LOG_TAG, "Couldn't find config value: " + name);
+            }
         }
 
         return value;

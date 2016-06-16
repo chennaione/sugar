@@ -16,14 +16,20 @@ public final class SugarTransactionHelper {
         database.beginTransaction();
 
         try {
-            Log.d(LOG_TAG, "Callback executing within transaction");
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.d(LOG_TAG, "Callback executing within transaction");
+            }
 
             callback.manipulateInTransaction();
             database.setTransactionSuccessful();
 
-            Log.d(LOG_TAG, "Callback successfully executed within transaction");
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.d(LOG_TAG, "Callback successfully executed within transaction");
+            }
         } catch (Throwable e) {
-            Log.d(LOG_TAG, "Could execute callback within transaction", e);
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.d(LOG_TAG, "Could execute callback within transaction", e);
+            }
         } finally {
             database.endTransaction();
         }

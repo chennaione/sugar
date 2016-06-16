@@ -37,7 +37,9 @@ public final class ReflectionUtil {
         List<Field> fieldList = SugarConfig.getFields(table);
         if (fieldList != null) return fieldList;
 
-        Log.d("Sugar", "Fetching properties");
+        if (ManifestHelper.isDebugEnabled()) {
+            Log.d("Sugar", "Fetching properties");
+        }
         List<Field> typeFields = new ArrayList<>();
 
         getAllFields(typeFields, table);
@@ -144,7 +146,9 @@ public final class ReflectionUtil {
             }
 
         } catch (IllegalAccessException e) {
-            Log.e("Sugar", e.getMessage());
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("Sugar", e.getMessage());
+            }
         }
     }
 
@@ -158,7 +162,9 @@ public final class ReflectionUtil {
 
             //TODO auto upgrade to add new columns
             if (columnIndex < 0) {
-                Log.e("SUGAR", "Invalid colName, you should upgrade database");
+                if (ManifestHelper.isDebugEnabled()) {
+                    Log.e("SUGAR", "Invalid colName, you should upgrade database");
+                }
                 return;
             }
 
@@ -218,12 +224,19 @@ public final class ReflectionUtil {
                     Object enumVal = valueOf.invoke(field.getType(), strVal);
                     field.set(object, enumVal);
                 } catch (Exception e) {
-                    Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    if (ManifestHelper.isDebugEnabled()) {
+                        Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    }
                 }
-            } else
-                Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
+            } else {
+                if (ManifestHelper.isDebugEnabled()) {
+                    Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
+                }
+            }
         } catch (IllegalArgumentException | IllegalAccessException e) {
-            Log.e("field set error", e.getMessage());
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("field set error", e.getMessage());
+            }
         }
     }
 
@@ -258,7 +271,9 @@ public final class ReflectionUtil {
                 if (domainClass != null) domainClasses.add(domainClass);
             }
         } catch (IOException | PackageManager.NameNotFoundException  e) {
-            Log.e("Sugar", e.getMessage());
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("Sugar", e.getMessage());
+            }
         }
 
         return domainClasses;
@@ -271,7 +286,9 @@ public final class ReflectionUtil {
             discoveredClass = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
         } catch (Throwable e) {
             String error = (e.getMessage() == null) ? "getDomainClass " + className + " error" : e.getMessage();
-            Log.e("Sugar", error);
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("Sugar", error);
+            }
         }
 
         if ((discoveredClass != null) &&
@@ -280,7 +297,9 @@ public final class ReflectionUtil {
                         discoveredClass.isAnnotationPresent(Table.class)) &&
                 !Modifier.isAbstract(discoveredClass.getModifiers())) {
 
-            Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
+            }
             return discoveredClass;
 
         } else {

@@ -9,6 +9,8 @@ import com.orm.annotation.Column;
 import com.orm.annotation.MultiUnique;
 import com.orm.annotation.NotNull;
 import com.orm.annotation.Unique;
+import com.orm.dsl.BuildConfig;
+import com.orm.helper.ManifestHelper;
 import com.orm.util.KeyWordUtil;
 import com.orm.util.MigrationFileParser;
 import com.orm.helper.NamingHelper;
@@ -100,7 +102,9 @@ public class SchemaGenerator {
             List<String> files = Arrays.asList(getAssets().list("sugar_upgrades"));
             Collections.sort(files, new NumberComparator());
             for (String file : files) {
-                Log.i(SUGAR, "filename : " + file);
+                if(ManifestHelper.isDebugEnabled()) {
+                    Log.i(SUGAR, "filename : " + file);
+                }
 
                 try {
                     int version = Integer.valueOf(file.replace(".sql", ""));
@@ -110,12 +114,16 @@ public class SchemaGenerator {
                         isSuccess = true;
                     }
                 } catch (NumberFormatException e) {
-                    Log.i(SUGAR, "not a sugar script. ignored." + file);
+                    if(ManifestHelper.isDebugEnabled()) {
+                        Log.i(SUGAR, "not a sugar script. ignored." + file);
+                    }
                 }
 
             }
         } catch (IOException e) {
-            Log.e(SUGAR, e.getMessage());
+            if(ManifestHelper.isDebugEnabled()) {
+                Log.e(SUGAR, e.getMessage());
+            }
         }
 
         return isSuccess;
@@ -132,17 +140,23 @@ public class SchemaGenerator {
             }
             MigrationFileParser migrationFileParser = new MigrationFileParser(sb.toString());
             for(String statement: migrationFileParser.getStatements()){
-                Log.i("Sugar script", statement);
+                if(ManifestHelper.isDebugEnabled()) {
+                    Log.i("Sugar script", statement);
+                }
                 if (!statement.isEmpty()) {
                     db.execSQL(statement);
                 }
             }
 
         } catch (IOException e) {
-            Log.e(SUGAR, e.getMessage());
+            if(ManifestHelper.isDebugEnabled()) {
+                Log.e(SUGAR, e.getMessage());
+            }
         }
 
-        Log.i(SUGAR, "Script executed");
+        if(ManifestHelper.isDebugEnabled()) {
+            Log.i(SUGAR, "Script executed");
+        }
     }
 
     private void addColumns(Class<?> table, SQLiteDatabase sqLiteDatabase) {
@@ -179,18 +193,24 @@ public class SchemaGenerator {
         }
 
         for (String command : alterCommands) {
-            Log.i("Sugar", command);
+            if(ManifestHelper.isDebugEnabled()) {
+                Log.i("Sugar", command);
+            }
             sqLiteDatabase.execSQL(command);
         }
     }
 
     protected String createTableSQL(Class<?> table) {
-        Log.i(SUGAR, "Create table if not exists");
+        if(ManifestHelper.isDebugEnabled()) {
+            Log.i(SUGAR, "Create table if not exists");
+        }
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toTableName(table);
 
         if(KeyWordUtil.isKeyword(tableName)) {
-            Log.i(SUGAR,"ERROR, SQLITE RESERVED WORD USED IN " + tableName);
+            if(ManifestHelper.isDebugEnabled()) {
+                Log.i(SUGAR, "ERROR, SQLITE RESERVED WORD USED IN " + tableName);
+            }
         }
 
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
@@ -258,7 +278,9 @@ public class SchemaGenerator {
         }
 
         sb.append(" ) ");
-        Log.i(SUGAR, "Creating table " + tableName);
+        if(ManifestHelper.isDebugEnabled()) {
+            Log.i(SUGAR, "Creating table " + tableName);
+        }
 
         return sb.toString();
     }
