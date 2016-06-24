@@ -14,10 +14,10 @@ android {
             minifyEnabled false
         }
     }
-    testOptions{
+    testOptions {
         unitTests.returnDefaultValues = true
     }
-    lintOptions{
+    lintOptions {
         abortOnError false
     }
 }

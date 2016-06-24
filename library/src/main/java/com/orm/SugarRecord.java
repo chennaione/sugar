@@ -386,8 +386,6 @@ public class SugarRecord {
         }
     }
 
-
-
     public static boolean isSugarEntity(Class<?> objectClass) {
         return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
