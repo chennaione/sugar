@@ -268,6 +268,36 @@ public class SugarRecord {
         return result;
     }
 
+    public static <T> long sum(Class<T> type, String field) {
+        return sum(type, field, null, null);
+    }
+
+    public static <T> long sum(Class<T> type, String field, String whereClause, String... whereArgs) {
+        long result = -1;
+        String filter = (!TextUtils.isEmpty(whereClause)) ? " where " + whereClause : "";
+        SQLiteStatement sqLiteStatement;
+        try {
+            sqLiteStatement = getSugarDataBase().compileStatement("SELECT sum(" + field + ") FROM " + NamingHelper.toTableName(type) + filter);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return result;
+        }
+
+        if (whereArgs != null) {
+            for (int i = whereArgs.length; i != 0; i--) {
+                sqLiteStatement.bindString(i, whereArgs[i - 1]);
+            }
+        }
+
+        try {
+            result = sqLiteStatement.simpleQueryForLong();
+        } finally {
+            sqLiteStatement.close();
+        }
+
+        return result;
+    }
+
     public static long save(Object object) {
         return save(getSugarDataBase(), object);
     }
