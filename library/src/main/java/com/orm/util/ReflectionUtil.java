@@ -139,20 +139,22 @@ public final class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
-                } else if (Serializable.class.isAssignableFrom(columnType)) {
-                    try {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        ObjectOutputStream oos = new ObjectOutputStream(bos);
-                        oos.writeObject(columnValue);
-                        values.put(columnName, bos.toByteArray());
-                    } catch(IOException e) {
-                        values.put(columnName, "".getBytes());
-                    }
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
                     } else if (columnType.isEnum()) {
                         values.put(columnName, ((Enum) columnValue).name());
+                    } else if (columnType.equals(String.class)) {
+                        values.put(columnName, (String)columnValue);
+                    } else if (Serializable.class.isAssignableFrom(columnType)) {
+                        try {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            ObjectOutputStream oos = new ObjectOutputStream(bos);
+                            oos.writeObject(columnValue);
+                            values.put(columnName, bos.toByteArray());
+                        } catch(IOException e) {
+                            values.put(columnName, "".getBytes());
+                        }
                     } else {
                         values.put(columnName, String.valueOf(columnValue));
                     }
