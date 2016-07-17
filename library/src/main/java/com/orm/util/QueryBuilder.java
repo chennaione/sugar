@@ -2,6 +2,7 @@ package com.orm.util;
 
 import com.orm.SugarRecord;
 
+import java.io.Serializable;
 import java.lang.RuntimeException;
 import java.lang.StringBuilder;
 import java.math.BigDecimal;
@@ -38,6 +39,10 @@ public class QueryBuilder {
         if ((type.equals(String.class)) || (type.equals(Character.TYPE)) ||
                 (type.equals(BigDecimal.class))) {
             return "TEXT";
+        }
+
+        if(Serializable.class.isAssignableFrom(type)) {
+            return "BLOB";
         }
 
         return "";
