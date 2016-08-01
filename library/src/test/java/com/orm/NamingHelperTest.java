@@ -1,15 +1,9 @@
 package com.orm;
 
-import com.orm.query.DummyContext;
-import com.orm.util.NamingHelper;
-
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+public class NamingHelperTest extends BaseSugarTest {
 
-public class NamingHelperTest {
-	private static SugarConfiguration config = SugarConfiguration
-			.manifest(new DummyContext());
 
 	@Test
 	public void testToSQLNameCaseConversion() throws Exception {
@@ -28,16 +22,5 @@ public class NamingHelperTest {
 		assertToSqlNameEquals("A", "a");
 	}
 
-	/**
-	 * Helper method that asserts a CamelCaseString is converted to UPPER_CASE_UNDER_SCORE.
-	 *
-	 * @param expected
-	 * 		a CamelCaseString
-	 * @param actual
-	 * 		the expected UPPER_CASE_UNDER_SCORE string
-	 */
-	private static void assertToSqlNameEquals(String expected, String actual) {
-		assertEquals(expected, NamingHelper.toSQLNameDefault(config, actual));
-	}
 
 }
