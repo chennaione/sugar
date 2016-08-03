@@ -7,10 +7,9 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
-
+import com.orm.annotation.OneToMany;
 import com.orm.annotation.Table;
 import com.orm.annotation.Unique;
-import com.orm.dsl.BuildConfig;
 import com.orm.helper.ManifestHelper;
 import com.orm.helper.NamingHelper;
 import com.orm.util.QueryBuilder;
@@ -18,13 +17,8 @@ import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -216,13 +210,27 @@ public class SugarRecord {
         return getEntitiesFromCursor(cursor, type);
     }
 
+    private static <T> List<T> findOneToMany(Class<T> type, String relationFieldName, Object relationObject, Long relationObjectId) {
+        String args[] = { String.valueOf(relationObjectId) };
+        String whereClause = NamingHelper.toSQLNameDefault(relationFieldName) + " = ?";
+
+        Cursor cursor = getSugarDataBase().query(NamingHelper.toTableName(type), null, whereClause, args,
+                null, null, null, null);
+
+        return getEntitiesFromCursor(cursor, type, relationFieldName, relationObject);
+    }
+
     public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type){
+        return getEntitiesFromCursor(cursor, type, null, null);
+    }
+
+    public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type, String relationFieldName, Object relationObject){
         T entity;
         List<T> result = new ArrayList<>();
         try {
             while (cursor.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                inflate(cursor, entity, getSugarContext().getEntitiesMap());
+                inflate(cursor, entity, getSugarContext().getEntitiesMap(), relationFieldName, relationObject);
                 result.add(entity);
             }
         } catch (Exception e) {
@@ -391,9 +399,14 @@ public class SugarRecord {
     }
 
     private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
+        inflate(cursor, object, entitiesMap, null, null);
+    }
+
+    private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap, String oneToManyFieldName, Object oneToManyObject) {
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
+        Long objectId = cursor.getLong(cursor.getColumnIndex(("ID")));
         if (!entitiesMap.containsKey(object)) {
-            entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
+            entitiesMap.put(object, objectId);
         }
 
         for (Field field : columns) {
@@ -401,10 +414,25 @@ public class SugarRecord {
             Class<?> fieldType = field.getType();
             if (isSugarEntity(fieldType)) {
                 try {
-                    long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toColumnName(field)));
-                    field.set(object, (id > 0) ? findById(fieldType, id) : null);
+                    if (field.getName().equals(oneToManyFieldName)) {
+                        field.set(object, oneToManyObject);
+                    } else {
+                        long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toColumnName(field)));
+                        field.set(object, (id > 0) ? findById(fieldType, id) : null);
+                    }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
+                }
+            } else if (fieldType.equals(List.class)) {
+                if (field.isAnnotationPresent(OneToMany.class)) {
+                    try {
+                        ParameterizedType genericListType = (ParameterizedType) field.getGenericType();
+                        Class<?> genericListClass = (Class<?>) genericListType.getActualTypeArguments()[0];
+                        String targetName = field.getAnnotation(OneToMany.class).targetField();
+                        field.set(object, findOneToMany(genericListClass, targetName, object, objectId));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
             } else {
                 ReflectionUtil.setFieldValueFromCursor(cursor, field, object);

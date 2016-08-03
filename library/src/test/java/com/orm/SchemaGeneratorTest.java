@@ -137,7 +137,7 @@ public final class SchemaGeneratorTest {
         Cursor c = sqLiteDatabase.rawQuery(sql, null);
 
         if (c.moveToFirst()) {
-            Assert.assertEquals(43, c.getInt(0));
+            Assert.assertEquals(45, c.getInt(0));
         }
 
         if (!c.isClosed()) {
