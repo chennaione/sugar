@@ -10,6 +10,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static com.orm.SugarRecord.save;
+import static com.orm.SugarRecord.findById;
+
 /**
  * Created by Łukasz Wesołowski on 28.07.2016.
  */
@@ -18,79 +24,99 @@ import org.robolectric.annotation.Config;
 @Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
 public class OneToManyTest {
     @Test
-    public void saveOneToManyRelationTest() {
-        OneToManyModel oneToManyModel = new OneToManyModel();
-        oneToManyModel.setId(1l);
-        oneToManyModel.setName("oneToMany");
-        oneToManyModel.save();
+    public void shouldSaveWithOneToManyRelation() {
+        List<Long> relationIds = Arrays.asList(1l, 2l, 3l, 4l);
 
-        ManyToOneModel manyToOneModel1 = new ManyToOneModel();
-        manyToOneModel1.setId(1l);
-        manyToOneModel1.setName("manyToOne 1");
-        manyToOneModel1.setModel(oneToManyModel);
-        manyToOneModel1.save();
+        OneToManyModel model = new OneToManyModel(1l);
+        save(model);
 
-        ManyToOneModel manyToOneModel2 = new ManyToOneModel();
-        manyToOneModel2.setId(2l);
-        manyToOneModel2.setName("manyToOne 2");
-        manyToOneModel2.setModel(oneToManyModel);
-        manyToOneModel2.save();
+        for (long i : relationIds) {
+            save(new ManyToOneModel(i, model));
+        }
 
-        ManyToOneModel manyToOneModel3 = new ManyToOneModel();
-        manyToOneModel3.setId(3l);
-        manyToOneModel3.setName("manyToOne 3");
-        manyToOneModel3.setModel(oneToManyModel);
-        manyToOneModel3.save();
+        OneToManyModel result = findById(OneToManyModel.class, 1l);
 
-        OneToManyModel result = OneToManyModel.findById(OneToManyModel.class, 1l);
+        Assert.assertEquals(4, result.getModels().size());
 
-        Assert.assertEquals(3, result.getModels().size());
-
-        Assert.assertTrue(result.getModels().contains(manyToOneModel1));
-        Assert.assertTrue(result.getModels().contains(manyToOneModel2));
-        Assert.assertTrue(result.getModels().contains(manyToOneModel3));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(0).getId()));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(1).getId()));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(2).getId()));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(3).getId()));
 
         Assert.assertEquals(result, result.getModels().get(0).getModel());
         Assert.assertEquals(result, result.getModels().get(1).getModel());
         Assert.assertEquals(result, result.getModels().get(2).getModel());
+        Assert.assertEquals(result, result.getModels().get(3).getModel());
     }
 
     @Test
-    public void removeOneToManyRelationTest() {
-        OneToManyModel oneToManyModel = new OneToManyModel();
-        oneToManyModel.setId(1l);
-        oneToManyModel.setName("oneToMany");
-        oneToManyModel.save();
+    public void shouldRemoveOneOfManyToOneRelation() {
+        OneToManyModel model = new OneToManyModel(1l);
+        save(model);
 
-        ManyToOneModel manyToOneModel1 = new ManyToOneModel();
-        manyToOneModel1.setId(1l);
-        manyToOneModel1.setName("manyToOne 1");
-        manyToOneModel1.setModel(oneToManyModel);
-        manyToOneModel1.save();
+        for (long i : Arrays.asList(1l, 2l, 3l, 4l)) {
+            save(new ManyToOneModel(i, model));
+        }
 
-        ManyToOneModel manyToOneModel2 = new ManyToOneModel();
-        manyToOneModel2.setId(2l);
-        manyToOneModel2.setName("manyToOne 2");
-        manyToOneModel2.setModel(oneToManyModel);
-        manyToOneModel2.save();
+        OneToManyModel result = findById(OneToManyModel.class, 1l);
 
-        ManyToOneModel manyToOneModel3 = new ManyToOneModel();
-        manyToOneModel3.setId(3l);
-        manyToOneModel3.setName("manyToOne 3");
-        manyToOneModel3.setModel(oneToManyModel);
-        manyToOneModel3.save();
+        Assert.assertEquals(4, result.getModels().size());
 
-        OneToManyModel result = OneToManyModel.findById(OneToManyModel.class, 1l);
+        ManyToOneModel.deleteAll(ManyToOneModel.class, "id = ?", String.valueOf(3l));
+
+        result = findById(OneToManyModel.class, 1l);
 
         Assert.assertEquals(3, result.getModels().size());
 
-        ManyToOneModel.delete(manyToOneModel2);
+        Assert.assertTrue(result.getModels().get(0).getId() != 3l);
+        Assert.assertTrue(result.getModels().get(1).getId() != 3l);
+        Assert.assertTrue(result.getModels().get(2).getId() != 3l);
+    }
 
-        result = OneToManyModel.findById(OneToManyModel.class, 1l);
+    @Test
+    public void shouldNotRemoveRelation() {
+        OneToManyModel model = new OneToManyModel(1l);
+        save(model);
 
-        Assert.assertEquals(2, result.getModels().size());
+        for (long i : Arrays.asList(1l, 2l, 3l, 4l)) {
+            save(new ManyToOneModel(i, model));
+        }
 
-        Assert.assertTrue(result.getModels().contains(manyToOneModel1));
-        Assert.assertTrue(result.getModels().contains(manyToOneModel3));
+        OneToManyModel result = findById(OneToManyModel.class, 1l);
+
+        result.getModels().clear();
+
+        save(model);
+
+        result = findById(OneToManyModel.class, 1l);
+
+        Assert.assertEquals(4, result.getModels().size());
+    }
+
+    @Test
+    public void shouldNotAddRelation() {
+        List<Long> relationIds = Arrays.asList(1l, 2l, 3l, 4l);
+        OneToManyModel model = new OneToManyModel(1l);
+        save(model);
+
+        for (long i : relationIds) {
+            save(new ManyToOneModel(i, model));
+        }
+
+        save(new ManyToOneModel(5l, null));
+
+        OneToManyModel result = findById(OneToManyModel.class, 1l);
+
+        Assert.assertEquals(4, result.getModels().size());
+
+        Assert.assertTrue(relationIds.contains(result.getModels().get(0).getId()));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(1).getId()));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(2).getId()));
+        Assert.assertTrue(relationIds.contains(result.getModels().get(3).getId()));
+
+        Assert.assertEquals(result, result.getModels().get(0).getModel());
+        Assert.assertEquals(result, result.getModels().get(1).getModel());
+        Assert.assertEquals(result, result.getModels().get(2).getModel());
+        Assert.assertEquals(result, result.getModels().get(3).getModel());
     }
 }
