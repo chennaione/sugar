@@ -12,34 +12,34 @@ import java.util.Map;
 /**
  * Created by Łukasz Wesołowski on 03.08.2016.
  */
-public class ObjectInflater {
+public class EntityInflater {
     private Cursor cursor;
     private Object object;
     private Object relationObject;
     private String relationFieldName;
     private Map<Object, Long> entitiesMap;
 
-    public ObjectInflater withCursor(Cursor cursor) {
+    public EntityInflater withCursor(Cursor cursor) {
         this.cursor = cursor;
         return this;
     }
 
-    public ObjectInflater withObject(Object object) {
+    public EntityInflater withObject(Object object) {
         this.object = object;
         return this;
     }
 
-    public ObjectInflater withRelationObject(Object relationObject) {
+    public EntityInflater withRelationObject(Object relationObject) {
         this.relationObject = relationObject;
         return this;
     }
 
-    public ObjectInflater withRelationFieldName(String relationFieldName) {
+    public EntityInflater withRelationFieldName(String relationFieldName) {
         this.relationFieldName = relationFieldName;
         return this;
     }
 
-    public ObjectInflater withEntitiesMap(Map<Object, Long> entitiesMap) {
+    public EntityInflater withEntitiesMap(Map<Object, Long> entitiesMap) {
         this.entitiesMap = entitiesMap;
         return this;
     }

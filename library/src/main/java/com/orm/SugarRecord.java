@@ -11,7 +11,7 @@ import com.orm.annotation.Table;
 import com.orm.annotation.Unique;
 import com.orm.helper.ManifestHelper;
 import com.orm.helper.NamingHelper;
-import com.orm.inflater.ObjectInflater;
+import com.orm.inflater.EntityInflater;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;
@@ -229,7 +229,7 @@ public class SugarRecord {
         try {
             while (cursor.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                new ObjectInflater()
+                new EntityInflater()
                         .withCursor(cursor)
                         .withObject(entity)
                         .withEntitiesMap(getSugarContext().getEntitiesMap())
@@ -469,7 +469,7 @@ public class SugarRecord {
 
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
-        new ObjectInflater()
+        new EntityInflater()
                 .withCursor(cursor)
                 .withObject(this)
                 .withEntitiesMap(getSugarContext().getEntitiesMap())
@@ -511,7 +511,7 @@ public class SugarRecord {
 
             try {
                 entity = type.getDeclaredConstructor().newInstance();
-                new ObjectInflater()
+                new EntityInflater()
                         .withCursor(cursor)
                         .withObject(entity)
                         .withEntitiesMap(getSugarContext().getEntitiesMap())
