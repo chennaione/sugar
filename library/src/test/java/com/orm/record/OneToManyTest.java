@@ -13,8 +13,8 @@ import org.robolectric.annotation.Config;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.orm.SugarRecord.save;
 import static com.orm.SugarRecord.findById;
+import static com.orm.SugarRecord.save;
 
 /**
  * Created by Łukasz Wesołowski on 28.07.2016.
