@@ -1,22 +1,23 @@
 package com.orm.helper;
 
+import com.orm.app.ClientApp;
+import com.orm.dsl.BuildConfig;
 import com.orm.model.TestRecord;
 import com.orm.util.ReflectionUtil;
-
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
+import static com.orm.helper.NamingHelper.*;
+import static junit.framework.Assert.*;
 
-import static com.orm.helper.NamingHelper.toColumnName;
-import static com.orm.helper.NamingHelper.toTableName;
-import static com.orm.helper.NamingHelper.toSQLNameDefault;
-
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
 public final class NamingHelperTest {
 
     @Test(expected = IllegalAccessException.class)
