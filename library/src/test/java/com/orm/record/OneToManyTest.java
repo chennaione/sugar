@@ -2,8 +2,10 @@ package com.orm.record;
 
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
-import com.orm.model.ManyToOneModel;
-import com.orm.model.OneToManyModel;
+import com.orm.model.onetomany.OneToManyRelationModel;
+import com.orm.model.onetomany.OneToManyModel;
+import com.orm.model.onetomany.WithoutOneToManyAnnotationModel;
+import com.orm.model.onetomany.WithoutOneToManyAnnotationRelationModel;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +33,7 @@ public class OneToManyTest {
         save(model);
 
         for (long i : relationIds) {
-            save(new ManyToOneModel(i, model));
+            save(new OneToManyRelationModel(i, model));
         }
 
         OneToManyModel result = findById(OneToManyModel.class, 1l);
@@ -55,14 +57,14 @@ public class OneToManyTest {
         save(model);
 
         for (long i : Arrays.asList(1l, 2l, 3l, 4l)) {
-            save(new ManyToOneModel(i, model));
+            save(new OneToManyRelationModel(i, model));
         }
 
         OneToManyModel result = findById(OneToManyModel.class, 1l);
 
         Assert.assertEquals(4, result.getModels().size());
 
-        ManyToOneModel.deleteAll(ManyToOneModel.class, "id = ?", String.valueOf(3l));
+        OneToManyRelationModel.deleteAll(OneToManyRelationModel.class, "id = ?", String.valueOf(3l));
 
         result = findById(OneToManyModel.class, 1l);
 
@@ -79,7 +81,7 @@ public class OneToManyTest {
         save(model);
 
         for (long i : Arrays.asList(1l, 2l, 3l, 4l)) {
-            save(new ManyToOneModel(i, model));
+            save(new OneToManyRelationModel(i, model));
         }
 
         OneToManyModel result = findById(OneToManyModel.class, 1l);
@@ -100,10 +102,10 @@ public class OneToManyTest {
         save(model);
 
         for (long i : relationIds) {
-            save(new ManyToOneModel(i, model));
+            save(new OneToManyRelationModel(i, model));
         }
 
-        save(new ManyToOneModel(5l, null));
+        save(new OneToManyRelationModel(5l, null));
 
         OneToManyModel result = findById(OneToManyModel.class, 1l);
 
@@ -118,5 +120,20 @@ public class OneToManyTest {
         Assert.assertEquals(result, result.getModels().get(1).getModel());
         Assert.assertEquals(result, result.getModels().get(2).getModel());
         Assert.assertEquals(result, result.getModels().get(3).getModel());
+    }
+
+    @Test
+    public void shouldNotInflateList() {
+        List<Long> relationIds = Arrays.asList(1l, 2l, 3l, 4l);
+        WithoutOneToManyAnnotationModel model = new WithoutOneToManyAnnotationModel(1l);
+        save(model);
+
+        for (long i : relationIds) {
+            save(new WithoutOneToManyAnnotationRelationModel(i, model));
+        }
+
+        WithoutOneToManyAnnotationModel result = findById(WithoutOneToManyAnnotationModel.class, 1l);
+
+        Assert.assertEquals(null, result.getModels());
     }
 }

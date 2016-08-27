@@ -29,7 +29,7 @@ public class ListFieldInflater extends FieldInflater {
                 String targetName = field.getAnnotation(OneToMany.class).targetField();
                 field.set(object, SugarRecord.findOneToMany(genericListClass, targetName, object, objectId));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, String.format("Error while inflating list field %s", field), e);
             }
         } else {
             Log.w(LOG_TAG, String.format("List field %s has not OneToMany annotation", field));

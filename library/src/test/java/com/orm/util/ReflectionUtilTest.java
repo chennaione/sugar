@@ -72,7 +72,7 @@ public final class ReflectionUtilTest {
     @Test
     public void testGetAllClasses() {
         List<Class> classes = ReflectionUtil.getDomainClasses();
-        Assert.assertEquals(43, classes.size());
+        Assert.assertEquals(45, classes.size());
     }
 
     @Test(expected = NoSuchFieldException.class)
