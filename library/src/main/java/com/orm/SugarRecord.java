@@ -142,7 +142,7 @@ public class SugarRecord {
         return findById(type, Long.valueOf(id));
     }
 
-    public static <T> List<T> findById(Class<T> type, String[] ids) {
+    public static <T> List<T> findById(Class<T> type, String... ids) {
         String whereClause = "id IN (" + QueryBuilder.generatePlaceholders(ids.length) + ")";
         return find(type, whereClause, ids);
     }
@@ -251,7 +251,7 @@ public class SugarRecord {
         return count(type, null, null, null, null, null);
     }
 
-    public static <T> long count(Class<T> type, String whereClause, String[] whereArgs) {
+    public static <T> long count(Class<T> type, String whereClause, String... whereArgs) {
     	return count(type, whereClause, whereArgs, null, null, null);
     }
 
