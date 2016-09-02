@@ -134,6 +134,8 @@ public final class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
+                } else if (columnType.equals(List.class)) {
+                    //ignore
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);

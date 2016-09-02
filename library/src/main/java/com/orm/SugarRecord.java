@@ -7,24 +7,17 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.orm.annotation.Table;
 import com.orm.annotation.Unique;
-import com.orm.dsl.BuildConfig;
 import com.orm.helper.ManifestHelper;
 import com.orm.helper.NamingHelper;
+import com.orm.inflater.EntityInflater;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static com.orm.SugarContext.getSugarContext;
 
@@ -198,7 +191,7 @@ public class SugarRecord {
     public static <T> List<T> findWithQuery(Class<T> type, String query, String... arguments) {
         Cursor cursor = getSugarDataBase().rawQuery(query, arguments);
 
-        return  getEntitiesFromCursor(cursor, type);
+        return getEntitiesFromCursor(cursor, type);
     }
 
     public static void executeQuery(String query, String... arguments) {
@@ -216,13 +209,33 @@ public class SugarRecord {
         return getEntitiesFromCursor(cursor, type);
     }
 
+    public static <T> List<T> findOneToMany(Class<T> type, String relationFieldName, Object relationObject, Long relationObjectId) {
+        String args[] = { String.valueOf(relationObjectId) };
+        String whereClause = NamingHelper.toSQLNameDefault(relationFieldName) + " = ?";
+
+        Cursor cursor = getSugarDataBase().query(NamingHelper.toTableName(type), null, whereClause, args,
+                null, null, null, null);
+
+        return getEntitiesFromCursor(cursor, type, relationFieldName, relationObject);
+    }
+
     public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type){
+        return getEntitiesFromCursor(cursor, type, null, null);
+    }
+
+    public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type, String relationFieldName, Object relationObject){
         T entity;
         List<T> result = new ArrayList<>();
         try {
             while (cursor.moveToNext()) {
                 entity = type.getDeclaredConstructor().newInstance();
-                inflate(cursor, entity, getSugarContext().getEntitiesMap());
+                new EntityInflater()
+                        .withCursor(cursor)
+                        .withObject(entity)
+                        .withEntitiesMap(getSugarContext().getEntitiesMap())
+                        .withRelationFieldName(relationFieldName)
+                        .withRelationObject(relationObject)
+                        .inflate();
                 result.add(entity);
             }
         } catch (Exception e) {
@@ -390,28 +403,6 @@ public class SugarRecord {
         return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
 
-    private static void inflate(Cursor cursor, Object object, Map<Object, Long> entitiesMap) {
-        List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
-        if (!entitiesMap.containsKey(object)) {
-            entitiesMap.put(object, cursor.getLong(cursor.getColumnIndex(("ID"))));
-        }
-
-        for (Field field : columns) {
-        	field.setAccessible(true);
-            Class<?> fieldType = field.getType();
-            if (isSugarEntity(fieldType)) {
-                try {
-                    long id = cursor.getLong(cursor.getColumnIndex(NamingHelper.toColumnName(field)));
-                    field.set(object, (id > 0) ? findById(fieldType, id) : null);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                ReflectionUtil.setFieldValueFromCursor(cursor, field, object);
-            }
-        }
-    }
-
     public boolean delete() {
         Long id = getId();
         Class<?> type = getClass();
@@ -478,7 +469,11 @@ public class SugarRecord {
 
     @SuppressWarnings("unchecked")
     void inflate(Cursor cursor) {
-        inflate(cursor, this, getSugarContext().getEntitiesMap());
+        new EntityInflater()
+                .withCursor(cursor)
+                .withObject(this)
+                .withEntitiesMap(getSugarContext().getEntitiesMap())
+                .inflate();
     }
 
     public Long getId() {
@@ -516,7 +511,11 @@ public class SugarRecord {
 
             try {
                 entity = type.getDeclaredConstructor().newInstance();
-                inflate(cursor, entity, getSugarContext().getEntitiesMap());
+                new EntityInflater()
+                        .withCursor(cursor)
+                        .withObject(entity)
+                        .withEntitiesMap(getSugarContext().getEntitiesMap())
+                        .inflate();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
