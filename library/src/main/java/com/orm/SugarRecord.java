@@ -376,7 +376,7 @@ public class SugarRecord {
                     String columnName = NamingHelper.toColumnName(column);
                     Object columnValue = column.get(object);
 
-                    whereClause.append(columnName).append(" = ?");
+                    whereClause.append(whereClause.toString().contains("?") ? " AND " : "").append(columnName).append(" = ?");
                     whereArgs.add(String.valueOf(columnValue));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
