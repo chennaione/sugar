@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.orm.SugarContext;
+import com.orm.SugarRecord;
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.TestRecord;
+import com.orm.model.foreignnull.OriginRecord;
 import com.orm.query.Select;
 
 import junit.framework.Assert;
@@ -87,5 +89,11 @@ public final class ReflectionUtilTest {
         Field field = TestRecord.class.getField("name");
 
         ReflectionUtil.setFieldValueFromCursor(cursor, field, testRecord);
+    }
+
+    @Test
+    public void testForeignNull() throws NoSuchFieldException {
+        final OriginRecord record = new OriginRecord(null,null);
+        SugarRecord.save(record);
     }
 }
