@@ -1,7 +1,5 @@
 package com.orm;
 
-import com.orm.SugarContext;
-
 import android.app.Application;
 
 public class SugarApp extends Application {

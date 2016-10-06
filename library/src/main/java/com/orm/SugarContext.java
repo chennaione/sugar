@@ -2,21 +2,22 @@ package com.orm;
 
 import android.content.Context;
 
-import com.google.common.collect.MapMaker;
+import com.orm.util.ContextUtil;
 
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class SugarContext {
 
+    private static SugarDbConfiguration dbConfiguration = null;
     private static SugarContext instance = null;
     private SugarDb sugarDb;
-    private Context context;
-    private ConcurrentMap<Object, Long> entitiesMap;
+    private Map<Object, Long> entitiesMap;
 
-    private SugarContext(Context context) {
-        this.context = context;
-        this.sugarDb = new SugarDb(context);
-        this.entitiesMap = new MapMaker().weakKeys().makeMap();
+    private SugarContext() {
+        this.sugarDb = SugarDb.getInstance();
+        this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
     }
     
     public static SugarContext getSugarContext() {
@@ -27,14 +28,23 @@ public class SugarContext {
     }
 
     public static void init(Context context) {
-        instance = new SugarContext(context);
+        ContextUtil.init(context);
+        instance = new SugarContext();
+        dbConfiguration = null;
     }
+
+    public static void init(Context context, SugarDbConfiguration configuration) {
+        init(context);
+        dbConfiguration = configuration;
+    }
+
 
     public static void terminate() {
         if (instance == null) {
             return;
         }
         instance.doTerminate();
+        ContextUtil.terminate();
     }
 
     /*
@@ -49,11 +59,15 @@ public class SugarContext {
         }
     }
 
-    protected SugarDb getSugarDb() {
+    public static SugarDbConfiguration getDbConfiguration() {
+        return dbConfiguration;
+    }
+
+    public SugarDb getSugarDb() {
         return sugarDb;
     }
 
-    ConcurrentMap<Object, Long> getEntitiesMap() {
+    public Map<Object, Long> getEntitiesMap() {
         return entitiesMap;
     }
 }

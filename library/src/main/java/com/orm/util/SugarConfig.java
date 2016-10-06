@@ -1,20 +1,14 @@
 package com.orm.util;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.util.Log;
-
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class SugarConfig {
 
-    static Map<Class<?>, List<Field>> fields = new HashMap<Class<?>, List<Field>>();
+    static Map<Class<?>, List<Field>> fields = new HashMap<>();
 
     public static void setFields(Class<?> clazz, List<Field> fieldz) {
          fields.put(clazz, fieldz);
@@ -31,7 +25,6 @@ public class SugarConfig {
 
     public static void clearCache() {
         fields.clear();
-        fields = new HashMap<Class<?>, List<Field>>();
+        fields = new HashMap<>();
     }
-
 }

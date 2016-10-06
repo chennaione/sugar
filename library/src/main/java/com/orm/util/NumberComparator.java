@@ -2,9 +2,12 @@ package com.orm.util;
 
 import java.util.Comparator;
 
+import static java.lang.Character.isDigit;
+import static java.lang.Character.isSpaceChar;
+
 public class NumberComparator implements Comparator<Object> {
 
-    private static char charAt(String s, int i) {
+    protected static char charAt(String s, int i) {
         if (i >= s.length()) {
             return '\000';
         }
@@ -12,7 +15,7 @@ public class NumberComparator implements Comparator<Object> {
         return s.charAt(i);
     }
 
-    private int compareRight(String a, String b) {
+    protected int compareRight(String a, String b) {
         int bias = 0;
         int ia = 0;
         int ib = 0;
@@ -20,13 +23,13 @@ public class NumberComparator implements Comparator<Object> {
             char ca = charAt(a, ia);
             char cb = charAt(b, ib);
 
-            if ((!Character.isDigit(ca)) && (!Character.isDigit(cb))) {
+            if ((!isDigit(ca)) && (!isDigit(cb))) {
                 return bias;
             }
-            if (!Character.isDigit(ca)) {
+            if (!isDigit(ca)) {
                 return -1;
             }
-            if (!Character.isDigit(cb)) {
+            if (!isDigit(cb)) {
                 return 1;
             }
             if (ca < cb) {
@@ -49,15 +52,15 @@ public class NumberComparator implements Comparator<Object> {
 
         int ia = 0;
         int ib = 0;
-        int nza = 0;
-        int nzb = 0;
+        int nza;
+        int nzb;
         while (true) {
             nza = nzb = 0;
 
             char ca = charAt(a, ia);
             char cb = charAt(b, ib);
 
-            while ((Character.isSpaceChar(ca)) || (ca == '0')) {
+            while ((isSpaceChar(ca)) || (ca == '0')) {
                 if (ca == '0') {
                     nza++;
                 } else {
@@ -67,7 +70,7 @@ public class NumberComparator implements Comparator<Object> {
                 ca = charAt(a, ++ia);
             }
 
-            while ((Character.isSpaceChar(cb)) || (cb == '0')) {
+            while ((isSpaceChar(cb)) || (cb == '0')) {
                 if (cb == '0') {
                     nzb++;
                 } else {
@@ -77,7 +80,7 @@ public class NumberComparator implements Comparator<Object> {
                 cb = charAt(b, ++ib);
             }
             int result;
-            if ((Character.isDigit(ca)) && (Character.isDigit(cb)) &&
+            if ((isDigit(ca)) && (isDigit(cb)) &&
                     ((result = compareRight(a.substring(ia), b.substring(ib))) != 0)) {
                 return result;
             }
