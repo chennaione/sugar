@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: '../maven_push.gradle'
+//apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion 23
@@ -25,10 +25,13 @@ android {
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.0'
+    compile 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
 }
 
+
+
 task libraryJar(type: Jar) {
-    dependsOn assembleRelease
+    dependsOn "assembleRelease"
     from android.sourceSets.main.java.srcDirs,
          ['build/intermediates/classes/release/'] // Add the release classes into the jar
     baseName 'sugar'

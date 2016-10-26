@@ -1,6 +1,6 @@
 package com.orm.helper;
 
-import android.database.sqlite.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteDatabase;
 import android.util.Log;
 
 import static com.orm.SugarContext.getSugarContext;

@@ -1,7 +1,7 @@
 package com.orm.util;
 
-import android.database.Cursor;
-import android.database.CursorWrapper;
+import net.sqlcipher.Cursor;
+import net.sqlcipher.CursorWrapper;
 
 public class SugarCursor extends CursorWrapper {
 

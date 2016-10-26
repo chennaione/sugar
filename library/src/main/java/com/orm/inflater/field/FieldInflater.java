@@ -20,5 +20,5 @@ public abstract class FieldInflater {
         this.fieldType = fieldType;
     }
 
-    public abstract void inflate();
+    public abstract void  inflate();
 }

@@ -1,7 +1,7 @@
 package com.orm;
 
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.orm.dsl.BuildConfig;
@@ -35,18 +35,18 @@ public class SugarDb extends SQLiteOpenHelper {
         schemaGenerator.createDatabase(sqLiteDatabase);
     }
 
-    @Override
-    public void onConfigure(SQLiteDatabase db) {
-        final SugarDbConfiguration configuration = getDbConfiguration();
-
-        if (null != configuration) {
-            db.setLocale(configuration.getDatabaseLocale());
-            db.setMaximumSize(configuration.getMaxSize());
-            db.setPageSize(configuration.getPageSize());
-        }
-
-        super.onConfigure(db);
-    }
+//    @Override
+//    public void onConfigure(SQLiteDatabase db) {
+//        final SugarDbConfiguration configuration = getDbConfiguration();
+//
+//        if (null != configuration) {
+//            db.setLocale(configuration.getDatabaseLocale());
+//            db.setMaximumSize(configuration.getMaxSize());
+//            db.setPageSize(configuration.getPageSize());
+//        }
+//
+//        super.onConfigure(db);
+//    }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
@@ -55,19 +55,20 @@ public class SugarDb extends SQLiteOpenHelper {
 
     public synchronized SQLiteDatabase getDB() {
         if (this.sqLiteDatabase == null) {
-            this.sqLiteDatabase = getWritableDatabase();
+            this.sqLiteDatabase = getWritableDatabase(ManifestHelper.getEncryptionKey());
         }
+        openedConnections++;
 
         return this.sqLiteDatabase;
     }
 
     @Override
-    public synchronized SQLiteDatabase getReadableDatabase() {
+    public synchronized SQLiteDatabase getReadableDatabase(String password) {
         if(ManifestHelper.isDebugEnabled()) {
             Log.d(LOG_TAG, "getReadableDatabase");
         }
         openedConnections++;
-        return super.getReadableDatabase();
+        return super.getReadableDatabase(password);
     }
 
     @Override

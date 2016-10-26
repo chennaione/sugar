@@ -24,6 +24,8 @@ public final class ManifestHelper {
     public final static String METADATA_VERSION = "VERSION";
     public final static String METADATA_DOMAIN_PACKAGE_NAME = "DOMAIN_PACKAGE_NAME";
     public final static String METADATA_QUERY_LOG = "QUERY_LOG";
+    public final static String METADATA_DB_PASSWORD = "DB_PASSWORD";
+
 
     /**
      * The default name for the database unless specified in the AndroidManifest.
@@ -39,6 +41,12 @@ public final class ManifestHelper {
      * @return the database version as specified by the {@link #METADATA_VERSION} version or 1 of
      *         not present
      */
+
+    public static String getEncryptionKey() {
+        String encryptionKey = getMetaDataString(METADATA_DB_PASSWORD);
+        return encryptionKey;
+    }
+
     public static int getDatabaseVersion() {
         Integer databaseVersion = getMetaDataInteger(METADATA_VERSION);
 

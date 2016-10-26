@@ -1,10 +1,10 @@
 package com.orm.util;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
-import android.database.sqlite.SQLiteCursorDriver;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQuery;
+import net.sqlcipher.Cursor;
+import net.sqlcipher.database.SQLiteCursor;
+import net.sqlcipher.database.SQLiteCursorDriver;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteQuery;
 import android.util.Log;
 
 public class SugarCursorFactory implements SQLiteDatabase.CursorFactory {
@@ -31,5 +31,6 @@ public class SugarCursorFactory implements SQLiteDatabase.CursorFactory {
 
         return new SQLiteCursor(sqLiteDatabase, sqLiteCursorDriver, editTable, sqLiteQuery);
     }
+
 
 }
