@@ -6,9 +6,11 @@
 - Clone this branch to you Project root folder
 - Follow [How to use master version](#usemasterv)
 - Add a meta property named DB_PASSWORD in your manifest file along with other Sugar configuration as follows:
+```
           <meta-data
            android:name="DB_PASSWORD"
            android:value="your_DB_ENCRYPTION_KEY_here"/>
+```
 
 You're good to go. Use Sugar as usual and your database is encrypted now.
 
