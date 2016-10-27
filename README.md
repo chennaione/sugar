@@ -1,4 +1,4 @@
-#Sugar Cipher using Sugar ORM v2.5
+#Sugar Cipher using Sugar ORM v2.4
  by Ethan Tam(sbhkin)
 
 
