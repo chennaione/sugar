@@ -1,55 +1,20 @@
-# Sugar ORM [![Build Status](https://travis-ci.org/satyan/sugar.svg?branch=master)](https://travis-ci.org/satyan/sugar) [![Coverage Status](https://coveralls.io/repos/satyan/sugar/badge.svg?branch=master)](https://coveralls.io/r/satyan/sugar?branch=master) [![Code Triagers Badge](http://www.codetriage.com/satyan/sugar/badges/users.svg)](http://www.codetriage.com/satyan/sugar)
-
-[![Join the chat at https://gitter.im/satyan/sugar](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/satyan/sugar?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Insanely easy way to work with Android databases.
-
-Official documentation can be found [here](http://satyan.github.io/sugar) - Check some examples below. The example application is provided in the **example** folder in the source.
-
-## Features
-
-Sugar ORM was built in contrast to other ORM's to have:
-
-- A simple, concise, and clean integration process with minimal configuration.
-- Automatic table and column naming through reflection.
-- Support for migrations between different schema versions.
-
-## Installing
-
-There are four ways to install Sugar:
-
-#### As a Gradle dependency
-
-This is the preferred way. Simply add:
-
-```groovy
-compile 'com.github.satyan:sugar:1.5'
-```
-
-to your project dependencies and run `gradle build` or `gradle assemble`.
-
-#### As a Maven dependency
-
-Declare the dependency in Maven:
-
-```xml
-<dependency>
-    <groupId>com.github.satyan</groupId>
-    <artifactId>sugar</artifactId>
-    <version>1.5</version>
-</dependency>
-```
-
-#### As a library project
-
-Download the source code and import it as a library project in Eclipse. The project is available in the folder **library**. For more information on how to do this, read [here](http://developer.android.com/tools/projects/index.html#LibraryProjects).
-
-#### As a jar
-
-Visit the [releases](https://github.com/satyan/sugar/releases) page to download jars directly. You can drop them into your `libs` folder and configure the Java build path to include the library. See this [tutorial](http://www.vogella.com/tutorials/AndroidLibraryProjects/article.html) for an excellent guide on how to do this.
+#Sugar Cipher using Sugar ORM v2.5
+ by Ethan Tam(sbhkin)
 
 
-### How to use master version
+- Extract the libs and assets into your application. This dependency is not included in the sugar library.
+- Clone this branch to you Project root folder
+- Follow [How to use master version](#usemasterv)
+- Add a meta property named DB_PASSWORD in your manifest file along with other Sugar configuration as follows:
+          <meta-data
+           android:name="DB_PASSWORD"
+           android:value="your_DB_ENCRYPTION_KEY_here"/>
+
+You're good to go. Use Sugar as usual and your database is encrypted now.
+
+# Sugar ORM
+
+###  <a link = "usemasterv"></a>How to use master version
 First, download sugar repository
 ```
 git clone git@github.com:satyan/sugar.git
@@ -89,7 +54,7 @@ You should also comment this line just comment this line (library/build.gradle):
 ```
 ===================
 
-After installing, check out how to set up your first database and models [here](http://satyan.github.io/sugar/getting-started.html) **Outdated**. Check examples of 1.4 and master below: 
+After installing, check out how to set up your first database and models [here](http://satyan.github.io/sugar/getting-started.html) **Outdated**. Check examples of 1.4 and master below:
 
 ## Examples
 ### SugarRecord
@@ -126,7 +91,7 @@ book.save();
 
 or
 ```java
-SugarRecord.save(book); // if using the @Table annotation 
+SugarRecord.save(book); // if using the @Table annotation
 ```
 
 ### Load Entity
@@ -151,7 +116,7 @@ book.delete();
 
 or
 ```java
-SugarRecord.delete(book); // if using the @Table annotation 
+SugarRecord.delete(book); // if using the @Table annotation
 ```
 
 ### Update Entity based on Unique values
@@ -168,7 +133,7 @@ book.getId() == sameBook.getId(); // true
 
 or
 ```java
-SugarRecord.update(sameBook); // if using the @Table annotation 
+SugarRecord.update(sameBook); // if using the @Table annotation
 ```
 
 ### Bulk Insert
