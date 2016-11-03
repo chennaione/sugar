@@ -266,7 +266,7 @@ public class SchemaGenerator {
 
             String[] constraintFields = constraint.split(",");
             for(int i = 0; i < constraintFields.length; i++) {
-                String columnName = NamingHelper.toSQLNameDefault(constraintFields[i]);
+                String columnName = constraintFields[i];
                 sb.append(columnName);
 
                 if(i < (constraintFields.length -1)) {
