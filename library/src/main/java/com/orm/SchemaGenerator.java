@@ -44,8 +44,8 @@ public class SchemaGenerator {
         return new SchemaGenerator();
     }
 
-    public void createDatabase(SQLiteDatabase sqLiteDatabase) {
-        List<Class> domainClasses = getDomainClasses();
+    public void createDatabase(SQLiteDatabase sqLiteDatabase, List<Class> modelsClasses) {
+        List<Class> domainClasses = modelsClasses == null ? getDomainClasses() : modelsClasses;
         for (Class domain : domainClasses) {
             createTable(domain, sqLiteDatabase);
             afterTableCreated(domain,sqLiteDatabase);
@@ -59,8 +59,8 @@ public class SchemaGenerator {
 
     }
 
-    public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        List<Class> domainClasses = getDomainClasses();
+    public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion, List<Class> modelsClasses) {
+        List<Class> domainClasses = modelsClasses == null ? getDomainClasses() : modelsClasses;
         String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
 
         for (Class domain : domainClasses) {
