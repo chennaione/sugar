@@ -30,6 +30,10 @@ public class SugarDb extends SQLiteOpenHelper {
         schemaGenerator = SchemaGenerator.getInstance();
     }
 
+    public static SugarDb getInstance() {
+        return new SugarDb(null);
+    }
+
     public static SugarDb getInstance(List<Class> modelsClasses) {
         return new SugarDb(modelsClasses);
     }

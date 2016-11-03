@@ -131,7 +131,7 @@ public final class SchemaGeneratorTest {
         SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
 
-        schemaGenerator.createDatabase(sqLiteDatabase);
+        schemaGenerator.createDatabase(sqLiteDatabase, null);
         String sql = "select count(*) from sqlite_master where type='table';";
 
         Cursor c = sqLiteDatabase.rawQuery(sql, null);
@@ -150,7 +150,7 @@ public final class SchemaGeneratorTest {
         SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
 
-        schemaGenerator.createDatabase(sqLiteDatabase);
+        schemaGenerator.createDatabase(sqLiteDatabase, null);
         schemaGenerator.deleteTables(sqLiteDatabase);
 
         String sql = "select count(*) from sqlite_master where type='table';";
