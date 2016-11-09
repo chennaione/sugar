@@ -78,9 +78,11 @@ public final class ReflectionUtil {
                 try {
                     field = columnType.getDeclaredField("id");
                     field.setAccessible(true);
-                    values.put(columnName,
-                            (field != null)
-                                    ? String.valueOf(field.get(columnValue)) : "0");
+                    if(columnValue != null) {
+                        values.put(columnName,String.valueOf(field.get(columnValue)));
+                    } else {
+                        values.putNull(columnName);
+                    }
                 } catch (NoSuchFieldException e) {
                     if (entitiesMap.containsKey(columnValue)) {
                         values.put(columnName, entitiesMap.get(columnValue));
