@@ -59,7 +59,7 @@ public class ReflectionUtil {
     }
 
     public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
-                                             Map<Object, Long> entitiesMap) {
+                                             Map<Object, Long> entitiesMap, boolean updateIfNull) {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
@@ -86,50 +86,62 @@ public class ReflectionUtil {
                                 : "0");
             } else {
                 if (columnType.equals(Short.class) || columnType.equals(short.class)) {
-                    values.put(columnName, (Short) columnValue);
+                    if (updateIfNull || columnValue != null)
+                        values.put(columnName, (Short) columnValue);
                 } else if (columnType.equals(Integer.class) || columnType.equals(int.class)) {
-                    values.put(columnName, (Integer) columnValue);
+                    if (updateIfNull || columnValue != null)
+                        values.put(columnName, (Integer) columnValue);
                 } else if (columnType.equals(Long.class) || columnType.equals(long.class)) {
-                    values.put(columnName, (Long) columnValue);
+                    if (updateIfNull || columnValue != null)
+                        values.put(columnName, (Long) columnValue);
                 } else if (columnType.equals(Float.class) || columnType.equals(float.class)) {
-                    values.put(columnName, (Float) columnValue);
+                    if (updateIfNull || columnValue != null)
+                        values.put(columnName, (Float) columnValue);
                 } else if (columnType.equals(Double.class) || columnType.equals(double.class)) {
-                    values.put(columnName, (Double) columnValue);
+                    if (updateIfNull || columnValue != null)
+                        values.put(columnName, (Double) columnValue);
                 } else if (columnType.equals(Boolean.class) || columnType.equals(boolean.class)) {
-                    values.put(columnName, (Boolean) columnValue);
+                    if (updateIfNull || columnValue != null)
+                        values.put(columnName, (Boolean) columnValue);
                 } else if (columnType.equals(BigDecimal.class)) {
                     try {
                         values.put(columnName, column.get(object).toString());
                     } catch (NullPointerException e) {
-                        values.putNull(columnName);
+                        if (updateIfNull)
+                            values.putNull(columnName);
                     }
                 } else if (Timestamp.class.equals(columnType)) {
                     try {
                         values.put(columnName, ((Timestamp) column.get(object)).getTime());
                     } catch (NullPointerException e) {
-                        values.put(columnName, (Long) null);
+                        if (updateIfNull)
+                            values.put(columnName, (Long) null);
                     }
                 } else if (Date.class.equals(columnType)) {
                     try {
                         values.put(columnName, ((Date) column.get(object)).getTime());
                     } catch (NullPointerException e) {
-                        values.put(columnName, (Long) null);
+                        if (updateIfNull)
+                            values.put(columnName, (Long) null);
                     }
                 } else if (Calendar.class.equals(columnType)) {
                     try {
                         values.put(columnName, ((Calendar) column.get(object)).getTimeInMillis());
                     } catch (NullPointerException e) {
-                        values.put(columnName, (Long) null);
+                        if (updateIfNull)
+                            values.put(columnName, (Long) null);
                     }
                 } else if (columnType.equals(byte[].class)) {
                     if (columnValue == null) {
-                        values.put(columnName, "".getBytes());
+                        if (updateIfNull)
+                            values.put(columnName, "".getBytes());
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
                 } else {
                     if (columnValue == null) {
-                        values.putNull(columnName);
+                        if (updateIfNull)
+                            values.putNull(columnName);
                     } else if (columnType.isEnum()) {
                         values.put(columnName, ((Enum) columnValue).name());
                     } else {
