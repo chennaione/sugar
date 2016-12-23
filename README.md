@@ -6,6 +6,11 @@ Insanely easy way to work with Android databases.
 
 Official documentation can be found [here](http://satyan.github.io/sugar) - Check some examples below. The example application is provided in the **example** folder in the source.
 
+## Looking for contributors
+We need contributors to help maintain this project, ask @satyan for repo permission
+
+Otherwise you can use another ORM, like https://github.com/requery/requery or https://realm.io/
+
 ## Features
 
 Sugar ORM was built in contrast to other ORM's to have:
