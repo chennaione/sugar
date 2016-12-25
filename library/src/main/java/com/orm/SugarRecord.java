@@ -2,6 +2,7 @@ package com.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
@@ -311,6 +312,40 @@ public class SugarRecord {
         return result;
     }
 
+    public static <T> float average(Class<T> type, String[] fields) {
+        return average(type, fields, null, null);
+    }
+
+    public static <T> float average(Class<T> type, String[] fields, String whereClause, String... whereArgs) {
+        long result = -1;
+        String filter = (!TextUtils.isEmpty(whereClause)) ? "where" + whereClause : "";
+        SQLiteStatement statement;
+
+        String average = "( " + TextUtils.join(",", fields) + " )";
+        try {
+            statement = getSugarDataBase().compileStatement("SELECT average" + average + " FROM "
+                    + NamingHelper.toTableName(type) + filter);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return result;
+        }
+        if (whereArgs != null) {
+
+        }
+
+        return result;
+    }
+
+    public static <T> long max(Class<T> type, String[] fields) {
+        return max(type, fields, null, null);
+    }
+
+    public static <T> long max(Class<T> type, String[] fields, String whereClause, String... whereArgs) {
+        long result = -1;
+
+        return result;
+    }
+
     public static long save(Object object) {
         return save(getSugarDataBase(), object);
     }
@@ -403,22 +438,6 @@ public class SugarRecord {
         return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
 
-    public boolean delete() {
-        Long id = getId();
-        Class<?> type = getClass();
-        if (id != null && id > 0L) {
-            if(ManifestHelper.isDebugEnabled()) {
-                Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
-            }
-            return getSugarDataBase().delete(NamingHelper.toTableName(type), "Id=?", new String[]{id.toString()}) == 1;
-        } else {
-            if(ManifestHelper.isDebugEnabled()) {
-                Log.i(SUGAR, "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
-            }
-            return false;
-        }
-    }
-
     public static boolean delete(Object object) {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
@@ -428,23 +447,23 @@ public class SugarRecord {
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
                     boolean deleted = getSugarDataBase().delete(NamingHelper.toTableName(type), "Id=?", new String[]{id.toString()}) == 1;
-                    if(ManifestHelper.isDebugEnabled()) {
+                    if (ManifestHelper.isDebugEnabled()) {
                         Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
                     }
                     return deleted;
                 } else {
-                    if(ManifestHelper.isDebugEnabled()) {
+                    if (ManifestHelper.isDebugEnabled()) {
                         Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - object has not been saved");
                     }
                     return false;
                 }
             } catch (NoSuchFieldException e) {
-                if(ManifestHelper.isDebugEnabled()) {
+                if (ManifestHelper.isDebugEnabled()) {
                     Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
                 }
                 return false;
             } catch (IllegalAccessException e) {
-                if(ManifestHelper.isDebugEnabled()) {
+                if (ManifestHelper.isDebugEnabled()) {
                     Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
                 }
                 return false;
@@ -454,6 +473,35 @@ public class SugarRecord {
         } else {
             if(ManifestHelper.isDebugEnabled()) {
                 Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
+            }
+            return false;
+        }
+    }
+
+    public static String[] replaceArgs(String[] args) {
+
+        String[] replace = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+
+            replace[i] = (args[i].equals("true")) ? replace[i] = "1" : (args[i].equals("false")) ? replace[i] = "0" : args[i];
+
+        }
+
+        return replace;
+
+    }
+
+    public boolean delete() {
+        Long id = getId();
+        Class<?> type = getClass();
+        if (id != null && id > 0L) {
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
+            }
+            return getSugarDataBase().delete(NamingHelper.toTableName(type), "Id=?", new String[]{id.toString()}) == 1;
+        } else {
+            if(ManifestHelper.isDebugEnabled()) {
+                Log.i(SUGAR, "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
             }
             return false;
         }
@@ -532,19 +580,6 @@ public class SugarRecord {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    }
-
-    public static String[] replaceArgs(String[] args){
-
-        String [] replace = new String[args.length];
-        for (int i=0; i<args.length; i++){
-
-            replace[i]= (args[i].equals("true")) ? replace[i]="1" : (args[i].equals("false")) ? replace[i]="0" : args[i];
-
-        }
-
-        return replace;
-
     }
 
 }
