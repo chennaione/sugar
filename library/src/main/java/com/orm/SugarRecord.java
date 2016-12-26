@@ -352,6 +352,14 @@ public class SugarRecord {
         String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
         SQLiteStatement statement;
 
+
+        //sanity check
+        for (String field: fields){
+            if (field.isEmpty()) {
+                throw new NullPointerException("Field " + field + " is null.");
+            }
+        }
+
         String maxString = "max( " + TextUtils.join("," ,fields) + " )";
 
         try {
@@ -392,6 +400,12 @@ public class SugarRecord {
             e.printStackTrace();
             return result;
         }
+
+        //sanity check
+        for (String field : fields){
+            if (field.isEmpty()) throw new NullPointerException("Field " + field + " is null.");
+        }
+
 
         if (whereArgs != null){
             for (int i= whereArgs.length - 1; i !=0 ; i--){
