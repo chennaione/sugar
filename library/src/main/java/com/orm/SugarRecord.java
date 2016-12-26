@@ -18,6 +18,7 @@ import com.orm.util.ReflectionUtil;
 import com.orm.util.SugarCursor;
 
 import java.lang.reflect.Field;
+import java.sql.Statement;
 import java.util.*;
 
 import static com.orm.SugarContext.getSugarContext;
@@ -312,27 +313,33 @@ public class SugarRecord {
         return result;
     }
 
-    public static <T> float average(Class<T> type, String[] fields) {
-        return average(type, fields, null, null);
+    public static <T> float average(Class<T> type, String field) {
+        return average(type, field, null, null);
     }
 
-    public static <T> float average(Class<T> type, String[] fields, String whereClause, String... whereArgs) {
+    public static <T> float average(Class<T> type, String field, String whereClause, String... whereArgs) {
         long result = -1;
         String filter = (!TextUtils.isEmpty(whereClause)) ? "where" + whereClause : "";
         SQLiteStatement statement;
 
-        String average = "( " + TextUtils.join(",", fields) + " )";
         try {
-            statement = getSugarDataBase().compileStatement("SELECT average" + average + " FROM "
+            statement = getSugarDataBase().compileStatement("SELECT average(" + field + ") FROM "
                     + NamingHelper.toTableName(type) + filter);
         } catch (SQLException e) {
             e.printStackTrace();
             return result;
         }
         if (whereArgs != null) {
-
+            for (int i = whereArgs.length ; i !=0 ; i--) {
+                statement.bindString(i,whereArgs[i-1]);
+            }
         }
 
+        try {
+            result = statement.simpleQueryForLong();
+        } finally {
+            statement.close();
+        }
         return result;
     }
 
@@ -342,9 +349,65 @@ public class SugarRecord {
 
     public static <T> long max(Class<T> type, String[] fields, String whereClause, String... whereArgs) {
         long result = -1;
+        String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
+        SQLiteStatement statement;
+
+        String maxString = "max( " + TextUtils.join("," ,fields) + " )";
+
+        try {
+            statement = getSugarDataBase().compileStatement("SELECT " + maxString + " FROM "
+                    + NamingHelper.toTableName(type) + filter);
+        } catch (SQLiteException  e) {
+            e.printStackTrace();
+            return result;
+        }
+
+        if (whereArgs != null) {
+            for (int i= whereArgs.length - 1; i !=0 ; i--){
+                statement.bindString(i,whereArgs[i-1]);
+            }
+        }
+
+        try {
+            result = statement.simpleQueryForLong();
+        } finally {
+            statement.close();
+        }
 
         return result;
     }
+
+    public static <T> long min(Class<T> type, String[] fields){return min(type,fields,null,null);}
+
+    public static <T> long min(Class<T> type , String[] fields , String whereClause, String... whereArgs){
+        long result = -1;
+        String filter = (!TextUtils.isEmpty(whereClause)) ? "where" + whereClause : "";
+        SQLiteStatement statement;
+        String minString = "min( " + TextUtils.join("," , fields);
+
+        try {
+            statement = getSugarDataBase().compileStatement("SELECT " + minString + " FROM "
+                    + NamingHelper.toTableName(type) + filter);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            return result;
+        }
+
+        if (whereArgs != null){
+            for (int i= whereArgs.length - 1; i !=0 ; i--){
+                statement.bindString(i,whereArgs[i-1]);
+            }
+        }
+
+        try {
+            result = statement.simpleQueryForLong();
+        } finally {
+            statement.close();
+        }
+        return result;
+    }
+
+
 
     public static long save(Object object) {
         return save(getSugarDataBase(), object);
