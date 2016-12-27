@@ -22,6 +22,7 @@ import java.sql.Statement;
 import java.util.*;
 
 import static com.orm.SugarContext.getSugarContext;
+import static com.orm.SugarContext.init;
 
 public class SugarRecord {
     public static final String SUGAR = "Sugar";
@@ -318,105 +319,86 @@ public class SugarRecord {
     }
 
     public static <T> float average(Class<T> type, String field, String whereClause, String... whereArgs) {
-        long result = -1;
-        String filter = (!TextUtils.isEmpty(whereClause)) ? "where" + whereClause : "";
-        SQLiteStatement statement;
-
-        try {
-            statement = getSugarDataBase().compileStatement("SELECT average(" + field + ") FROM "
-                    + NamingHelper.toTableName(type) + filter);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return result;
-        }
-        if (whereArgs != null) {
-            for (int i = whereArgs.length ; i !=0 ; i--) {
-                statement.bindString(i,whereArgs[i-1]);
-            }
-        }
-
-        try {
-            result = statement.simpleQueryForLong();
-        } finally {
-            statement.close();
-        }
-        return result;
-    }
-
-    public static <T> long max(Class<T> type, String[] fields) {
-        return max(type, fields, null, null);
-    }
-
-    public static <T> long max(Class<T> type, String[] fields, String whereClause, String... whereArgs) {
-        long result = -1;
+        float result = -1;
+        Cursor cursor;
         String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
-        SQLiteStatement statement;
 
-
-        //sanity check
-        for (String field: fields){
-            if (field.isEmpty()) {
-                throw new NullPointerException("Field " + field + " is null.");
-            }
-        }
-
-        String maxString = "max( " + TextUtils.join("," ,fields) + " )";
-
+        if (field.isEmpty()) throw new NullPointerException("field is empty");
         try {
-            statement = getSugarDataBase().compileStatement("SELECT " + maxString + " FROM "
-                    + NamingHelper.toTableName(type) + filter);
-        } catch (SQLiteException  e) {
+            cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
+                    new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
+                    : getSugarDataBase().rawQuery("SELECT AVG( " + field + ") FROM " // raw query
+                    + NamingHelper.toTableName(type) + filter, null);
+        } catch (SQLiteException e){
             e.printStackTrace();
-            return result;
-        }
-
-        if (whereArgs != null) {
-            for (int i= whereArgs.length - 1; i !=0 ; i--){
-                statement.bindString(i,whereArgs[i-1]);
-            }
+            return  result;
         }
 
         try {
-            result = statement.simpleQueryForLong();
+            cursor.moveToFirst();
+            result = cursor.getFloat(0);
         } finally {
-            statement.close();
+            cursor.close();
         }
 
         return result;
     }
 
-    public static <T> long min(Class<T> type, String[] fields){return min(type,fields,null,null);}
+    public static <T> long max(Class<T> type, String field) {
+        return max(type, field, null, null);
+    }
 
-    public static <T> long min(Class<T> type , String[] fields , String whereClause, String... whereArgs){
+    public static <T> long max(Class<T> type, String field, String whereClause, String... whereArgs) {
+        // handles only single column max
         long result = -1;
-        String filter = (!TextUtils.isEmpty(whereClause)) ? "where" + whereClause : "";
-        SQLiteStatement statement;
-        String minString = "min( " + TextUtils.join("," , fields);
+        Cursor cursor;
+        String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
+
+        if (field.isEmpty()) throw new NullPointerException("field "+ field + " is empty.");
 
         try {
-            statement = getSugarDataBase().compileStatement("SELECT " + minString + " FROM "
-                    + NamingHelper.toTableName(type) + filter);
-        } catch (SQLiteException e) {
+            cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
+                    new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
+                    : getSugarDataBase().rawQuery("SELECT MAX( " + field + ") FROM " // raw query
+                    + NamingHelper.toTableName(type) + filter, null);
+        } catch (SQLiteException e){
             e.printStackTrace();
-            return result;
-        }
-
-        //sanity check
-        for (String field : fields){
-            if (field.isEmpty()) throw new NullPointerException("Field " + field + " is null.");
-        }
-
-
-        if (whereArgs != null){
-            for (int i= whereArgs.length - 1; i !=0 ; i--){
-                statement.bindString(i,whereArgs[i-1]);
-            }
+            return  result;
         }
 
         try {
-            result = statement.simpleQueryForLong();
+            cursor.moveToFirst();
+            result = cursor.getLong(0);
         } finally {
-            statement.close();
+            cursor.close();
+        }
+        return result;
+    }
+
+    public static <T> long min(Class<T> type, String field){return min(type,field,null,null);}
+
+    public static <T> long min(Class<T> type , String field , String whereClause, String... whereArgs){
+        long result = -1;
+        Cursor cursor;
+        String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
+
+        if (field.isEmpty()) throw new NullPointerException("field "+ field + " is empty.");
+
+        try {
+            cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
+                    new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
+                    : getSugarDataBase().rawQuery("SELECT MAX( " + field + ") FROM " // raw query
+                    + NamingHelper.toTableName(type) + filter, null);
+        } catch (SQLiteException e){
+            e.printStackTrace();
+            return  result;
+        }
+
+        try {
+            cursor.moveToFirst();
+            result = cursor.getLong(0);
+        } finally {
+            cursor.close();
         }
         return result;
     }
@@ -511,7 +493,7 @@ public class SugarRecord {
         }
     }
 
-    public static boolean isSugarEntity(Class<?> objectClass) {
+        public static boolean isSugarEntity(Class<?> objectClass) {
         return objectClass.isAnnotationPresent(Table.class) || SugarRecord.class.isAssignableFrom(objectClass);
     }
 
