@@ -387,7 +387,7 @@ public class SugarRecord {
         try {
             cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
                     new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
-                    : getSugarDataBase().rawQuery("SELECT MAX( " + field + ") FROM " // raw query
+                    : getSugarDataBase().rawQuery("SELECT MIN( " + field + ") FROM " // raw query
                     + NamingHelper.toTableName(type) + filter, null);
         } catch (SQLiteException e){
             e.printStackTrace();
