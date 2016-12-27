@@ -322,11 +322,12 @@ public class SugarRecord {
         float result = -1;
         Cursor cursor;
         String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
+        String whereField = (!TextUtils.isEmpty(field))? "AVG( " + field + " ) " : "";
 
-        if (field.isEmpty()) throw new NullPointerException("field is empty");
+        if (whereField.isEmpty()) throw new NullPointerException("field " + field + "is empty");
         try {
             cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
-                    new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
+                    new String[]{whereField}, whereClause, whereArgs, null, null, null) // default helper method
                     : getSugarDataBase().rawQuery("SELECT AVG( " + field + ") FROM " // raw query
                     + NamingHelper.toTableName(type) + filter, null);
         } catch (SQLiteException e){
@@ -353,12 +354,13 @@ public class SugarRecord {
         long result = -1;
         Cursor cursor;
         String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
+        String whereField = (!TextUtils.isEmpty(field))? "AVG( " + field + " ) " : "";
 
-        if (field.isEmpty()) throw new NullPointerException("field "+ field + " is empty.");
+        if (whereField.isEmpty()) throw new NullPointerException("field" + field + "is empty");
 
         try {
             cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
-                    new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
+                    new String[]{whereField}, whereClause, whereArgs, null, null, null) // default helper method
                     : getSugarDataBase().rawQuery("SELECT MAX( " + field + ") FROM " // raw query
                     + NamingHelper.toTableName(type) + filter, null);
         } catch (SQLiteException e){
@@ -381,12 +383,13 @@ public class SugarRecord {
         long result = -1;
         Cursor cursor;
         String filter = (!TextUtils.isEmpty(whereClause))? "where" + whereClause : "";
+        String whereField = (!TextUtils.isEmpty(field))? "AVG( " + field + " ) " : "";
 
-        if (field.isEmpty()) throw new NullPointerException("field "+ field + " is empty.");
+        if (whereField.isEmpty()) throw new NullPointerException("field" + field + "is empty");
 
         try {
             cursor = (whereArgs != null) ? getSugarDataBase().query(NamingHelper.toTableName(type),
-                    new String[]{field}, whereClause, whereArgs, null, null, null) // default helper method
+                    new String[]{whereField}, whereClause, whereArgs, null, null, null) // default helper method
                     : getSugarDataBase().rawQuery("SELECT MIN( " + field + ") FROM " // raw query
                     + NamingHelper.toTableName(type) + filter, null);
         } catch (SQLiteException e){
