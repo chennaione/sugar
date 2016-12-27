@@ -3,22 +3,28 @@ apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 23
     }
-
     buildTypes {
         release {
             minifyEnabled false
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:3.0'
 }
 
 task libraryJar(type: Jar) {

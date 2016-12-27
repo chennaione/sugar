@@ -1,10 +1,19 @@
 package com.orm.query;
 
+import com.orm.app.ClientApp;
+import com.orm.dsl.BuildConfig;
+import com.orm.model.TestRecord;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertEquals;
 
-public class SelectTest {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
+public final class SelectTest {
 
     @Test
     public void testMergeCondition(){
@@ -20,7 +29,6 @@ public class SelectTest {
         assertEquals("2", where.getArgs()[1]);
     }
 
-
     @Test
     public void testWhere(){
         Select where = Select.from(TestRecord.class).where(Condition.prop("test").eq("satya"));
@@ -33,6 +41,34 @@ public class SelectTest {
         assertEquals(2, where.getArgs().length);
         assertEquals("satya", where.getArgs()[0]);
         assertEquals("2", where.getArgs()[1]);
+    }
+
+    @Test
+    public void toSqlAllClauses(){
+        String toSql = Select.from(TestRecord.class)
+                .where("foo")
+                .orderBy("doe")
+                .groupBy("john")
+                .limit("5")
+                .offset("10")
+                .toSql();
+        assertEquals("SELECT * FROM TEST_RECORD WHERE foo ORDER BY doe GROUP BY john LIMIT 5 OFFSET 10 ", toSql);
+    }
+
+    @Test
+    public void toSqlNoClauses(){
+        String toSql = Select.from(TestRecord.class)
+                .toSql();
+        assertEquals("SELECT * FROM TEST_RECORD ", toSql);
+    }
+
+    @Test
+    public void toSqlWhereLimitClauses(){
+        String toSql = Select.from(TestRecord.class)
+                .where("foo")
+                .limit("10")
+                .toSql();
+        assertEquals("SELECT * FROM TEST_RECORD WHERE foo LIMIT 10 ", toSql);
     }
 
 

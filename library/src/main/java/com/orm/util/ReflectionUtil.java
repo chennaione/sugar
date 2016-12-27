@@ -1,14 +1,16 @@
 package com.orm.util;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.Log;
 
 import com.orm.SugarRecord;
-import com.orm.dsl.Ignore;
-import com.orm.dsl.Table;
+import com.orm.annotation.Ignore;
+import com.orm.annotation.Table;
+import com.orm.helper.ManifestHelper;
+import com.orm.helper.MultiDexHelper;
+import com.orm.helper.NamingHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +19,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Ref;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,22 +28,23 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-import dalvik.system.DexFile;
+public final class ReflectionUtil {
 
-public class ReflectionUtil {
-
-    private static final String TAG = ReflectionUtil.class.getSimpleName();
+    //Prevent instantiation..
+    private ReflectionUtil() { }
 
     public static List<Field> getTableFields(Class table) {
         List<Field> fieldList = SugarConfig.getFields(table);
         if (fieldList != null) return fieldList;
 
-        Log.d("Sugar", "Fetching properties");
-        List<Field> typeFields = new ArrayList<Field>();
+        if (ManifestHelper.isDebugEnabled()) {
+            Log.d("Sugar", "Fetching properties");
+        }
+        List<Field> typeFields = new ArrayList<>();
 
         getAllFields(typeFields, table);
 
-        List<Field> toStore = new ArrayList<Field>();
+        List<Field> toStore = new ArrayList<>();
         for (Field field : typeFields) {
             if (!field.isAnnotationPresent(Ignore.class) && !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
                 toStore.add(field);
@@ -68,17 +70,19 @@ public class ReflectionUtil {
         column.setAccessible(true);
         Class<?> columnType = column.getType();
         try {
-            String columnName = NamingHelper.toSQLName(column);
+            String columnName = NamingHelper.toColumnName(column);
             Object columnValue = column.get(object);
 
             if (columnType.isAnnotationPresent(Table.class)) {
-                Field field = null;
+                Field field;
                 try {
                     field = columnType.getDeclaredField("id");
                     field.setAccessible(true);
-                    values.put(columnName,
-                            (field != null)
-                                    ? String.valueOf(field.get(columnValue)) : "0");
+                    if(columnValue != null) {
+                        values.put(columnName,String.valueOf(field.get(columnValue)));
+                    } else {
+                        values.putNull(columnName);
+                    }
                 } catch (NoSuchFieldException e) {
                     if (entitiesMap.containsKey(columnValue)) {
                         values.put(columnName, entitiesMap.get(columnValue));
@@ -132,6 +136,8 @@ public class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
+                } else if (columnType.equals(List.class)) {
+                    //ignore
                 } else {
                     if (columnValue == null) {
                         values.putNull(columnName);
@@ -144,7 +150,9 @@ public class ReflectionUtil {
             }
 
         } catch (IllegalAccessException e) {
-            Log.e("Sugar", e.getMessage());
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("Sugar", e.getMessage());
+            }
         }
     }
 
@@ -152,9 +160,17 @@ public class ReflectionUtil {
         field.setAccessible(true);
         try {
             Class fieldType = field.getType();
-            String colName = NamingHelper.toSQLName(field);
+            String colName = NamingHelper.toColumnName(field);
 
             int columnIndex = cursor.getColumnIndex(colName);
+
+            //TODO auto upgrade to add new columns
+            if (columnIndex < 0) {
+                if (ManifestHelper.isDebugEnabled()) {
+                    Log.e("SUGAR", "Invalid colName, you should upgrade database");
+                }
+                return;
+            }
 
             if (cursor.isNull(columnIndex)) {
                 return;
@@ -162,7 +178,7 @@ public class ReflectionUtil {
 
             if (colName.equalsIgnoreCase("id")) {
                 long cid = cursor.getLong(columnIndex);
-                field.set(object, Long.valueOf(cid));
+                field.set(object, cid);
             } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
                 field.set(object,
                         cursor.getLong(columnIndex));
@@ -212,26 +228,29 @@ public class ReflectionUtil {
                     Object enumVal = valueOf.invoke(field.getType(), strVal);
                     field.set(object, enumVal);
                 } catch (Exception e) {
-                    Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    if (ManifestHelper.isDebugEnabled()) {
+                        Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
+                    }
                 }
-            } else
-                Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
-        } catch (IllegalArgumentException e) {
-            Log.e("field set error", e.getMessage());
-        } catch (IllegalAccessException e) {
-            Log.e("field set error", e.getMessage());
+            } else {
+                if (ManifestHelper.isDebugEnabled()) {
+                    Log.e("Sugar", "Class cannot be read from Sqlite3 database. Please check the type of field " + field.getName() + "(" + field.getType().getName() + ")");
+                }
+            }
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("field set error", e.getMessage());
+            }
         }
     }
 
     private static Field getDeepField(String fieldName, Class<?> type) throws NoSuchFieldException {
         try {
-            Field field = type.getDeclaredField(fieldName);
-            return field;
+            return type.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
             Class superclass = type.getSuperclass();
             if (superclass != null) {
-                Field field = getDeepField(fieldName, superclass);
-                return field;
+                return getDeepField(fieldName, superclass);
             } else {
                 throw e;
             }
@@ -243,37 +262,37 @@ public class ReflectionUtil {
             Field field = getDeepField("id", object.getClass());
             field.setAccessible(true);
             field.set(object, value);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static List<Class> getDomainClasses(Context context) {
-        List<Class> domainClasses = new ArrayList<Class>();
+    public static List<Class> getDomainClasses() {
+        List<Class> domainClasses = new ArrayList<>();
         try {
-            for (String className : getAllClasses(context)) {
-                Log.d(TAG, className);
-                Class domainClass = getDomainClass(className, context);
+            for (String className : getAllClasses()) {
+                Class domainClass = getDomainClass(className);
                 if (domainClass != null) domainClasses.add(domainClass);
             }
-        } catch (IOException e) {
-            Log.e("Sugar", e.getMessage());
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e("Sugar", e.getMessage());
+        } catch (IOException | PackageManager.NameNotFoundException  e) {
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("Sugar", e.getMessage());
+            }
         }
 
         return domainClasses;
     }
 
 
-    private static Class getDomainClass(String className, Context context) {
+    private static Class getDomainClass(String className) {
         Class<?> discoveredClass = null;
         try {
-            discoveredClass = Class.forName(className, true, context.getClass().getClassLoader());
-        } catch (ClassNotFoundException e) {
-            Log.e("Sugar", e.getMessage());
+            discoveredClass = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+        } catch (Throwable e) {
+            String error = (e.getMessage() == null) ? "getDomainClass " + className + " error" : e.getMessage();
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.e("Sugar", error);
+            }
         }
 
         if ((discoveredClass != null) &&
@@ -282,7 +301,9 @@ public class ReflectionUtil {
                         discoveredClass.isAnnotationPresent(Table.class)) &&
                 !Modifier.isAbstract(discoveredClass.getModifiers())) {
 
-            Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
+            if (ManifestHelper.isDebugEnabled()) {
+                Log.i("Sugar", "domain class : " + discoveredClass.getSimpleName());
+            }
             return discoveredClass;
 
         } else {
@@ -291,11 +312,11 @@ public class ReflectionUtil {
     }
 
 
-    private static List<String> getAllClasses(Context context) throws PackageManager.NameNotFoundException, IOException {
-        String packageName = ManifestHelper.getDomainPackageName(context);
-        List<String> classNames = new ArrayList<String>();
+    private static List<String> getAllClasses() throws PackageManager.NameNotFoundException, IOException {
+        String packageName = ManifestHelper.getDomainPackageName();
+        List<String> classNames = new ArrayList<>();
         try {
-            List<String> allClasses = MultiDexHelper.getAllClasses(context);
+            List<String> allClasses = MultiDexHelper.getAllClasses();
             for (String classString : allClasses) {
                 if (classString.startsWith(packageName)) classNames.add(classString);
             }
@@ -303,9 +324,10 @@ public class ReflectionUtil {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Enumeration<URL> urls = classLoader.getResources("");
             while (urls.hasMoreElements()) {
-                List<String> fileNames = new ArrayList<String>();
+                List<String> fileNames = new ArrayList<>();
                 String classDirectoryName = urls.nextElement().getFile();
-                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")) {
+                if (classDirectoryName.contains("bin") || classDirectoryName.contains("classes")
+                        || classDirectoryName.contains("retrolambda")) {
                     File classDirectory = new File(classDirectoryName);
                     for (File filePath : classDirectory.listFiles()) {
                         populateFiles(filePath, fileNames, "");
@@ -315,9 +337,11 @@ public class ReflectionUtil {
                     }
                 }
             }
-        } finally {
-//            if (null != dexfile) dexfile.close();
         }
+//        } finally {
+//            if (null != dexfile) dexfile.close();
+//        }
+
         return classNames;
     }
 
@@ -343,7 +367,7 @@ public class ReflectionUtil {
         }
     }
 
-    private static String getSourcePath(Context context) throws PackageManager.NameNotFoundException {
-        return context.getPackageManager().getApplicationInfo(context.getPackageName(), 0).sourceDir;
+    private static String getSourcePath() throws PackageManager.NameNotFoundException {
+        return ContextUtil.getPackageManager().getApplicationInfo(ContextUtil.getPackageName(), 0).sourceDir;
     }
 }

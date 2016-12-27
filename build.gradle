@@ -1,12 +1,13 @@
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'java'
 
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath 'com.android.tools.build:gradle:2.0.0'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
     }
 }
@@ -14,7 +15,11 @@ buildscript {
 def isReleaseBuild() {
     return version.contains("SNAPSHOT") == false
 }
-
+test{
+    testLogging{
+        exceptionFormat = 'full'
+    }
+}
 allprojects {
     version = VERSION_NAME
     group = GROUP
@@ -33,7 +38,7 @@ subprojects { proj ->
         version "0.7.1.201405082137"
     }
 
-    task jacocoTestReport(type: JacocoReport, dependsOn: "testDebug") {
+    task jacocoTestReport(type: JacocoReport) {
         group = "Reporting"
         description = "Generate Jacoco coverage reports after running tests."
         reports {
@@ -45,7 +50,7 @@ subprojects { proj ->
             excludes: ['**/R*.class',
                        '**/BuildConfig*'])
         sourceDirectories = files('src/main/java')
-        executionData = files('build/jacoco/testDebug.exec')
+        executionData = files('build/jacoco/testDebugUnitTest.exec')
         doFirst {
             files('build/intermediates/classes/debug').getFiles().each { file ->
                 if (file.name.contains('$$')) {
@@ -65,14 +70,18 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     description = 'Generates an aggregate report from all subprojects'
     dependsOn(subprojects.jacocoTestReport)
 
-    additionalSourceDirs = files('example/src/main/java') + files('library/src/main/java')
-    sourceDirectories = files('example/src/main/java') + files('library/src/main/java')
-    classDirectories = files('example/build/intermediates/classes/debug') + files('library/build/intermediates/classes/debug')
+    additionalSourceDirs = files('library/src/main/java')
+    sourceDirectories = files('library/src/main/java')
+    classDirectories = files('library/build/intermediates/classes/debug')
     executionData = files(subprojects.jacocoTestReport.executionData)
 
     reports {
         html.enabled = true
         xml.enabled = true
+    }
+
+    onlyIf = {
+        true
     }
 
     doFirst {
@@ -81,7 +90,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 }
 
 coveralls {
-    sourceDirs = files('example/src/main/java').flatten() + files('library/src/main/java').flatten()
+    sourceDirs = files('library/src/main/java').flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 
