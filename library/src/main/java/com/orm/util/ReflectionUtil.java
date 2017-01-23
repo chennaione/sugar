@@ -40,9 +40,7 @@ public final class ReflectionUtil {
         if (ManifestHelper.isDebugEnabled()) {
             Log.d("Sugar", "Fetching properties");
         }
-        List<Field> typeFields = new ArrayList<>();
-
-        getAllFields(typeFields, table);
+        List<Field> typeFields = getAllFields(table);
 
         List<Field> toStore = new ArrayList<>();
         for (Field field : typeFields) {
@@ -55,14 +53,25 @@ public final class ReflectionUtil {
         return toStore;
     }
 
-    private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+    public static List<Field> getAllFields(Class<?> type) {
+        List<Field> fields = new ArrayList<>();
         Collections.addAll(fields, type.getDeclaredFields());
 
         if (type.getSuperclass() != null) {
-            fields = getAllFields(fields, type.getSuperclass());
+            fields.addAll(getAllFields(type.getSuperclass()));
         }
 
         return fields;
+    }
+
+    public static Field getFieldByName(Class<?> type, String name) {
+        List<Field> all = getAllFields(type);
+        for(Field field : all){
+            if(field.getName().equals(name)){
+                return field;
+            }
+        }
+        return null;
     }
 
     public static void addFieldValueToColumn(ContentValues values, Field column, Object object,
