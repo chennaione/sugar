@@ -18,7 +18,6 @@ public final class SugarAppTest {
         Assert.assertNotNull(context);
     }
 
-
     @Test(expected = NullPointerException.class)
     public void testOnTerminate() {
         SugarApp app = new SugarApp();

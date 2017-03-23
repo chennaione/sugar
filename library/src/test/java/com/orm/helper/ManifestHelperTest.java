@@ -2,7 +2,6 @@ package com.orm.helper;
 
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
-import com.orm.util.KeyWordUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +30,6 @@ public final class ManifestHelperTest {
         ManifestHelper helper = ManifestHelper.class.getDeclaredConstructor().newInstance();
         assertNull(helper);
     }
-
 
     @Test
     public void testGetDbName() {

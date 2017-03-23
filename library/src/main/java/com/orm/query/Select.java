@@ -64,9 +64,7 @@ public class Select<T> implements Iterable {
     }
 
     public Select<T> where(Condition... condition) {
-
         mergeConditions(condition, Condition.Type.AND);
-
         return this;
     }
 
@@ -130,6 +128,7 @@ public class Select<T> implements Iterable {
     public Cursor getCursor() {
        return SugarRecord.getCursor(record, whereClause, arguments, groupBy, orderBy, limit);
     }
+
     public List<T> list() {
         if (arguments == null) {
             arguments = convertArgs(args);

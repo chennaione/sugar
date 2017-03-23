@@ -28,7 +28,6 @@ public final class ContextUtilTest {
         assertNull(contextUtil);
     }
 
-
     @Test
     public void testInitContext() {
         assertNotNull(getContext());

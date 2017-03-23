@@ -1,7 +1,6 @@
 package com.orm.record;
 
 import com.orm.app.ClientApp;
-import com.orm.SugarRecord;
 import com.orm.dsl.BuildConfig;
 import com.orm.model.DoubleFieldAnnotatedModel;
 import com.orm.model.DoubleFieldExtendedModel;
