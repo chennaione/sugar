@@ -35,7 +35,9 @@ public final class ReflectionUtil {
 
     public static List<Field> getTableFields(Class table) {
         List<Field> fieldList = SugarConfig.getFields(table);
-        if (fieldList != null) return fieldList;
+        if (fieldList != null) {
+            return fieldList;
+        }
 
         if (ManifestHelper.isDebugEnabled()) {
             Log.d("Sugar", "Fetching properties");
@@ -78,7 +80,7 @@ public final class ReflectionUtil {
                 try {
                     field = columnType.getDeclaredField("id");
                     field.setAccessible(true);
-                    if(columnValue != null) {
+                    if (columnValue != null) {
                         values.put(columnName,String.valueOf(field.get(columnValue)));
                     } else {
                         values.putNull(columnName);
@@ -272,7 +274,9 @@ public final class ReflectionUtil {
         try {
             for (String className : getAllClasses()) {
                 Class domainClass = getDomainClass(className);
-                if (domainClass != null) domainClasses.add(domainClass);
+                if (domainClass != null) {
+                    domainClasses.add(domainClass);
+                }
             }
         } catch (IOException | PackageManager.NameNotFoundException  e) {
             if (ManifestHelper.isDebugEnabled()) {
@@ -318,7 +322,9 @@ public final class ReflectionUtil {
         try {
             List<String> allClasses = MultiDexHelper.getAllClasses();
             for (String classString : allClasses) {
-                if (classString.startsWith(packageName)) classNames.add(classString);
+                if (classString.startsWith(packageName)) {
+                    classNames.add(classString);
+                }
             }
         } catch (NullPointerException e) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -333,7 +339,9 @@ public final class ReflectionUtil {
                         populateFiles(filePath, fileNames, "");
                     }
                     for (String fileName : fileNames) {
-                        if (fileName.startsWith(packageName)) classNames.add(fileName);
+                        if (fileName.startsWith(packageName)) {
+                            classNames.add(fileName);
+                        }
                     }
                 }
             }

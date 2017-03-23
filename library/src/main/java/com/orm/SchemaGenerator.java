@@ -9,7 +9,6 @@ import com.orm.annotation.Column;
 import com.orm.annotation.MultiUnique;
 import com.orm.annotation.NotNull;
 import com.orm.annotation.Unique;
-import com.orm.dsl.BuildConfig;
 import com.orm.helper.ManifestHelper;
 import com.orm.util.KeyWordUtil;
 import com.orm.util.MigrationFileParser;
@@ -56,7 +55,6 @@ public class SchemaGenerator {
     public void afterTableCreated(Class<?> table, SQLiteDatabase sqLiteDatabase) {
         String fileName = table.getSimpleName() + ".sql";
         executeScript(sqLiteDatabase,"sugar_after_create/" ,fileName);
-
     }
 
     public void doUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
@@ -102,7 +100,7 @@ public class SchemaGenerator {
             List<String> files = Arrays.asList(getAssets().list("sugar_upgrades"));
             Collections.sort(files, new NumberComparator());
             for (String file : files) {
-                if(ManifestHelper.isDebugEnabled()) {
+                if (ManifestHelper.isDebugEnabled()) {
                     Log.i(SUGAR, "filename : " + file);
                 }
 
@@ -114,14 +112,14 @@ public class SchemaGenerator {
                         isSuccess = true;
                     }
                 } catch (NumberFormatException e) {
-                    if(ManifestHelper.isDebugEnabled()) {
+                    if (ManifestHelper.isDebugEnabled()) {
                         Log.i(SUGAR, "not a sugar script. ignored." + file);
                     }
                 }
 
             }
         } catch (IOException e) {
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.e(SUGAR, e.getMessage());
             }
         }
@@ -139,8 +137,8 @@ public class SchemaGenerator {
                 sb.append(line);
             }
             MigrationFileParser migrationFileParser = new MigrationFileParser(sb.toString());
-            for(String statement: migrationFileParser.getStatements()){
-                if(ManifestHelper.isDebugEnabled()) {
+            for (String statement: migrationFileParser.getStatements()) {
+                if (ManifestHelper.isDebugEnabled()) {
                     Log.i("Sugar script", statement);
                 }
                 if (!statement.isEmpty()) {
@@ -149,12 +147,12 @@ public class SchemaGenerator {
             }
 
         } catch (IOException e) {
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.e(SUGAR, e.getMessage());
             }
         }
 
-        if(ManifestHelper.isDebugEnabled()) {
+        if (ManifestHelper.isDebugEnabled()) {
             Log.i(SUGAR, "Script executed");
         }
     }
@@ -193,7 +191,7 @@ public class SchemaGenerator {
         }
 
         for (String command : alterCommands) {
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.i("Sugar", command);
             }
             sqLiteDatabase.execSQL(command);
@@ -201,14 +199,14 @@ public class SchemaGenerator {
     }
 
     protected String createTableSQL(Class<?> table) {
-        if(ManifestHelper.isDebugEnabled()) {
+        if (ManifestHelper.isDebugEnabled()) {
             Log.i(SUGAR, "Create table if not exists");
         }
         List<Field> fields = ReflectionUtil.getTableFields(table);
         String tableName = NamingHelper.toTableName(table);
 
-        if(KeyWordUtil.isKeyword(tableName)) {
-            if(ManifestHelper.isDebugEnabled()) {
+        if (KeyWordUtil.isKeyword(tableName)) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.i(SUGAR, "ERROR, SQLITE RESERVED WORD USED IN " + tableName);
             }
         }
@@ -265,11 +263,11 @@ public class SchemaGenerator {
             sb.append(", UNIQUE(");
 
             String[] constraintFields = constraint.split(",");
-            for(int i = 0; i < constraintFields.length; i++) {
+            for (int i = 0; i < constraintFields.length; i++) {
                 String columnName = NamingHelper.toSQLNameDefault(constraintFields[i]);
                 sb.append(columnName);
 
-                if(i < (constraintFields.length -1)) {
+                if (i < (constraintFields.length -1)) {
                     sb.append(",");
                 }
             }
@@ -278,7 +276,7 @@ public class SchemaGenerator {
         }
 
         sb.append(" ) ");
-        if(ManifestHelper.isDebugEnabled()) {
+        if (ManifestHelper.isDebugEnabled()) {
             Log.i(SUGAR, "Creating table " + tableName);
         }
 

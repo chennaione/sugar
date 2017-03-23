@@ -33,7 +33,7 @@ public final class NamingHelperTest {
         if (null != fieldList && !fieldList.isEmpty()) {
             List<String> columnList = new ArrayList<>();
 
-            for(Field field: fieldList) {
+            for (Field field: fieldList) {
                 columnList.add(toColumnName(field));
             }
 

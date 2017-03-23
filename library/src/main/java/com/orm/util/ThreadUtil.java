@@ -25,7 +25,7 @@ public final class ThreadUtil {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         Future future = executor.submit(callable);
 
-        if(executor.isTerminated()) {
+        if (executor.isTerminated()) {
             executor.shutdown();
         }
 
