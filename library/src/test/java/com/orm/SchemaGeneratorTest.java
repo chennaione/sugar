@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
-import com.orm.model.AllAnotatedModel;
+import com.orm.model.AllAnnotatedModel;
 import com.orm.model.EmptyModel;
 import com.orm.model.IntUniqueModel;
 import com.orm.model.MultiColumnUniqueModel;
@@ -111,10 +111,10 @@ public final class SchemaGeneratorTest {
     public void testAnnotatedModelTableCreation() {
         SQLiteDatabase sqLiteDatabase = SugarContext.getSugarContext().getSugarDb().getDB();
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
-        schemaGenerator.createTable(AllAnotatedModel.class, sqLiteDatabase);
+        schemaGenerator.createTable(AllAnnotatedModel.class, sqLiteDatabase);
         String sql = "select count(*) from sqlite_master where type='table' and name='%s';";
 
-        String tableName = NamingHelper.toTableName(AllAnotatedModel.class);
+        String tableName = NamingHelper.toTableName(AllAnnotatedModel.class);
         Cursor c = sqLiteDatabase.rawQuery(String.format(sql, tableName), null);
 
         if (c.moveToFirst()) {
