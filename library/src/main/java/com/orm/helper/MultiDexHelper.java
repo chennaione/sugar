@@ -9,6 +9,7 @@ import android.os.Build;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -76,6 +77,14 @@ public final class MultiDexHelper {
             if (extractedFile.isFile()) {
                 sourcePaths.add(extractedFile.getAbsolutePath());
                 //we ignore the verify zip part
+            }
+        }
+
+        // handle split files built by instant run
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            String[] splitSourceDirs = applicationInfo.splitSourceDirs;
+            if ((splitSourceDirs!=null) && (splitSourceDirs.length > 0)) {
+                sourcePaths.addAll(Arrays.asList(splitSourceDirs));
             }
         }
 
