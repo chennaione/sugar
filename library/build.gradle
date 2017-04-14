@@ -1,9 +1,8 @@
 apply plugin: 'com.android.library'
-apply from: '../maven_push.gradle'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 9
@@ -28,7 +27,6 @@ dependencies {
 }
 
 task libraryJar(type: Jar) {
-    dependsOn assembleRelease
     from android.sourceSets.main.java.srcDirs,
          ['build/intermediates/classes/release/'] // Add the release classes into the jar
     baseName 'sugar'
