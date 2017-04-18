@@ -12,8 +12,13 @@ import com.orm.helper.ManifestHelper;
 import com.orm.helper.MultiDexHelper;
 import com.orm.helper.NamingHelper;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -143,6 +148,17 @@ public final class ReflectionUtil {
                         values.putNull(columnName);
                     } else if (columnType.isEnum()) {
                         values.put(columnName, ((Enum) columnValue).name());
+                    } else if (columnType.equals(String.class)) {
+                        values.put(columnName, (String)columnValue);
+                    } else if (Serializable.class.isAssignableFrom(columnType)) {
+                        try {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            ObjectOutputStream oos = new ObjectOutputStream(bos);
+                            oos.writeObject(columnValue);
+                            values.put(columnName, bos.toByteArray());
+                        } catch(IOException e) {
+                            values.put(columnName, "".getBytes());
+                        }
                     } else {
                         values.put(columnName, String.valueOf(columnValue));
                     }
@@ -231,6 +247,15 @@ public final class ReflectionUtil {
                     if (ManifestHelper.isDebugEnabled()) {
                         Log.e("Sugar", "Enum cannot be read from Sqlite3 database. Please check the type of field " + field.getName());
                     }
+                }
+            } else if(Serializable.class.isAssignableFrom(fieldType)) {
+                try {
+                    ByteArrayInputStream bis = new ByteArrayInputStream(cursor.getBlob(columnIndex));
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    Object obj = ois.readObject();
+                    field.set(object, obj);
+                } catch(IOException|ClassNotFoundException e) {
+                    field.set(object, null);
                 }
             } else {
                 if (ManifestHelper.isDebugEnabled()) {
