@@ -423,7 +423,10 @@ public class SugarRecord {
         Class<?> type = object.getClass();
         if (type.isAnnotationPresent(Table.class)) {
             try {
-                Field field = type.getDeclaredField("id");
+                Field field = ReflectionUtil.getFieldByName(type, "id");
+                if(field == null){
+                    throw new NoSuchFieldException();
+                }
                 field.setAccessible(true);
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {

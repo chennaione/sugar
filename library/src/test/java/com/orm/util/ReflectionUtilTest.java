@@ -7,6 +7,8 @@ import com.orm.SugarContext;
 import com.orm.SugarRecord;
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
+import com.orm.model.SimpleModel;
+import com.orm.model.SimpleModelWithMore;
 import com.orm.model.TestRecord;
 import com.orm.model.foreignnull.OriginRecord;
 import com.orm.query.Select;
@@ -38,14 +40,40 @@ public final class ReflectionUtilTest {
     @Test
     public void testGetTableFields() {
         List<Field> fieldList = ReflectionUtil.getTableFields(TestRecord.class);
-        List<String> strings = new ArrayList<>();
 
-        for (Field field: fieldList) {
-            strings.add(field.getName());
-        }
+        List<String> strings = getStringNamesFromFields(fieldList);
 
         Assert.assertEquals(true, strings.contains("id"));
         Assert.assertEquals(true, strings.contains("name"));
+    }
+
+    @Test
+    public void testGetAllFields() {
+        List<Field> fieldList = ReflectionUtil.getAllFields(SimpleModelWithMore.class);
+
+        List<String> strings = getStringNamesFromFields(fieldList);
+
+        Assert.assertEquals(true, strings.contains("more"));
+        Assert.assertEquals(true, strings.contains("str"));
+        Assert.assertEquals(true, strings.contains("integer"));
+        Assert.assertEquals(true, strings.contains("bool"));
+
+    }
+
+    @Test
+    public void testGetFieldByName() {
+        Field field = ReflectionUtil.getFieldByName(SimpleModel.class, "str");
+        Assert.assertNotNull(field);
+    }
+
+    private List<String> getStringNamesFromFields(List<Field> fieldList) {
+        List<String> strings = new ArrayList<>();
+
+        for (Field field : fieldList) {
+            strings.add(field.getName());
+        }
+
+        return strings;
     }
 
     @Test(expected = NoSuchFieldException.class)
@@ -74,7 +102,7 @@ public final class ReflectionUtilTest {
     @Test
     public void testGetAllClasses() {
         List<Class> classes = ReflectionUtil.getDomainClasses();
-        Assert.assertEquals(46, classes.size());
+        Assert.assertEquals(47, classes.size());
     }
 
     @Test(expected = NoSuchFieldException.class)
@@ -93,7 +121,7 @@ public final class ReflectionUtilTest {
 
     @Test
     public void testForeignNull() throws NoSuchFieldException {
-        final OriginRecord record = new OriginRecord(null,null);
+        final OriginRecord record = new OriginRecord(null, null);
         SugarRecord.save(record);
     }
 }
