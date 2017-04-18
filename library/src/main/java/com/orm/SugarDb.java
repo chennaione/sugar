@@ -8,6 +8,8 @@ import com.orm.dsl.BuildConfig;
 import com.orm.helper.ManifestHelper;
 import com.orm.util.SugarCursorFactory;
 
+import java.util.List;
+
 import static com.orm.util.ContextUtil.getContext;
 import static com.orm.helper.ManifestHelper.getDatabaseVersion;
 import static com.orm.helper.ManifestHelper.getDbName;
@@ -19,20 +21,26 @@ public class SugarDb extends SQLiteOpenHelper {
     private final SchemaGenerator schemaGenerator;
     private SQLiteDatabase sqLiteDatabase;
     private int openedConnections = 0;
+    private List<Class> classes;
 
     //Prevent instantiation
-    private SugarDb() {
+    private SugarDb(List<Class> modelsClasses) {
         super(getContext(), getDbName(), new SugarCursorFactory(ManifestHelper.isDebugEnabled()), getDatabaseVersion());
+        this.classes = modelsClasses;
         schemaGenerator = SchemaGenerator.getInstance();
     }
 
     public static SugarDb getInstance() {
-        return new SugarDb();
+        return new SugarDb(null);
+    }
+
+    public static SugarDb getInstance(List<Class> modelsClasses) {
+        return new SugarDb(modelsClasses);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        schemaGenerator.createDatabase(sqLiteDatabase);
+        schemaGenerator.createDatabase(sqLiteDatabase, classes);
     }
 
     @Override
@@ -50,7 +58,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        schemaGenerator.doUpgrade(sqLiteDatabase, oldVersion, newVersion);
+        schemaGenerator.doUpgrade(sqLiteDatabase, oldVersion, newVersion, classes);
     }
 
     public synchronized SQLiteDatabase getDB() {
