@@ -136,16 +136,12 @@ public final class ReflectionUtil {
                     } else {
                         values.put(columnName, (byte[]) columnValue);
                     }
-                } else if (columnType.equals(List.class)) {
-                    //ignore
+                }  else if (columnValue == null) {
+                    values.putNull(columnName);
+                } else if (columnType.isEnum()) {
+                    values.put(columnName, ((Enum) columnValue).name());
                 } else {
-                    if (columnValue == null) {
-                        values.putNull(columnName);
-                    } else if (columnType.isEnum()) {
-                        values.put(columnName, ((Enum) columnValue).name());
-                    } else {
-                        values.put(columnName, String.valueOf(columnValue));
-                    }
+                    values.put(columnName, String.valueOf(columnValue));
                 }
             }
 
