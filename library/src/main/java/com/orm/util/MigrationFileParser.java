@@ -10,11 +10,11 @@ public class MigrationFileParser {
     /**
      * @param content
      */
-    public MigrationFileParser(String content){
+    public MigrationFileParser(String content) {
         this.content = content.replaceAll("(\\/\\*([\\s\\S]*?)\\*\\/)|(--(.)*)|(\n)","");
     }
 
-    public String[] getStatements(){
+    public String[] getStatements() {
         return this.content.split(";");
     }
 

@@ -4,7 +4,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.orm.dsl.BuildConfig;
 import com.orm.helper.ManifestHelper;
 import com.orm.util.SugarCursorFactory;
 
@@ -63,7 +62,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @Override
     public synchronized SQLiteDatabase getReadableDatabase() {
-        if(ManifestHelper.isDebugEnabled()) {
+        if (ManifestHelper.isDebugEnabled()) {
             Log.d(LOG_TAG, "getReadableDatabase");
         }
         openedConnections++;
@@ -72,12 +71,12 @@ public class SugarDb extends SQLiteOpenHelper {
 
     @Override
     public synchronized void close() {
-        if(ManifestHelper.isDebugEnabled()) {
+        if (ManifestHelper.isDebugEnabled()) {
             Log.d(LOG_TAG, "getReadableDatabase");
         }
         openedConnections--;
-        if(openedConnections == 0) {
-            if(ManifestHelper.isDebugEnabled()) {
+        if (openedConnections == 0) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.d(LOG_TAG, "closing");
             }
             super.close();

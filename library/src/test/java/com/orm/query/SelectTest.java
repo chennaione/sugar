@@ -16,7 +16,7 @@ import static junit.framework.Assert.assertEquals;
 public final class SelectTest {
 
     @Test
-    public void testMergeCondition(){
+    public void testMergeCondition() {
         Select where = Select.from(TestRecord.class).where(Condition.prop("test").eq("satya"));
         assertEquals("(test = ? )", where.getWhereCond());
         assertEquals(1, where.getArgs().length);
@@ -30,7 +30,7 @@ public final class SelectTest {
     }
 
     @Test
-    public void testWhere(){
+    public void testWhere() {
         Select where = Select.from(TestRecord.class).where(Condition.prop("test").eq("satya"));
         assertEquals("(test = ? )", where.getWhereCond());
         assertEquals(1, where.getArgs().length);
@@ -44,7 +44,7 @@ public final class SelectTest {
     }
 
     @Test
-    public void toSqlAllClauses(){
+    public void toSqlAllClauses() {
         String toSql = Select.from(TestRecord.class)
                 .where("foo")
                 .orderBy("doe")
@@ -56,14 +56,14 @@ public final class SelectTest {
     }
 
     @Test
-    public void toSqlNoClauses(){
+    public void toSqlNoClauses() {
         String toSql = Select.from(TestRecord.class)
                 .toSql();
         assertEquals("SELECT * FROM TEST_RECORD ", toSql);
     }
 
     @Test
-    public void toSqlWhereLimitClauses(){
+    public void toSqlWhereLimitClauses() {
         String toSql = Select.from(TestRecord.class)
                 .where("foo")
                 .limit("10")
@@ -73,7 +73,7 @@ public final class SelectTest {
 
 
     @Test
-    public void testWhereOr(){
+    public void testWhereOr() {
         Select where = Select.from(TestRecord.class).whereOr(Condition.prop("test").eq("satya"));
         assertEquals("(test = ? )", where.getWhereCond());
         assertEquals(1, where.getArgs().length);
@@ -87,7 +87,7 @@ public final class SelectTest {
     }
 
     @Test
-    public void testAnd(){
+    public void testAnd() {
         Select where = Select.from(TestRecord.class).whereOr(Condition.prop("test").eq("satya"));
         assertEquals("(test = ? )", where.getWhereCond());
         assertEquals(1, where.getArgs().length);
@@ -102,7 +102,7 @@ public final class SelectTest {
     }
 
     @Test
-    public void testOr(){
+    public void testOr() {
         Select where = Select.from(TestRecord.class).whereOr(Condition.prop("test").eq("satya"));
         assertEquals("(test = ? )", where.getWhereCond());
         assertEquals(1, where.getArgs().length);

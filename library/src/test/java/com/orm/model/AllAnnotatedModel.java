@@ -10,7 +10,7 @@ import com.orm.annotation.Unique;
  * @author jonatan.salas
  */
 @Table
-public class AllAnotatedModel {
+public class AllAnnotatedModel {
 
     @NotNull @Unique
     private Long id;
@@ -21,5 +21,5 @@ public class AllAnotatedModel {
     @Ignore
     private String surname;
 
-    public AllAnotatedModel() { }
+    public AllAnnotatedModel() { }
 }

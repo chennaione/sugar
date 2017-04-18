@@ -114,7 +114,7 @@ public class SugarRecord {
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             deletedRows = 0;
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.i(SUGAR, "Error in deleting in transaction " + e.getMessage());
             }
         } finally {
@@ -134,7 +134,9 @@ public class SugarRecord {
 
     public static <T> T findById(Class<T> type, Long id) {
         List<T> list = find(type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
-        if (list.isEmpty()) return null;
+        if (list.isEmpty()) {
+            return null;
+        }
         return list.get(0);
     }
 
@@ -190,7 +192,6 @@ public class SugarRecord {
 
     public static <T> List<T> findWithQuery(Class<T> type, String query, String... arguments) {
         Cursor cursor = getSugarDataBase().rawQuery(query, arguments);
-
         return getEntitiesFromCursor(cursor, type);
     }
 
@@ -199,7 +200,6 @@ public class SugarRecord {
     }
 
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
-
         String args[];
         args = (whereArgs == null) ? null : replaceArgs(whereArgs);
 
@@ -219,11 +219,11 @@ public class SugarRecord {
         return getEntitiesFromCursor(cursor, type, relationFieldName, relationObject);
     }
 
-    public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type){
+    public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type) {
         return getEntitiesFromCursor(cursor, type, null, null);
     }
 
-    public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type, String relationFieldName, Object relationObject){
+    public static <T> List<T> getEntitiesFromCursor(Cursor cursor, Class<T> type, String relationFieldName, Object relationObject) {
         T entity;
         List<T> result = new ArrayList<>();
         try {
@@ -370,7 +370,7 @@ public class SugarRecord {
         List<String> whereArgs = new ArrayList<>();
 
         for (Field column : columns) {
-            if(column.isAnnotationPresent(Unique.class)) {
+            if (column.isAnnotationPresent(Unique.class)) {
                 try {
                     column.setAccessible(true);
                     String columnName = NamingHelper.toColumnName(column);
@@ -407,12 +407,12 @@ public class SugarRecord {
         Long id = getId();
         Class<?> type = getClass();
         if (id != null && id > 0L) {
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
             }
             return getSugarDataBase().delete(NamingHelper.toTableName(type), "Id=?", new String[]{id.toString()}) == 1;
         } else {
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.i(SUGAR, "Cannot delete object: " + type.getSimpleName() + " - object has not been saved");
             }
             return false;
@@ -428,23 +428,23 @@ public class SugarRecord {
                 Long id = (Long) field.get(object);
                 if (id != null && id > 0L) {
                     boolean deleted = getSugarDataBase().delete(NamingHelper.toTableName(type), "Id=?", new String[]{id.toString()}) == 1;
-                    if(ManifestHelper.isDebugEnabled()) {
+                    if (ManifestHelper.isDebugEnabled()) {
                         Log.i(SUGAR, type.getSimpleName() + " deleted : " + id);
                     }
                     return deleted;
                 } else {
-                    if(ManifestHelper.isDebugEnabled()) {
+                    if (ManifestHelper.isDebugEnabled()) {
                         Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - object has not been saved");
                     }
                     return false;
                 }
             } catch (NoSuchFieldException e) {
-                if(ManifestHelper.isDebugEnabled()) {
+                if (ManifestHelper.isDebugEnabled()) {
                     Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - annotated object has no id");
                 }
                 return false;
             } catch (IllegalAccessException e) {
-                if(ManifestHelper.isDebugEnabled()) {
+                if (ManifestHelper.isDebugEnabled()) {
                     Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - can't access id");
                 }
                 return false;
@@ -452,7 +452,7 @@ public class SugarRecord {
         } else if (SugarRecord.class.isAssignableFrom(type)) {
             return ((SugarRecord) object).delete();
         } else {
-            if(ManifestHelper.isDebugEnabled()) {
+            if (ManifestHelper.isDebugEnabled()) {
                 Log.i(SUGAR, "Cannot delete object: " + object.getClass().getSimpleName() + " - not persisted");
             }
             return false;
@@ -534,17 +534,12 @@ public class SugarRecord {
         }
     }
 
-    public static String[] replaceArgs(String[] args){
-
+    public static String[] replaceArgs(String[] args) {
         String [] replace = new String[args.length];
-        for (int i=0; i<args.length; i++){
-
+        for (int i=0; i<args.length; i++) {
             replace[i]= (args[i].equals("true")) ? replace[i]="1" : (args[i].equals("false")) ? replace[i]="0" : args[i];
-
         }
-
         return replace;
-
     }
 
 }

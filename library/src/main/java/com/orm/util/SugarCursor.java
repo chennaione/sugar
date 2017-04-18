@@ -14,17 +14,19 @@ public class SugarCursor extends CursorWrapper {
         try {
             return super.getColumnIndexOrThrow(columnName);
         } catch (IllegalArgumentException e) {
-            if (columnName.equals("_id"))
+            if (columnName.equals("_id")) {
                 return super.getColumnIndexOrThrow("ID");
-            else
+            } else {
                 throw e;
+            }
         }
     }
 
     @Override
     public int getColumnIndex(String columnName) {
-        if (columnName.equals("_id"))
+        if (columnName.equals("_id")) {
             columnName = "ID";
+        }
         return super.getColumnIndex(columnName);
     }
 }

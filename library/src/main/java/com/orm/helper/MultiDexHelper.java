@@ -59,7 +59,7 @@ public final class MultiDexHelper {
         sourcePaths.add(applicationInfo.sourceDir); //add the default apk path
 
         if (instantRunDir.exists()) { //check if app using instant run
-            for(final File dexFile : instantRunDir.listFiles()) { //add all sources from instan-run
+            for (final File dexFile : instantRunDir.listFiles()) { //add all sources from instant-run
                 sourcePaths.add(dexFile.getAbsolutePath());
             }
         }
