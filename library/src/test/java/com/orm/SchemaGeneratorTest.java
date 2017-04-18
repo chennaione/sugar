@@ -84,7 +84,7 @@ public final class SchemaGeneratorTest {
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(MultiColumnUniqueModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "A INTEGER, B INTEGER, " +
-                        "UNIQUE(A, B) ON CONFLICT REPLACE ) ",
+                        "UNIQUE(a, b) ON CONFLICT REPLACE ) ",
                 createSQL);
     }
 
