@@ -1,13 +1,10 @@
-.DS_Store
-
-# built application files
-*.apk
-*.ap_
-
-# files for the dex VM
-*.dex
-
-# Java class files
+.idea
+library/bin
+library/build
+library/gen
+library/.project
+library/.classpath
+library/library.iml
 *.class
 
 # generated files
