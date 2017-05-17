@@ -4,16 +4,17 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.util.Pair;
 
 import com.orm.annotation.Column;
 import com.orm.annotation.MultiUnique;
 import com.orm.annotation.NotNull;
 import com.orm.annotation.Unique;
-import com.orm.dsl.BuildConfig;
+import com.orm.annotation.Index;
 import com.orm.helper.ManifestHelper;
+import com.orm.helper.NamingHelper;
 import com.orm.util.KeyWordUtil;
 import com.orm.util.MigrationFileParser;
-import com.orm.helper.NamingHelper;
 import com.orm.util.NumberComparator;
 import com.orm.util.QueryBuilder;
 import com.orm.util.ReflectionUtil;
@@ -28,8 +29,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.orm.util.ReflectionUtil.getDomainClasses;
 import static com.orm.util.ContextUtil.getAssets;
+import static com.orm.util.ReflectionUtil.getDomainClasses;
 
 public class SchemaGenerator {
     public static final String NULL = " NULL";
@@ -200,7 +201,7 @@ public class SchemaGenerator {
         }
     }
 
-    protected String createTableSQL(Class<?> table) {
+    protected Pair<String, List<String>> createTableSQL(Class<?> table) {
         if(ManifestHelper.isDebugEnabled()) {
             Log.i(SUGAR, "Create table if not exists");
         }
@@ -216,6 +217,7 @@ public class SchemaGenerator {
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         sb.append(tableName).append(" ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
 
+        List<String> indexStatements = new ArrayList<>();
         for (Field column : fields) {
             String columnName = NamingHelper.toColumnName(column);
             String columnType = QueryBuilder.getColumnType(column.getType());
@@ -257,6 +259,13 @@ public class SchemaGenerator {
                     }
                 }
             }
+
+            if (column.isAnnotationPresent(Index.class)) {
+                String idxStr = column.getAnnotation(Index.class).unique() ? "CREATE UNIQUE INDEX" : "CREATE INDEX";
+                StringBuilder indexBuilder = new StringBuilder(idxStr).append(" ").append(tableName).append("_").append(columnName).append("_IDX")
+                        .append(" ON ").append(tableName).append(" (").append(columnName).append(")");
+                indexStatements.add(indexBuilder.toString());
+            }
         }
 
         if (table.isAnnotationPresent(MultiUnique.class)) {
@@ -282,15 +291,22 @@ public class SchemaGenerator {
             Log.i(SUGAR, "Creating table " + tableName);
         }
 
-        return sb.toString();
+        return new Pair<>(sb.toString(), indexStatements);
     }
 
     protected void createTable(Class<?> table, SQLiteDatabase sqLiteDatabase) {
-        String createSQL = createTableSQL(table);
+        Pair<String, List<String>> createSQL = createTableSQL(table);
+        String tableCreate = createSQL.first;
+        List<String> indexStatements = createSQL.second;
 
-        if (!createSQL.isEmpty()) {
+        if (!tableCreate.isEmpty()) {
             try {
-                sqLiteDatabase.execSQL(createSQL);
+                sqLiteDatabase.execSQL(tableCreate);
+
+                for (String indexStatement : indexStatements) {
+                    Log.i(SUGAR, "Creating index " + indexStatement);
+                    sqLiteDatabase.execSQL(indexStatement);
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }

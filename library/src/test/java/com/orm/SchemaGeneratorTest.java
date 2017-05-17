@@ -2,9 +2,11 @@ package com.orm;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Pair;
 
 import com.orm.app.ClientApp;
 import com.orm.dsl.BuildConfig;
+import com.orm.helper.NamingHelper;
 import com.orm.model.AllAnotatedModel;
 import com.orm.model.EmptyModel;
 import com.orm.model.IntUniqueModel;
@@ -12,7 +14,6 @@ import com.orm.model.MultiColumnUniqueModel;
 import com.orm.model.StringFieldAnnotatedModel;
 import com.orm.model.StringFieldExtendedModel;
 import com.orm.model.StringFieldExtendedModelAnnotatedColumn;
-import com.orm.helper.NamingHelper;
 import com.orm.model.TestRecord;
 
 import junit.framework.Assert;
@@ -33,59 +34,59 @@ public final class SchemaGeneratorTest {
     @Test
     public void testEmptyTableCreation() throws Exception {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
-        String createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
+        Pair<String, List<String>> createSQL = schemaGenerator.createTableSQL(EmptyModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(EmptyModel.class) +
                     " ( ID INTEGER PRIMARY KEY AUTOINCREMENT  ) ",
-                createSQL);
+                createSQL.first);
     }
 
     @Test
     public void testSimpleColumnTableCreation() throws Exception {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
-        String createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
+        Pair<String, List<String>> createSQL = schemaGenerator.createTableSQL(StringFieldExtendedModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(StringFieldExtendedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "STRING TEXT ) ",
-                createSQL);
+                createSQL.first);
 
-        String createSQL2 = schemaGenerator.createTableSQL(StringFieldAnnotatedModel.class);
+        Pair<String, List<String>> createSQL2 = schemaGenerator.createTableSQL(StringFieldAnnotatedModel.class);
 
         assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(StringFieldAnnotatedModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "STRING TEXT ) ",
-                createSQL2);
+                createSQL2.first);
 
-        String createSQL3 = schemaGenerator.createTableSQL(StringFieldExtendedModelAnnotatedColumn.class);
+        Pair<String, List<String>> createSQL3 = schemaGenerator.createTableSQL(StringFieldExtendedModelAnnotatedColumn.class);
 
         assertEquals("CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(StringFieldExtendedModelAnnotatedColumn.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "anyName TEXT ) ",
-                createSQL3);
+                createSQL3.first);
     }
 
     @Test
     public void testUniqueTableCreation() {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
-        String createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
+        Pair<String, List<String>> createSQL = schemaGenerator.createTableSQL(IntUniqueModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(IntUniqueModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "VALUE INTEGER UNIQUE ) ",
-                createSQL);
+                createSQL.first);
     }
 
     @Test
     public void testMultiColumnUniqueTableCreation() {
         SchemaGenerator schemaGenerator = SchemaGenerator.getInstance();
-        String createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
+        Pair<String, List<String>> createSQL = schemaGenerator.createTableSQL(MultiColumnUniqueModel.class);
         assertEquals(
                 "CREATE TABLE IF NOT EXISTS " + NamingHelper.toTableName(MultiColumnUniqueModel.class) +
                         " ( ID INTEGER PRIMARY KEY AUTOINCREMENT , " +
                         "A INTEGER, B INTEGER, " +
                         "UNIQUE(A, B) ON CONFLICT REPLACE ) ",
-                createSQL);
+                createSQL.first);
     }
 
     @Test
