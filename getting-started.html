@@ -18,6 +18,7 @@ title: Getting Started
           <li><a href="#configuration">Configuration</a></li>
           <li><a href="#entities">Entities</a></li>
           <li><a href="#usage">Usage</a></li>
+          <li><a href="#notes">Notes</a></li>
         </ul>
       </div>
     </div>
@@ -192,7 +193,17 @@ Book.deleteAll(Book.class);
 {% endhighlight %}
           </div>
         </section>
-
+        <section id="notes">
+          <div class="page-header">
+            <h1>5. Notes</h1>
+            <p class="lead">SugarORM fails to create tables</p>
+            You might get a similar error like this:
+            {% highlight %}
+            android.database.sqlite.SQLiteException: no such table: ... (code 1): , while compiling
+            {% endhighlight %}
+            This problem might be caused by Android Studio's Instant Run feature. Disable "Instant Run" in your Android Studio settings (File > Settings > Instant Run) and try again.
+          </div>
+        </section>
     </div>
   </div>
 </div>
