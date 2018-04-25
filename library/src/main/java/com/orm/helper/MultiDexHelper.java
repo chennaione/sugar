@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,7 +115,10 @@ public final class MultiDexHelper {
                     classNames.add(dexEntries.nextElement());
                 }
             } catch (IOException e) {
-                throw new IOException("Error at loading dex file '" + path + "'");
+                Log.e( "MultiDexHelper", "Error at loading dex file '" + path + "'");
+                Log.e( "MultiDexHelper", e.getMessage() );
+
+               // throw new IOException("Error at loading dex file '" + path + "'");
             }
         }
         return classNames;
