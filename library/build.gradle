@@ -1,29 +1,36 @@
-buildscript {
-        repositories {
-            mavenCentral()
-        }
+apply plugin: 'com.android.library'
+apply from: '../maven_push.gradle'
 
-        dependencies {
-            classpath 'com.android.tools.build:gradle:0.9.+'
-        }
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 23
     }
-
-    apply plugin: 'android-library'
-
-    dependencies {
-        compile 'com.android.support:support-v4:19.0.1'
-    }
-
-    android {
-        compileSdkVersion 19
-        buildToolsVersion "19.0.3"
-        sourceSets {
-            main {
-                manifest.srcFile 'AndroidManifest.xml'
-                java.srcDirs = ['src']
-                resources.srcDirs = ['src']
-                res.srcDirs = ['res']
-                assets.srcDirs = ['assets']
-            }
+    buildTypes {
+        release {
+            minifyEnabled false
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:3.0'
+}
+
+task libraryJar(type: Jar) {
+    dependsOn assembleRelease
+    from android.sourceSets.main.java.srcDirs,
+         ['build/intermediates/classes/release/'] // Add the release classes into the jar
+    baseName 'sugar'
+}
+
