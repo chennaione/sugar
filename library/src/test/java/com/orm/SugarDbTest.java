@@ -11,6 +11,7 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author jonatan.salas
@@ -24,18 +25,18 @@ public final class SugarDbTest {
     //TODO check this better!
     public void testGetReadableDatabase() {
         final SQLiteDatabase db = sugarDb.getReadableDatabase();
-        assertEquals(false, db.isReadOnly());
+	    assertFalse(db.isReadOnly());
     }
 
     @Test
     public void testGetWritableDatabase() {
         final SQLiteDatabase db = sugarDb.getWritableDatabase();
-        assertEquals(false, db.isReadOnly());
+	    assertFalse(db.isReadOnly());
     }
 
     @Test
     public void testGetDB() {
         final SQLiteDatabase db = sugarDb.getDB();
-        assertEquals(false, db.isReadOnly());
+	    assertFalse(db.isReadOnly());
     }
 }

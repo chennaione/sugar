@@ -12,7 +12,7 @@ public final class MigrationFileParserTest {
     public void testSingleLineStatement() {
         MigrationFileParser singleLineComment = new MigrationFileParser("insert into table--comment");
 
-        String statements[] = singleLineComment.getStatements();
+	    String[] statements = singleLineComment.getStatements();
         assertEquals("Testing single line statement size",1,statements.length);
         assertEquals("Testing single line statement content","insert into table",statements[0]);
 
@@ -27,7 +27,7 @@ public final class MigrationFileParserTest {
     public void testMultiLineComment() {
         MigrationFileParser multiLineComment = new MigrationFileParser("insert into table /**comment \n new line 2 \n new line 3 */hello");
 
-        String statements[] = multiLineComment.getStatements();
+	    String[] statements = multiLineComment.getStatements();
         assertEquals("Testing multiline statement size",1,statements.length);
         assertEquals("Testing multiline comment","insert into table hello",statements[0]);
     }
@@ -36,7 +36,7 @@ public final class MigrationFileParserTest {
     public void testMixedComment() {
         MigrationFileParser mixedComment = new MigrationFileParser("insert into/*multiline\n **comment*/--comment");
 
-        String statements[] = mixedComment.getStatements();
+	    String[] statements = mixedComment.getStatements();
 
         assertEquals("Testing mixed comment statement size",1,statements.length);
         assertEquals("Testing mixed comment statments", "insert into", statements[0]);

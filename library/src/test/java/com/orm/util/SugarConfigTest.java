@@ -28,6 +28,6 @@ public final class SugarConfigTest {
     @Test
     public void testClearCache() {
         SugarConfig.clearCache();
-        Assert.assertEquals(true, SugarConfig.fields.isEmpty());
+	    Assert.assertTrue(SugarConfig.fields.isEmpty());
     }
 }

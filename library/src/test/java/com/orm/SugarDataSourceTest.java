@@ -59,7 +59,7 @@ public final class SugarDataSourceTest {
                     @Override
                     public void onSuccess(Boolean result) {
                         assertNotNull(result);
-                        assertEquals(true, result.booleanValue());
+                        assertTrue(result.booleanValue());
                     }
                 },
                 new SugarDataSource.ErrorCallback() {

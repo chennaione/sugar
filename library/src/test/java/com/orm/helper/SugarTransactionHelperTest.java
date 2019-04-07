@@ -18,6 +18,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author jonatan.salas
@@ -67,9 +68,9 @@ public final class SugarTransactionHelperTest {
 
         final List<TestRecord> results = TestRecord.listAll(TestRecord.class);
 
-        assertEquals(true, inList(results, record1));
-        assertEquals(true, inList(results, record2));
-        assertEquals(true, inList(results, record3));
+	    assertTrue(inList(results, record1));
+	    assertTrue(inList(results, record2));
+	    assertTrue(inList(results, record3));
     }
 
     private boolean inList(List<TestRecord> list, TestRecord testRecord) {

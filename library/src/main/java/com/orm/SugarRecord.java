@@ -200,7 +200,7 @@ public class SugarRecord {
 
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
 
-        String args[];
+	    String[] args;
         args = (whereArgs == null) ? null : replaceArgs(whereArgs);
 
         Cursor cursor = getSugarDataBase().query(NamingHelper.toTableName(type), null, whereClause, args,
@@ -210,7 +210,7 @@ public class SugarRecord {
     }
 
     public static <T> List<T> findOneToMany(Class<T> type, String relationFieldName, Object relationObject, Long relationObjectId) {
-        String args[] = { String.valueOf(relationObjectId) };
+	    String[] args = {String.valueOf(relationObjectId)};
         String whereClause = NamingHelper.toSQLNameDefault(relationFieldName) + " = ?";
 
         Cursor cursor = getSugarDataBase().query(NamingHelper.toTableName(type), null, whereClause, args,

@@ -44,8 +44,8 @@ public final class ReflectionUtilTest {
             strings.add(field.getName());
         }
 
-        Assert.assertEquals(true, strings.contains("id"));
-        Assert.assertEquals(true, strings.contains("name"));
+        Assert.assertTrue(strings.contains("id"));
+        Assert.assertTrue(strings.contains("name"));
     }
 
     @Test(expected = NoSuchFieldException.class)

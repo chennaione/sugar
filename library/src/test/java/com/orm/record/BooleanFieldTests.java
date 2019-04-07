@@ -14,7 +14,9 @@ import static com.orm.SugarRecord.save;
 import static com.orm.SugarRecord.findById;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
@@ -31,7 +33,7 @@ public final class BooleanFieldTests {
     public void nullRawBooleanExtendedTest() {
         save(new BooleanFieldExtendedModel());
         BooleanFieldExtendedModel model = findById(BooleanFieldExtendedModel.class, 1);
-        assertEquals(false, model.getRawBoolean());
+	    assertFalse(model.getRawBoolean());
     }
 
     @Test
@@ -45,7 +47,7 @@ public final class BooleanFieldTests {
     public void nullRawBooleanAnnotatedTest() {
         save(new BooleanFieldAnnotatedModel());
         BooleanFieldAnnotatedModel model = findById(BooleanFieldAnnotatedModel.class, 1);
-        assertEquals(false, model.getRawBoolean());
+	    assertFalse(model.getRawBoolean());
     }
 
 ////TODO check this method
@@ -60,7 +62,7 @@ public final class BooleanFieldTests {
     public void rawBooleanExtendedTest() {
         save(new BooleanFieldExtendedModel(true));
         BooleanFieldExtendedModel model = findById(BooleanFieldExtendedModel.class, 1);
-        assertEquals(true, model.getRawBoolean());
+	    assertTrue(model.getRawBoolean());
     }
 
 //    //TODO check this
@@ -78,6 +80,6 @@ public final class BooleanFieldTests {
     public void rawBooleanAnnotatedTest() {
         save(new BooleanFieldAnnotatedModel(true));
         BooleanFieldAnnotatedModel model = findById(BooleanFieldAnnotatedModel.class, 1);
-        assertEquals(true, model.getRawBoolean());
+	    assertTrue(model.getRawBoolean());
     }
 }

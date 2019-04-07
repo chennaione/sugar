@@ -4,11 +4,11 @@ import com.orm.annotation.Table;
 
 @Table
 public class EnumFieldAnnotatedModel {
-    public static enum DefaultEnum {
+    public enum DefaultEnum {
         ONE, TWO
     }
 
-    public static enum OverrideEnum {
+    public enum OverrideEnum {
         ONE, TWO;
 
         @Override

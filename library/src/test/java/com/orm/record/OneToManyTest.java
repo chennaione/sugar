@@ -134,6 +134,6 @@ public class OneToManyTest {
 
         WithoutOneToManyAnnotationModel result = findById(WithoutOneToManyAnnotationModel.class, 1l);
 
-        Assert.assertEquals(null, result.getModels());
+        Assert.assertNull(result.getModels());
     }
 }

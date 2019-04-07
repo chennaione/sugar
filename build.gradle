@@ -1,22 +1,21 @@
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'java'
-
 buildscript {
     repositories {
+        google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:3.4.0-rc03'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.3.1'
     }
 }
-
 def isReleaseBuild() {
     return version.contains("SNAPSHOT") == false
 }
-test{
-    testLogging{
+test {
+    testLogging {
         exceptionFormat = 'full'
     }
 }
@@ -25,12 +24,12 @@ allprojects {
     group = GROUP
 
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
         jcenter()
     }
 }
-
 subprojects { proj ->
     apply plugin: 'jacoco'
 
@@ -46,9 +45,9 @@ subprojects { proj ->
             html.enabled = true
         }
         classDirectories = fileTree(
-            dir: 'build/intermediates/classes/debug',
-            excludes: ['**/R*.class',
-                       '**/BuildConfig*'])
+                dir: 'build/intermediates/classes/debug',
+                excludes: ['**/R*.class',
+                           '**/BuildConfig*'])
         sourceDirectories = files('src/main/java')
         executionData = files('build/jacoco/testDebugUnitTest.exec')
         doFirst {
@@ -60,11 +59,9 @@ subprojects { proj ->
         }
     }
 }
-
 jacoco {
     toolVersion "0.7.1.201405082137"
 }
-
 task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     group = "Reporting"
     description = 'Generates an aggregate report from all subprojects'
@@ -88,16 +85,16 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
         executionData = files(executionData.findAll { it.exists() })
     }
 }
-
 coveralls {
     sourceDirs = files('library/src/main/java').flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
-
 tasks.coveralls {
     group = 'Coverage reports'
     description = 'Uploads the aggregated coverage report to Coveralls'
 
     dependsOn jacocoRootReport
     onlyIf { System.env.'CI' }
+}
+dependencies {
 }

@@ -3,11 +3,11 @@ package com.orm.model;
 import com.orm.SugarRecord;
 
 public class EnumFieldExtendedModel extends SugarRecord {
-    public static enum DefaultEnum {
+    public enum DefaultEnum {
         ONE, TWO
     }
 
-    public static enum OverrideEnum {
+    public enum OverrideEnum {
         ONE, TWO;
 
         @Override
