@@ -1,18 +1,17 @@
 package com.orm.model;
 
-
 import com.orm.SugarRecord;
 
 public class NestedMixedABModel extends SugarRecord {
-    private RelationshipMixedBModel nested;
+	private RelationshipMixedBModel nested;
 
-    public NestedMixedABModel() {}
+	public NestedMixedABModel() {}
 
-    public NestedMixedABModel(RelationshipMixedBModel nested) {
-        this.nested = nested;
-    }
+	public NestedMixedABModel(RelationshipMixedBModel nested) {
+		this.nested = nested;
+	}
 
-    public RelationshipMixedBModel getNested() {
-        return nested;
-    }
+	public RelationshipMixedBModel getNested() {
+		return nested;
+	}
 }

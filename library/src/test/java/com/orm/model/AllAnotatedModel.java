@@ -12,14 +12,15 @@ import com.orm.annotation.Unique;
 @Table
 public class AllAnotatedModel {
 
-    @NotNull @Unique
-    private Long id;
+	@NotNull
+	@Unique
+	private Long id;
 
-    @Column(notNull = true, name = "name", unique = true)
-    private String name;
+	@Column(notNull = true, name = "name", unique = true)
+	private String name;
 
-    @Ignore
-    private String surname;
+	@Ignore
+	private String surname;
 
-    public AllAnotatedModel() { }
+	public AllAnotatedModel() { }
 }

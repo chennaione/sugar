@@ -4,25 +4,25 @@ import com.orm.annotation.Table;
 
 @Table
 public class LongFieldAnnotatedModel {
-    private Long objectLong;
-    private long rawLong;
-    private Long id;
+	private Long objectLong;
+	private long rawLong;
+	private Long id;
 
-    public LongFieldAnnotatedModel() {}
+	public LongFieldAnnotatedModel() {}
 
-    public LongFieldAnnotatedModel(Long objectLong) {
-        this.objectLong = objectLong;
-    }
+	public LongFieldAnnotatedModel(Long objectLong) {
+		this.objectLong = objectLong;
+	}
 
-    public LongFieldAnnotatedModel(long rawLong) {
-        this.rawLong = rawLong;
-    }
+	public LongFieldAnnotatedModel(long rawLong) {
+		this.rawLong = rawLong;
+	}
 
-    public Long getLong() {
-        return objectLong;
-    }
+	public Long getLong() {
+		return objectLong;
+	}
 
-    public long getRawLong() {
-        return rawLong;
-    }
+	public long getRawLong() {
+		return rawLong;
+	}
 }

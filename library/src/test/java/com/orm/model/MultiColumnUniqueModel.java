@@ -9,13 +9,13 @@ import com.orm.annotation.MultiUnique;
 @MultiUnique("a, b")
 public class MultiColumnUniqueModel extends SugarRecord {
 
-    private int a;
-    private int b;
+	private int a;
+	private int b;
 
-    public MultiColumnUniqueModel() { }
+	public MultiColumnUniqueModel() { }
 
-    public MultiColumnUniqueModel(int a, int b) {
-        this.a = a;
-        this.b = b;
-    }
+	public MultiColumnUniqueModel(int a, int b) {
+		this.a = a;
+		this.b = b;
+	}
 }

@@ -4,20 +4,20 @@ import com.orm.annotation.Table;
 
 @Table
 public class ByteArrayAnnotatedModel {
-    private byte[] byteArray;
-    private Long id;
+	private byte[] byteArray;
+	private Long id;
 
-    public ByteArrayAnnotatedModel() {}
+	public ByteArrayAnnotatedModel() {}
 
-    public ByteArrayAnnotatedModel(byte[] byteArray) {
-        this.byteArray = byteArray;
-    }
+	public ByteArrayAnnotatedModel(byte[] byteArray) {
+		this.byteArray = byteArray;
+	}
 
-    public byte[] getByteArray() {
-        return byteArray;
-    }
+	public byte[] getByteArray() {
+		return byteArray;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 }

@@ -4,20 +4,20 @@ import com.orm.annotation.Table;
 
 @Table
 public class RelationshipAnnotatedModel {
-    private SimpleAnnotatedModel simple;
-    private Long id;
+	private SimpleAnnotatedModel simple;
+	private Long id;
 
-    public RelationshipAnnotatedModel() {}
+	public RelationshipAnnotatedModel() {}
 
-    public RelationshipAnnotatedModel(SimpleAnnotatedModel simple) {
-        this.simple = simple;
-    }
+	public RelationshipAnnotatedModel(SimpleAnnotatedModel simple) {
+		this.simple = simple;
+	}
 
-    public SimpleAnnotatedModel getSimple() {
-        return simple;
-    }
+	public SimpleAnnotatedModel getSimple() {
+		return simple;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 }

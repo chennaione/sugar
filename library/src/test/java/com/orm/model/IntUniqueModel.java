@@ -8,12 +8,12 @@ import com.orm.annotation.Unique;
  */
 public class IntUniqueModel extends SugarRecord {
 
-    @Unique
-    private int value;
+	@Unique
+	private int value;
 
-    public IntUniqueModel() { }
+	public IntUniqueModel() { }
 
-    public IntUniqueModel(int value) {
-        this.value = value;
-    }
+	public IntUniqueModel(int value) {
+		this.value = value;
+	}
 }
