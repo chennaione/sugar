@@ -15,19 +15,19 @@ import java.util.List;
  */
 public final class SugarConfigTest {
 
-    @Test
-    public void testSetGetFields() {
-        Field[] fields = TestRecord.class.getFields();
+	@Test
+	public void testSetGetFields() {
+		Field[] fields = TestRecord.class.getFields();
 
-        List<Field> fieldList = Arrays.asList(fields);
-        SugarConfig.setFields(TestRecord.class, fieldList);
+		List<Field> fieldList = Arrays.asList(fields);
+		SugarConfig.setFields(TestRecord.class, fieldList);
 
-        Assert.assertEquals(fieldList, SugarConfig.getFields(TestRecord.class));
-    }
+		Assert.assertEquals(fieldList, SugarConfig.getFields(TestRecord.class));
+	}
 
-    @Test
-    public void testClearCache() {
-        SugarConfig.clearCache();
-        Assert.assertEquals(true, SugarConfig.fields.isEmpty());
-    }
+	@Test
+	public void testClearCache() {
+		SugarConfig.clearCache();
+		Assert.assertTrue(SugarConfig.fields.isEmpty());
+	}
 }

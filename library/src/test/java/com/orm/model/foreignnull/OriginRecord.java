@@ -16,5 +16,4 @@ public class OriginRecord {
 		this.origin = origin;
 	}
 
-
 }

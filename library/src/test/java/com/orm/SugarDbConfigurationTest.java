@@ -1,46 +1,39 @@
 package com.orm;
 
-import com.orm.dsl.BuildConfig;
+import org.junit.*;
+import org.junit.runner.*;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
+import java.util.*;
 
-import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * @author jonatan.salas
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk = 16, constants = BuildConfig.class)
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 16/*, constants = BuildConfig.class*/)
 public final class SugarDbConfigurationTest {
 
-    @Test
-    public void testNotNullConfiguration() {
-        SugarDbConfiguration configuration = new SugarDbConfiguration()
-                .setDatabaseLocale(Locale.getDefault())
-                .setMaxSize(1024L)
-                .setPageSize(400L);
+	@Test
+	public void testNotNullConfiguration() {
+		SugarDbConfiguration configuration = new SugarDbConfiguration().setDatabaseLocale(Locale.getDefault()).setMaxSize(1024L).setPageSize(400L);
 
-        SugarContext.init(RuntimeEnvironment.application, configuration);
+		SugarContext.init(RuntimeEnvironment.application, configuration);
 
-        final SugarDbConfiguration config = SugarContext.getDbConfiguration();
+		final SugarDbConfiguration config = SugarContext.getDbConfiguration();
 
-        assertEquals(configuration.getDatabaseLocale(), config.getDatabaseLocale());
-        assertEquals(configuration.getMaxSize(), config.getMaxSize());
-        assertEquals(configuration.getPageSize(), config.getPageSize());
-    }
+		assertEquals(configuration.getDatabaseLocale(), config.getDatabaseLocale());
+		assertEquals(configuration.getMaxSize(), config.getMaxSize());
+		assertEquals(configuration.getPageSize(), config.getPageSize());
+	}
 
-    @Test
-    public void testNullConfiguration() {
-        SugarContext.init(RuntimeEnvironment.application);
-        assertNull(SugarContext.getDbConfiguration());
-    }
+	@Test
+	public void testNullConfiguration() {
+		SugarContext.init(RuntimeEnvironment.application);
+		assertNull(SugarContext.getDbConfiguration());
+	}
 
 //    @Test
 //    public void testNotNullConfigurationWithSugarDb() {

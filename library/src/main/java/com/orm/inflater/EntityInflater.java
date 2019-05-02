@@ -1,6 +1,8 @@
 package com.orm.inflater;
 
 import android.database.Cursor;
+import android.util.*;
+
 import com.orm.SugarRecord;
 import com.orm.inflater.field.*;
 import com.orm.util.ReflectionUtil;
@@ -18,6 +20,9 @@ public class EntityInflater {
     private Object relationObject;
     private String relationFieldName;
     private Map<Object, Long> entitiesMap;
+
+    private static final String LOG_TAG = "EntityInflater";
+
 
     public EntityInflater withCursor(Cursor cursor) {
         this.cursor = cursor;
@@ -45,6 +50,8 @@ public class EntityInflater {
     }
 
     public void inflate() {
+        Log.w(LOG_TAG, this.toString());
+
         List<Field> columns = ReflectionUtil.getTableFields(object.getClass());
         Long objectId = cursor.getLong(cursor.getColumnIndex(("ID")));
         if (!entitiesMap.containsKey(object)) {
@@ -71,5 +78,9 @@ public class EntityInflater {
 
             fieldInflater.inflate();
         }
+    }
+    @Override
+    public String toString() {
+        return "{" + "cursor=" + cursor + ", object=" + object + ", relationObject=" + relationObject + ", relationFieldName='" + relationFieldName + '\'' + ", entitiesMap=" + entitiesMap + '}';
     }
 }

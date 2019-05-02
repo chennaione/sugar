@@ -1,25 +1,21 @@
 package com.orm;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteStatement;
-import android.text.TextUtils;
-import android.util.Log;
-import com.orm.annotation.Table;
-import com.orm.annotation.Unique;
-import com.orm.helper.ManifestHelper;
-import com.orm.helper.NamingHelper;
-import com.orm.inflater.EntityInflater;
-import com.orm.util.QueryBuilder;
-import com.orm.util.ReflectionUtil;
-import com.orm.util.SugarCursor;
+import android.annotation.*;
+import android.content.*;
+import android.database.*;
+import android.database.sqlite.*;
+import android.text.*;
+import android.util.*;
 
-import java.lang.reflect.Field;
+import com.orm.annotation.*;
+import com.orm.helper.*;
+import com.orm.inflater.*;
+import com.orm.util.*;
+
+import java.lang.reflect.*;
 import java.util.*;
 
-import static com.orm.SugarContext.getSugarContext;
+import static com.orm.SugarContext.*;
 
 public class SugarRecord {
     public static final String SUGAR = "Sugar";
@@ -200,7 +196,7 @@ public class SugarRecord {
 
     public static <T> List<T> find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit) {
 
-        String args[];
+	    String[] args;
         args = (whereArgs == null) ? null : replaceArgs(whereArgs);
 
         Cursor cursor = getSugarDataBase().query(NamingHelper.toTableName(type), null, whereClause, args,
@@ -210,7 +206,7 @@ public class SugarRecord {
     }
 
     public static <T> List<T> findOneToMany(Class<T> type, String relationFieldName, Object relationObject, Long relationObjectId) {
-        String args[] = { String.valueOf(relationObjectId) };
+	    String[] args = {String.valueOf(relationObjectId)};
         String whereClause = NamingHelper.toSQLNameDefault(relationFieldName) + " = ?";
 
         Cursor cursor = getSugarDataBase().query(NamingHelper.toTableName(type), null, whereClause, args,
@@ -321,6 +317,16 @@ public class SugarRecord {
         ContentValues values = new ContentValues(columns.size());
         Field idField = null;
         for (Field column : columns) {
+            if (column.isAnnotationPresent(Follow.class)) {
+                Log.w("sugarNested Follow", column.getType().getName());
+                // Recursive idea
+                // https://github.com/iweinzierl/sugar/commit/274a572bdb9a5775bb7686f45098d4e94d6f6fb1
+                try {
+                    save(column.get(object)/*Class.forName(column.getType().getName())*/);
+                } catch (@SuppressLint("NewApi") IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
             ReflectionUtil.addFieldValueToColumn(values, column, object, entitiesMap);
             if (column.getName().equals("id")) {
                 idField = column;

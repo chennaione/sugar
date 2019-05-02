@@ -33,7 +33,6 @@ local.properties
 *.xcworkspace
 *_ReSharper*
 
-.DS_Store
 ._.DS_Store
 
 project.properties

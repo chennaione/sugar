@@ -17,7 +17,7 @@ public class SugarContext {
 
     private SugarContext() {
         this.sugarDb = SugarDb.getInstance();
-        this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<Object, Long>());
+        this.entitiesMap = Collections.synchronizedMap(new WeakHashMap<>());
     }
     
     public static SugarContext getSugarContext() {

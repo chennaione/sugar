@@ -3,34 +3,36 @@ package com.orm.util;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author jonatan.salas
  */
 public final class KeyWordUtilTest {
 
-    @Test(expected = IllegalAccessException.class)
-    public void testPrivateConstructor() throws Exception {
-        KeyWordUtil keyWordUtil = KeyWordUtil.class.getDeclaredConstructor().newInstance();
-        assertNull(keyWordUtil);
-    }
+	@Test(expected = IllegalAccessException.class)
+	public void testPrivateConstructor() throws Exception {
+		KeyWordUtil keyWordUtil = KeyWordUtil.class.getDeclaredConstructor().newInstance();
+		assertNull(keyWordUtil);
+	}
 
-    @Test
-    public void testKeyWord() {
-        assertEquals(true, KeyWordUtil.isKeyword("SELECT"));
-        assertEquals(true, KeyWordUtil.isKeyword("TRANSACTION"));
-        assertEquals(true, KeyWordUtil.isKeyword("MATCH"));
-        assertEquals(true, KeyWordUtil.isKeyword("AS"));
-        assertEquals(true, KeyWordUtil.isKeyword("NOTNULL"));
-        assertEquals(true, KeyWordUtil.isKeyword("NOT"));
-        assertEquals(false, KeyWordUtil.isKeyword("PERSONS"));
-        assertEquals(false, KeyWordUtil.isKeyword("NAME"));
-        assertEquals(false, KeyWordUtil.isKeyword("LOCATION"));
-    }
+	@Test
+	public void testKeyWord() {
+		assertTrue(KeyWordUtil.isKeyword("SELECT"));
+		assertTrue(KeyWordUtil.isKeyword("TRANSACTION"));
+		assertTrue(KeyWordUtil.isKeyword("MATCH"));
+		assertTrue(KeyWordUtil.isKeyword("AS"));
+		assertTrue(KeyWordUtil.isKeyword("NOTNULL"));
+		assertTrue(KeyWordUtil.isKeyword("NOT"));
+		assertFalse(KeyWordUtil.isKeyword("PERSONS"));
+		assertFalse(KeyWordUtil.isKeyword("NAME"));
+		assertFalse(KeyWordUtil.isKeyword("LOCATION"));
+	}
 
-    @Test
-    public void testNullKeyword() {
-        assertEquals(false, KeyWordUtil.isKeyword(null));
-    }
+	@Test
+	public void testNullKeyword() {
+		assertFalse(KeyWordUtil.isKeyword(null));
+	}
 }

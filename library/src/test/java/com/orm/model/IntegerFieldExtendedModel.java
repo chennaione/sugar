@@ -3,24 +3,24 @@ package com.orm.model;
 import com.orm.SugarRecord;
 
 public class IntegerFieldExtendedModel extends SugarRecord {
-    private Integer integer;
-    private int rawInteger;
+	private Integer integer;
+	private int rawInteger;
 
-    public IntegerFieldExtendedModel() {}
+	public IntegerFieldExtendedModel() {}
 
-    public IntegerFieldExtendedModel(Integer integer) {
-        this.integer = integer;
-    }
+	public IntegerFieldExtendedModel(Integer integer) {
+		this.integer = integer;
+	}
 
-    public IntegerFieldExtendedModel(int rawInteger) {
-        this.rawInteger = rawInteger;
-    }
+	public IntegerFieldExtendedModel(int rawInteger) {
+		this.rawInteger = rawInteger;
+	}
 
-    public Integer getInteger() {
-        return integer;
-    }
+	public Integer getInteger() {
+		return integer;
+	}
 
-    public int getInt() {
-        return rawInteger;
-    }
+	public int getInt() {
+		return rawInteger;
+	}
 }

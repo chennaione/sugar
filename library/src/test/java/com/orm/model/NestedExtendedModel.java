@@ -1,18 +1,17 @@
 package com.orm.model;
 
-
 import com.orm.SugarRecord;
 
 public class NestedExtendedModel extends SugarRecord {
-    private RelationshipExtendedModel nested;
+	private RelationshipExtendedModel nested;
 
-    public NestedExtendedModel() {}
+	public NestedExtendedModel() {}
 
-    public NestedExtendedModel(RelationshipExtendedModel nested) {
-        this.nested = nested;
-    }
+	public NestedExtendedModel(RelationshipExtendedModel nested) {
+		this.nested = nested;
+	}
 
-    public RelationshipExtendedModel getNested() {
-        return nested;
-    }
+	public RelationshipExtendedModel getNested() {
+		return nested;
+	}
 }
