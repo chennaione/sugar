@@ -11,6 +11,8 @@ We need contributors to help maintain this project, ask @satyan for repo permiss
 
 Otherwise you can use another ORM, like https://github.com/requery/requery or https://realm.io/
 
+One easy way to get started with contribution is by triaging issues. This may include reproducing bug reports or asking for vital information, such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to sugar on CodeTriage](https://www.codetriage.com/satyan/sugar). [![Open Source Helpers](https://www.codetriage.com/satyan/sugar/badges/users.svg)](https://www.codetriage.com/satyan/sugar)
+
 ## Features
 
 Sugar ORM was built in contrast to other ORM's to have:
