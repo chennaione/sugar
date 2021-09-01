@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 //apply from: '../maven_push.gradle'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
     }
     buildTypes {
         release {
@@ -27,8 +27,7 @@ android {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.robolectric:robolectric:3.0'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 task libraryJar(type: Jar) {
