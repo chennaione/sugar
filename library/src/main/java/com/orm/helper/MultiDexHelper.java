@@ -48,8 +48,8 @@ public final class MultiDexHelper {
      * get all the dex path
      *
      * @return all the dex path, including the ones in the newly added instant-run folder
-     * @throws PackageManager.NameNotFoundException
-     * @throws IOException
+     * @throws PackageManager.NameNotFoundException ...
+     * @throws IOException ...
      */
     public static List<String> getSourcePaths() throws PackageManager.NameNotFoundException, IOException {
         ApplicationInfo applicationInfo = getPackageManager().getApplicationInfo(getPackageName(), 0);
@@ -96,8 +96,8 @@ public final class MultiDexHelper {
      * get all the classes name in "classes.dex", "classes2.dex", ....
      *
      * @return all the classes name
-     * @throws PackageManager.NameNotFoundException
-     * @throws IOException
+     * @throws PackageManager.NameNotFoundException ...
+     * @throws IOException ...
      */
     public static List<String> getAllClasses() throws PackageManager.NameNotFoundException, IOException {
         List<String> classNames = new ArrayList<>();
