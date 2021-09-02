@@ -2,40 +2,49 @@ package com.orm;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.orm.app.ClientApp;
-import com.orm.dsl.BuildConfig;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
+import org.robolectric.RobolectricTestRunner;
+
+import androidx.test.core.app.ApplicationProvider;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author jonatan.salas
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
-public final class SugarDbTest {
-    private final SugarDb sugarDb = SugarDb.getInstance();
+@RunWith( RobolectricTestRunner.class )
+public final class SugarDbTest
+{
+    private SugarDb sugarDb;
+
+    @Before
+    public void setUp( )
+    {
+        SugarContext.init( ApplicationProvider.getApplicationContext( ) );
+        sugarDb = SugarDb.getInstance( );
+    }
 
     @Test
     //TODO check this better!
-    public void testGetReadableDatabase() {
-        final SQLiteDatabase db = sugarDb.getReadableDatabase();
-        assertEquals(false, db.isReadOnly());
+    public void testGetReadableDatabase( )
+    {
+        final SQLiteDatabase db = sugarDb.getReadableDatabase( );
+        assertEquals( false, db.isReadOnly( ) );
     }
 
     @Test
-    public void testGetWritableDatabase() {
-        final SQLiteDatabase db = sugarDb.getWritableDatabase();
-        assertEquals(false, db.isReadOnly());
+    public void testGetWritableDatabase( )
+    {
+        final SQLiteDatabase db = sugarDb.getWritableDatabase( );
+        assertEquals( false, db.isReadOnly( ) );
     }
 
     @Test
-    public void testGetDB() {
-        final SQLiteDatabase db = sugarDb.getDB();
-        assertEquals(false, db.isReadOnly());
+    public void testGetDB( )
+    {
+        final SQLiteDatabase db = sugarDb.getDB( );
+        assertEquals( false, db.isReadOnly( ) );
     }
 }

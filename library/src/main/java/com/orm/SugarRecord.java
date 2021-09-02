@@ -318,7 +318,7 @@ public class SugarRecord {
             return result;
         }
 
-        if (whereArgs != null) {
+        if (whereClause != null) {
             for (int i = whereArgs.length; i != 0; i--) {
                 sqLiteStatement.bindString(i, whereArgs[i - 1]);
             }
