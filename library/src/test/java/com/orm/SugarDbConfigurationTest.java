@@ -1,14 +1,14 @@
 package com.orm;
 
-import com.orm.dsl.BuildConfig;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
 
 import java.util.Locale;
+
+import androidx.test.core.app.ApplicationProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -16,30 +16,37 @@ import static org.junit.Assert.assertNull;
 /**
  * @author jonatan.salas
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk = 16, constants = BuildConfig.class)
-public final class SugarDbConfigurationTest {
-
-    @Test
-    public void testNotNullConfiguration() {
-        SugarDbConfiguration configuration = new SugarDbConfiguration()
-                .setDatabaseLocale(Locale.getDefault())
-                .setMaxSize(1024L)
-                .setPageSize(400L);
-
-        SugarContext.init(RuntimeEnvironment.application, configuration);
-
-        final SugarDbConfiguration config = SugarContext.getDbConfiguration();
-
-        assertEquals(configuration.getDatabaseLocale(), config.getDatabaseLocale());
-        assertEquals(configuration.getMaxSize(), config.getMaxSize());
-        assertEquals(configuration.getPageSize(), config.getPageSize());
+@RunWith( RobolectricTestRunner.class )
+public final class SugarDbConfigurationTest
+{
+    @Before
+    public void setUp( )
+    {
+        SugarContext.init( ApplicationProvider.getApplicationContext( ) );
     }
 
     @Test
-    public void testNullConfiguration() {
-        SugarContext.init(RuntimeEnvironment.application);
-        assertNull(SugarContext.getDbConfiguration());
+    public void testNotNullConfiguration( )
+    {
+        SugarDbConfiguration configuration = new SugarDbConfiguration( )
+                .setDatabaseLocale( Locale.getDefault( ) )
+                .setMaxSize( 1024L )
+                .setPageSize( 400L );
+
+        SugarContext.init( RuntimeEnvironment.application, configuration );
+
+        final SugarDbConfiguration config = SugarContext.getDbConfiguration( );
+
+        assertEquals( configuration.getDatabaseLocale( ), config.getDatabaseLocale( ) );
+        assertEquals( configuration.getMaxSize( ), config.getMaxSize( ) );
+        assertEquals( configuration.getPageSize( ), config.getPageSize( ) );
+    }
+
+    @Test
+    public void testNullConfiguration( )
+    {
+        SugarContext.init( RuntimeEnvironment.application );
+        assertNull( SugarContext.getDbConfiguration( ) );
     }
 
 //    @Test

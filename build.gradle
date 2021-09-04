@@ -70,10 +70,10 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     description = 'Generates an aggregate report from all subprojects'
     dependsOn(subprojects.jacocoTestReport)
 
-    additionalSourceDirs = files('library/src/main/java')
-    sourceDirectories = files('library/src/main/java')
-    classDirectories = files('library/build/intermediates/classes/debug')
-    executionData = files(subprojects.jacocoTestReport.executionData)
+    getAdditionalSourceDirs().setFrom(files('src/main/java'))
+    getSourceDirectories().setFrom(files('src/main/java'))
+    getClassDirectories().setFrom(files('build/intermediates/classes/debug'))
+    getExecutionData().setFrom(files(subprojects.jacocoTestReport.executionData))
 
     reports {
         html.enabled = true
@@ -90,7 +90,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 }
 
 coveralls {
-    sourceDirs = files('library/src/main/java').flatten()
+    sourceDirs = files('src/main/java').flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 

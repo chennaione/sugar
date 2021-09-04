@@ -1,86 +1,100 @@
 package com.orm.record;
 
-import com.orm.app.ClientApp;
-import com.orm.dsl.BuildConfig;
+import com.orm.SugarContext;
 import com.orm.model.EnumFieldAnnotatedModel;
 import com.orm.model.EnumFieldExtendedModel;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
+import org.robolectric.RobolectricTestRunner;
 
-import static com.orm.SugarRecord.save;
+import androidx.test.core.app.ApplicationProvider;
+
 import static com.orm.SugarRecord.findById;
+import static com.orm.SugarRecord.save;
 import static com.orm.model.EnumFieldExtendedModel.DefaultEnum;
 import static com.orm.model.EnumFieldExtendedModel.OverrideEnum;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(sdk = 18, constants = BuildConfig.class, application = ClientApp.class, packageName = "com.orm.model", manifest = Config.NONE)
-public final class EnumFieldTests {
-
-    @Test
-    public void nullDefaultEnumExtendedTest() {
-        save(new EnumFieldExtendedModel());
-        EnumFieldExtendedModel model = findById(EnumFieldExtendedModel.class, 1);
-        assertNull(model.getDefaultEnum());
+@RunWith( RobolectricTestRunner.class )
+public final class EnumFieldTests
+{
+    @Before
+    public void setUp( )
+    {
+        SugarContext.init( ApplicationProvider.getApplicationContext( ) );
     }
 
     @Test
-    public void nullOverriddenEnumExtendedTest() {
-        save(new EnumFieldExtendedModel());
-        EnumFieldExtendedModel model = findById(EnumFieldExtendedModel.class, 1);
-        assertNull(model.getOverrideEnum());
-    }
-    @Test
-    public void nullDefaultEnumAnnotatedTest() {
-        save(new EnumFieldAnnotatedModel());
-        EnumFieldAnnotatedModel model = findById(EnumFieldAnnotatedModel.class, 1);
-        assertNull(model.getDefaultEnum());
+    public void nullDefaultEnumExtendedTest( )
+    {
+        save( new EnumFieldExtendedModel( ) );
+        EnumFieldExtendedModel model = findById( EnumFieldExtendedModel.class, 1 );
+        assertNull( model.getDefaultEnum( ) );
     }
 
     @Test
-    public void nullOverriddenEnumAnnotatedTest() {
-        save(new EnumFieldAnnotatedModel());
-        EnumFieldAnnotatedModel model = findById(EnumFieldAnnotatedModel.class, 1);
-        assertNull(model.getOverrideEnum());
+    public void nullOverriddenEnumExtendedTest( )
+    {
+        save( new EnumFieldExtendedModel( ) );
+        EnumFieldExtendedModel model = findById( EnumFieldExtendedModel.class, 1 );
+        assertNull( model.getOverrideEnum( ) );
     }
 
     @Test
-    public void defaultEnumExtendedTest() {
-        save(new EnumFieldExtendedModel(OverrideEnum.ONE, DefaultEnum.TWO));
-        EnumFieldExtendedModel model = findById(EnumFieldExtendedModel.class, 1);
-        assertNotNull(model);
-        assertEquals(model.getDefaultEnum(), DefaultEnum.TWO);
+    public void nullDefaultEnumAnnotatedTest( )
+    {
+        save( new EnumFieldAnnotatedModel( ) );
+        EnumFieldAnnotatedModel model = findById( EnumFieldAnnotatedModel.class, 1 );
+        assertNull( model.getDefaultEnum( ) );
     }
 
     @Test
-    public void overriddenEnumExtendedTest() {
-        save(new EnumFieldExtendedModel(OverrideEnum.ONE, DefaultEnum.TWO));
-        EnumFieldExtendedModel model = findById(EnumFieldExtendedModel.class, 1);
-        assertNotNull(model);
-        assertEquals(model.getOverrideEnum(), OverrideEnum.ONE);
+    public void nullOverriddenEnumAnnotatedTest( )
+    {
+        save( new EnumFieldAnnotatedModel( ) );
+        EnumFieldAnnotatedModel model = findById( EnumFieldAnnotatedModel.class, 1 );
+        assertNull( model.getOverrideEnum( ) );
     }
 
     @Test
-    public void defaultEnumAnnotatedTest() {
-        save(new EnumFieldAnnotatedModel(EnumFieldAnnotatedModel.OverrideEnum.ONE,
-                EnumFieldAnnotatedModel.DefaultEnum.TWO));
-        EnumFieldAnnotatedModel model = findById(EnumFieldAnnotatedModel.class, 1);
-        assertNotNull(model);
-        assertEquals(model.getDefaultEnum(), EnumFieldAnnotatedModel.DefaultEnum.TWO);
+    public void defaultEnumExtendedTest( )
+    {
+        save( new EnumFieldExtendedModel( OverrideEnum.ONE, DefaultEnum.TWO ) );
+        EnumFieldExtendedModel model = findById( EnumFieldExtendedModel.class, 1 );
+        assertNotNull( model );
+        assertEquals( model.getDefaultEnum( ), DefaultEnum.TWO );
     }
 
     @Test
-    public void overriddenEnumAnnotatedTest() {
-        save(new EnumFieldAnnotatedModel(EnumFieldAnnotatedModel.OverrideEnum.ONE,
-                EnumFieldAnnotatedModel.DefaultEnum.TWO));
-        EnumFieldAnnotatedModel model = findById(EnumFieldAnnotatedModel.class, 1);
-        assertNotNull(model);
-        assertEquals(model.getOverrideEnum(), EnumFieldAnnotatedModel.OverrideEnum.ONE);
+    public void overriddenEnumExtendedTest( )
+    {
+        save( new EnumFieldExtendedModel( OverrideEnum.ONE, DefaultEnum.TWO ) );
+        EnumFieldExtendedModel model = findById( EnumFieldExtendedModel.class, 1 );
+        assertNotNull( model );
+        assertEquals( model.getOverrideEnum( ), OverrideEnum.ONE );
+    }
+
+    @Test
+    public void defaultEnumAnnotatedTest( )
+    {
+        save( new EnumFieldAnnotatedModel( EnumFieldAnnotatedModel.OverrideEnum.ONE,
+                EnumFieldAnnotatedModel.DefaultEnum.TWO ) );
+        EnumFieldAnnotatedModel model = findById( EnumFieldAnnotatedModel.class, 1 );
+        assertNotNull( model );
+        assertEquals( model.getDefaultEnum( ), EnumFieldAnnotatedModel.DefaultEnum.TWO );
+    }
+
+    @Test
+    public void overriddenEnumAnnotatedTest( )
+    {
+        save( new EnumFieldAnnotatedModel( EnumFieldAnnotatedModel.OverrideEnum.ONE,
+                EnumFieldAnnotatedModel.DefaultEnum.TWO ) );
+        EnumFieldAnnotatedModel model = findById( EnumFieldAnnotatedModel.class, 1 );
+        assertNotNull( model );
+        assertEquals( model.getOverrideEnum( ), EnumFieldAnnotatedModel.OverrideEnum.ONE );
     }
 }
